@@ -1,15 +1,15 @@
 class FloorCalculator
 
   def calculate_floor(input)
-    floor = 0
-    input.each_char do |char|
+    input.each_char.reduce(0) do |floor, char|
       if char == "("
-        floor += 1
+        floor + 1
       elsif char == ")"
-        floor -=1
+        floor - 1
+      else
+        floor
       end
     end
-    floor
   end
 end
 
