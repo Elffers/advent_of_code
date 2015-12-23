@@ -19,3 +19,34 @@
 # square feet of wrapping paper plus 1 square foot of slack, for a total of 43
 # square feet.  All numbers in the elves' list are in feet. How many total
 # square feet of wrapping paper should they order?
+
+class WrapperCalculator
+  attr_accessor :measurements
+  def initialize(input)
+    @measurements = File.readlines(input)
+  end
+
+  def calculate
+    # handle malformed lines?
+    measurements.map do |line|
+      dimensions = parse_dimensions(line)
+      measure(dimensions)
+    end.reduce(:+)
+  end
+
+  def measure(dimensions)
+    l, w, h = dimensions
+    dimensions.sort!.pop
+    smallest = dimensions.reduce(:*)
+    2*(l*w + w*h + l*h) + smallest
+  end
+
+  def parse_dimensions(line)
+    line.split("x").map(&:to_i)
+  end
+end
+
+if $0 == __FILE__
+  wc = WrapperCalculator.new('day2_input.txt')
+  p wc.calculate
+end
