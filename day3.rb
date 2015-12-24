@@ -18,3 +18,44 @@
 # the east.  ^>v< delivers presents to 4 houses in a square, including twice
 # to the house at his starting/ending location.  ^v^v^v^v^v delivers a bunch
 # of presents to some very lucky children at only 2 houses.
+
+class Mapper
+  attr_accessor :visited, :row, :column
+
+  def initialize
+    @visited = Hash.new do |h, row|
+      h[row] = Hash.new false # column => visited
+    end
+    @row = 0
+    @column = 0
+  end
+
+  def count_houses(input)
+    input.each_char.reduce 1 do |count, char|
+      @visited[@row][@column] = true
+
+      case char
+      when ">"
+        @column += 1
+      when "^"
+        @row -= 1
+      when "<"
+        @column -= 1
+      when "v"
+        @row += 1
+      end
+
+      if @visited[@row][@column] == false
+        count + 1
+      else
+        count
+      end
+    end
+  end
+end
+
+if $0 == __FILE__
+  input = File.read('day3_input.txt')
+  mapper = Mapper.new
+  p mapper.count_houses(input)
+end
