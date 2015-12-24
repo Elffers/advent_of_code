@@ -86,16 +86,24 @@ class Mapper
   end
 
   def count_houses(input)
-    input.each_char.reduce 1 do |count, char|
+    input.each_char.with_index.reduce 1 do |count, (char, index)|
+      santa = get_santa(index)
       @visited[santa.row][santa.column] = true
       santa.move(char)
-
-      if @visited[santa.row][santa.column] == false
-        count + 1
-      else
-        count
-      end
+      increment(count, santa)
     end
+  end
+
+  def increment(count, santa)
+    if @visited[santa.row][santa.column] == false
+      count + 1
+    else
+      count
+    end
+  end
+
+  def get_santa(index)
+    @santa
   end
 end
 
@@ -107,19 +115,8 @@ class RoboMapper < Mapper
     super
   end
 
-  def count_houses(input)
-    input.each_char.with_index.reduce 1 do |count, (char, i)|
-      santa = i.even? ? @santa : @robosanta
-
-      @visited[santa.row][santa.column] = true
-      santa.move(char)
-
-      if @visited[santa.row][santa.column] == false
-        count + 1
-      else
-        count
-      end
-    end
+  def get_santa(index)
+    index.even? ? @santa : @robosanta
   end
 end
 
