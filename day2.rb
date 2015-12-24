@@ -28,10 +28,10 @@ class WrapperCalculator
 
   def calculate
     # handle malformed lines?
-    measurements.map do |line|
+    measurements.reduce(0) do |memo, line|
       dimensions = parse_dimensions(line)
-      measure(dimensions)
-    end.reduce(:+)
+      measure(dimensions) + memo
+    end
   end
 
   def measure(dimensions)
