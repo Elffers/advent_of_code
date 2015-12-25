@@ -43,15 +43,21 @@
 class FloorCalculator
 
   def calculate_floor(input)
-    input.each_char.reduce(0) do |floor, char|
+    floor = 0
+    input.each_char.with_index do |char, index|
       if char == "("
-        floor + 1
+        floor += 1
       elsif char == ")"
-        floor - 1
+        floor -= 1
       else
         floor
       end
+
+      if floor == -1
+        p index + 1
+      end
     end
+    floor
   end
 end
 
