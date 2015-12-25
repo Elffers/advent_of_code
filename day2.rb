@@ -39,25 +39,41 @@
 # to wrap the present plus 1*1*10 = 10 feet of ribbon for the bow, for a total
 # of 14 feet.  How many total feet of ribbon should they order?
 
-class WrapperCalculator
+class GiftWrapper
   attr_accessor :measurements
+
   def initialize(input)
     @measurements = File.readlines(input)
   end
 
-  def calculate
+  def calculate_total_paper
     # handle malformed lines?
     measurements.reduce(0) do |memo, line|
       dimensions = parse_dimensions(line)
-      measure(dimensions) + memo
+      calculate_paper(dimensions) + memo
     end
   end
 
-  def measure(dimensions)
+  def calculate_total_ribbon
+    # handle malformed lines?
+    measurements.reduce(0) do |memo, line|
+      dimensions = parse_dimensions(line)
+      cut_ribbon(dimensions) + memo
+    end
+  end
+
+  def calculate_paper(dimensions)
     l, w, h = dimensions
     dimensions.sort!.pop
     smallest = dimensions.reduce(:*)
     2*(l*w + w*h + l*h) + smallest
+  end
+
+  def cut_ribbon(dimensions)
+    l, w, h = dimensions
+    dimensions.sort!.pop
+    smallest = dimensions.reduce(:+)
+    2*smallest + l*w*h
   end
 
   def parse_dimensions(line)
@@ -66,6 +82,7 @@ class WrapperCalculator
 end
 
 if $0 == __FILE__
-  wc = WrapperCalculator.new('day2_input.txt')
-  p wc.calculate
+  wc = GiftWrapper.new('day2_input.txt')
+  p wc.calculate_total_paper
+  p wc.calculate_total_ribbon
 end
