@@ -16,6 +16,10 @@
 # such number to do so.  If your secret key is pqrstuv, the lowest number it
 # combines with to make an MD5 hash starting with five zeroes is 1048970; that
 # is, the MD5 hash of pqrstuv1048970 looks like 000006136ef....
+#
+# --- Part Two ---
+# Now find one that starts with six zeroes.
+
 
 require 'digest'
 
@@ -29,7 +33,7 @@ class Stuffer
   def hash_key(key)
     value = 0
     md5 = digest.hexdigest(key + value.to_s)
-    while md5[0,5] != "00000"
+    while md5[0,6] != "000000"
       value +=1
       md5 = digest.hexdigest(key + value.to_s)
     end
