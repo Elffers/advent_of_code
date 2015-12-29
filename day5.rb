@@ -21,3 +21,40 @@
 # dvszwmarrgswjxmb is naughty because it contains only one vowel.
 #
 # How many strings are nice?
+
+class SantaString
+  attr_accessor :string
+
+  def initialize(string)
+    @string= string
+  end
+
+  def nice?
+    return false if has_prohibited?
+    return false unless has_double?
+    count_vowels > 2
+  end
+
+  def count_vowels
+    string.chars.count do |c|
+      /[aeiou]/ =~ c
+    end
+  end
+
+  def has_double?
+    /(.)\1/ =~ string
+  end
+
+  def has_prohibited?
+    /ab|cd|pq|xy/ =~ string
+  end
+end
+
+if $0 == __FILE__
+  strings = File.readlines('day5_input.txt')
+  count = strings.count do |string|
+    s = SantaString.new string
+    s.nice?
+  end
+  p count
+end
