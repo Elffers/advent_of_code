@@ -94,4 +94,7 @@ if $0 == __FILE__
     display.flip(coord1, coord2, action)
   end
   p  display.count_lights
+  display.grid.each do |row|
+    puts row.join
+  end
 end
