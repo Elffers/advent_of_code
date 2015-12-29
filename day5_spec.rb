@@ -13,11 +13,33 @@ describe SantaString do
   end
 
   describe "nice2?" do
-    xit "tells if a string is nice" do
+    it "tells if a string is nice" do
       s = SantaString.new "qjhvhtzxzqqjkmpb"
-      expect(s.nice?).to eq true
+      expect(s.nice2?).to eq true
       s = SantaString.new "xxyxx"
-      expect(s.nice?).to eq true
+      expect(s.nice2?).to eq true
+    end
+  end
+
+  describe "double_repeated?" do
+    it "returns true if string has double repeated substring" do
+      s = SantaString.new "xyxy"
+      expect(s.double_repeated?).to be_truthy
+      s = SantaString.new "aabcdefgaa"
+      expect(s.double_repeated?).to be_truthy
+    end
+  end
+
+  describe "has_spaced_double?" do
+    it "returns true if string contains a repeated letter with one letter in between" do
+      s = SantaString.new "xyx"
+      expect(s.has_spaced_double?).to be_truthy
+      s = SantaString.new "abcdefeghi"
+      expect(s.has_spaced_double?).to be_truthy
+      s = SantaString.new "aaa"
+      expect(s.has_spaced_double?).to be_truthy
+      s = SantaString.new "axyza"
+      expect(s.has_spaced_double?).to be_falsey
     end
   end
 

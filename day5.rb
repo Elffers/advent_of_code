@@ -36,6 +36,7 @@ class SantaString
   end
 
   def nice2?
+    !!(double_repeated? && has_spaced_double?)
   end
 
   def count_vowels
@@ -51,6 +52,14 @@ class SantaString
   def has_prohibited?
     /ab|cd|pq|xy/ =~ string
   end
+
+  def double_repeated?
+    /(\w{2}).*\1/ =~ string
+  end
+
+  def has_spaced_double?
+    /(\w).\1/ =~ string
+  end
 end
 
 if $0 == __FILE__
@@ -58,5 +67,10 @@ if $0 == __FILE__
   p strings.count { |string|
     s = SantaString.new string
     s.nice?
+  }
+
+  p strings.count { |string|
+    s = SantaString.new string
+    s.nice2?
   }
 end
