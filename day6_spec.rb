@@ -64,3 +64,14 @@ describe Display do
     end
   end
 end
+
+describe BrightnessDisplay do
+  let(:lights) { BrightnessDisplay.new }
+  describe "brightness" do
+    it "returns total brightness" do
+      lights.flip([0,0], [1, 1], :on)
+      expect(lights.brightness).to eq 4
+    end
+  end
+
+end
