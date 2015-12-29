@@ -52,9 +52,8 @@ end
 
 if $0 == __FILE__
   strings = File.readlines('day5_input.txt')
-  count = strings.count do |string|
+  p strings.count { |string|
     s = SantaString.new string
     s.nice?
-  end
-  p count
+  }
 end
