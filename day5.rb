@@ -31,8 +31,11 @@ class SantaString
 
   def nice?
     return false if has_prohibited?
-    return false unless has_double?
+    return false unless has_repeated?
     count_vowels > 2
+  end
+
+  def nice2?
   end
 
   def count_vowels
@@ -41,7 +44,7 @@ class SantaString
     end
   end
 
-  def has_double?
+  def has_repeated?
     /(.)\1/ =~ string
   end
 

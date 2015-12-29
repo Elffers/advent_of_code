@@ -12,15 +12,24 @@ describe SantaString do
     end
   end
 
+  describe "nice2?" do
+    xit "tells if a string is nice" do
+      s = SantaString.new "qjhvhtzxzqqjkmpb"
+      expect(s.nice?).to eq true
+      s = SantaString.new "xxyxx"
+      expect(s.nice?).to eq true
+    end
+  end
+
   describe "count_vowels" do
     it "counts the number of the vowels in a string" do
       expect(s.count_vowels).to eq 3
     end
   end
 
-  describe "has_double?" do
+  describe "has_repeated?" do
     it "returns true if letter in string appears twice in a row" do
-      expect(s.has_double?).to be_truthy
+      expect(s.has_repeated?).to be_truthy
     end
   end
 
