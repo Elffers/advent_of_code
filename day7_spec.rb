@@ -74,5 +74,26 @@ NOT y -> i
 
       expect(circuit.wires["h"]).to eq 65412
     end
+
+    describe "build2" do
+      it "resolves dependencies" do
+      input = <<-INPUT
+x AND y -> d
+x OR y -> e
+123 -> x
+456 -> y
+      INPUT
+
+      expected = {
+        "d" =>  %w[x y],
+        "e" =>  %w[x y],
+        "x" =>  [],
+        "y" =>  [],
+      }
+      circuit.build2(input)
+
+      expect(circuit.unresolved).to eq expected
+      end
+    end
   end
 end

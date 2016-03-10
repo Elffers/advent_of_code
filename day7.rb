@@ -1,63 +1,33 @@
-class AND
-  attr_accessor :a, :b, :out
+require 'tsort'
 
-  def initialize(a, b, out)
-    @a = a
-    @b = b
-    @out = out
-  end
-end
-
-class OR
-  attr_accessor :a, :b, :out
-
-  def initialize(a, b, out)
-    @a = a
-    @b = b
-    @out = out
-  end
-end
-
-class LSHIFT
-  attr_accessor :a, :bits, :out
-
-  def initialize(a, bits, out)
-    @a = a
-    @bits = bits
-    @out = out
-  end
-end
-
-class RSHIFT
-  attr_accessor :a, :bits, :out
-
-  def initialize(a, bits, out)
-    @a = a
-    @bits = bits
-    @out = out
-  end
-end
-
-class NOT
-  attr_accessor :in, :out
-
-  def initialize(inn, out)
-    @in = inn
-    @out = out
+class Hash
+  include TSort
+  alias tsort_each_node each_key
+  def tsort_each_child(node, &block)
+    fetch(node).each(&block)
   end
 end
 
 class Circuit
-  attr_accessor :wires
+  attr_accessor :wires, :unresolved
 
   def initialize
     @wires = {}
+    @unresolved = Hash.new { |h, k| h[k] = [] }
   end
 
   def build(instructions)
     instructions.each_line do |instr|
       parse instr
     end
+  end
+
+  def build2(instructions)
+    instructions.each_line do |instr|
+      parse2 instr
+    end
+
+    @unresolved.tsort
   end
 
   def parse(instruction)
@@ -76,7 +46,24 @@ class Circuit
       elsif /^NOT (?<a>\w+)/ =~ left
         [~wires[a]].pack("s").unpack("S").first
       end
-     wires[out] = signal
+    wires[out] = signal
+  end
+
+  def parse2(instruction)
+    left, out = instruction.split("->").map { |x| x.strip }
+    if /^(?<signal>\d+)/ =~ left
+      unresolved[out]
+    elsif /(?<a>\w+) AND (?<b>\w+)/ =~ left
+      unresolved[out].push a, b
+    elsif /(?<a>\w+) OR (?<b>\w+)/ =~ left
+      unresolved[out].push a, b
+    elsif /(?<a>\w+) LSHIFT (?<bits>\w+)/ =~ left
+      unresolved[out].push a
+    elsif /(?<a>\w+) RSHIFT (?<bits>\w+)/ =~ left
+      unresolved[out].push a
+    elsif /^NOT (?<a>\w+)/ =~ left
+      unresolved[out].push a
+    end
   end
 end
 
