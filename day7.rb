@@ -22,40 +22,36 @@ class Circuit
     instructions.each_line do |instr|
       parse instr
     end
+
+    evaluate
+  end
+
+  def evaluate
     resolved = unresolved.tsort
     resolved.each do |gate|
       # p todo[gate]
+      p wires[gate] if gate == "b"
       wires[gate] = calculate(todo[gate])
       # p wires[gate]
     end
   end
 
   def calculate(instruction)
-    operation = instruction.shift
+    operation, a, b = instruction
     case operation
     when :"="
-      instruction.shift
+      a
     when :"=="
-      a = instruction.shift
       decode(a)
     when :>>
-      a = instruction.shift
-      bits = instruction.shift
-      decode(a) >> bits
+      decode(a) >> b
     when :<<
-      a = instruction.shift
-      bits = instruction.shift
-      decode(a) << bits
+      decode(a) << b
     when :&
-      a = instruction.shift
-      b = instruction.shift
       decode(a) & decode(b)
     when :|
-      a = instruction.shift
-      b = instruction.shift
       decode(a) | decode(b)
     when :~
-      a = instruction.shift
       [~decode(a)].pack("s").unpack("S").first
     end
   end
@@ -101,6 +97,7 @@ class Circuit
 
     unresolved[out].concat named
   end
+
 end
 
 if $0 == __FILE__
@@ -109,6 +106,11 @@ if $0 == __FILE__
   circuit.build(instructions)
 
   # circuit.unresolved.tsort.take_while { |w| w != 'a' }.each { |w| puts "#{w}: #{circuit.wires[w]}" }
+  p circuit.wires["a"]
+
+  circuit.todo["b"] = [:"=", circuit.wires["a"]]
+  circuit.wires.clear
+  circuit.evaluate
   p circuit.wires["a"]
 end
 
