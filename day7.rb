@@ -9,61 +9,97 @@ class Hash
 end
 
 class Circuit
-  attr_accessor :wires, :unresolved
+  MAX_SIGNAL = 65_535
+  attr_accessor :wires, :unresolved, :todo
 
   def initialize
     @wires = {}
     @unresolved = Hash.new { |h, k| h[k] = [] }
+    @todo = Hash.new { |h, k| h[k] = [] }
   end
 
   def build(instructions)
     instructions.each_line do |instr|
       parse instr
     end
+    resolved = unresolved.tsort
+    resolved.each do |gate|
+      # p todo[gate]
+      wires[gate] = calculate(todo[gate])
+      # p wires[gate]
+    end
   end
 
-  def build2(instructions)
-    instructions.each_line do |instr|
-      parse2 instr
+  def calculate(instruction)
+    operation = instruction.shift
+    case operation
+    when :"="
+      instruction.shift
+    when :"=="
+      a = instruction.shift
+      decode(a)
+    when :>>
+      a = instruction.shift
+      bits = instruction.shift
+      decode(a) >> bits
+    when :<<
+      a = instruction.shift
+      bits = instruction.shift
+      decode(a) << bits
+    when :&
+      a = instruction.shift
+      b = instruction.shift
+      decode(a) & decode(b)
+    when :|
+      a = instruction.shift
+      b = instruction.shift
+      decode(a) | decode(b)
+    when :~
+      a = instruction.shift
+      [~decode(a)].pack("s").unpack("S").first
     end
-
-    @unresolved.tsort
   end
 
   def parse(instruction)
     left, out = instruction.split("->").map { |x| x.strip }
-    signal =
-      if /^(?<signal>\d+)/ =~ left
-        signal.to_i
-      elsif /(?<a>\w+) AND (?<b>\w+)/ =~ left
-        wires[a] & wires[b]
-      elsif /(?<a>\w+) OR (?<b>\w+)/ =~ left
-        wires[a] | wires[b]
-      elsif /(?<a>\w+) LSHIFT (?<bits>\w+)/ =~ left
-        wires[a] << bits.to_i
-      elsif /(?<a>\w+) RSHIFT (?<bits>\w+)/ =~ left
-        wires[a] >> bits.to_i
-      elsif /^NOT (?<a>\w+)/ =~ left
-        [~wires[a]].pack("s").unpack("S").first
-      end
-    wires[out] = signal
+    if /^(?<signal>\d+)$/ =~ left
+      unresolved[out]
+      todo[out].push :"=", signal.to_i
+    elsif /^(?<a>\w+)$/ =~ left
+      unresolved[out].push a
+      todo[out].push :"==", a
+    elsif /(?<a>\w+) AND (?<b>\w+)/ =~ left
+      add_dependency out, a, b
+      todo[out].push :&, a, b
+    elsif /(?<a>\w+) OR (?<b>\w+)/ =~ left
+      add_dependency out, a, b
+      todo[out].push :|, a, b
+    elsif /(?<a>\w+) LSHIFT (?<bits>\w+)/ =~ left
+      add_dependency out, a
+      todo[out].push :<<, a, bits.to_i
+    elsif /(?<a>\w+) RSHIFT (?<bits>\w+)/ =~ left
+      add_dependency out, a
+      todo[out].push :>>, a, bits.to_i
+    elsif /^NOT (?<a>\w+)/ =~ left
+      add_dependency out, a
+      todo[out].push :~, a
+    else
+      raise "unparseable #{instruction}"
+    end
   end
 
-  def parse2(instruction)
-    left, out = instruction.split("->").map { |x| x.strip }
-    if /^(?<signal>\d+)/ =~ left
-      unresolved[out]
-    elsif /(?<a>\w+) AND (?<b>\w+)/ =~ left
-      unresolved[out].push a, b
-    elsif /(?<a>\w+) OR (?<b>\w+)/ =~ left
-      unresolved[out].push a, b
-    elsif /(?<a>\w+) LSHIFT (?<bits>\w+)/ =~ left
-      unresolved[out].push a
-    elsif /(?<a>\w+) RSHIFT (?<bits>\w+)/ =~ left
-      unresolved[out].push a
-    elsif /^NOT (?<a>\w+)/ =~ left
-      unresolved[out].push a
+  def decode gate
+    if gate =~ /\A\d+\z/
+      gate.to_i
+    else
+      wires[gate]
     end
+  end
+
+  def add_dependency(out, *gates)
+    named = gates.select { |gate| gate !~ /\A\d+\z/ }
+
+    unresolved[out].concat named
   end
 end
 
@@ -71,6 +107,8 @@ if $0 == __FILE__
   instructions = File.read("day7_input.txt")
   circuit = Circuit.new
   circuit.build(instructions)
-  p circuit.wires
+
+  # circuit.unresolved.tsort.take_while { |w| w != 'a' }.each { |w| puts "#{w}: #{circuit.wires[w]}" }
+  p circuit.wires["a"]
 end
 
