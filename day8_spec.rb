@@ -47,4 +47,21 @@ describe Matchstick do
     end
   end
 
+  describe "#total_encoding" do
+    it "returns the difference in total length and length" do
+      expect(m.total_encoding empty_string).to eq 6
+      expect(m.total_encoding normal_string).to eq 9
+      expect(m.total_encoding string_with_escape_chars).to eq 16
+      expect(m.total_encoding string_with_hex_escape).to eq 11
+    end
+  end
+
+  describe "#total_diff" do
+    it "returns the difference in total length and length" do
+      expect(m.total_diff empty_string).to eq 4
+      expect(m.total_diff normal_string).to eq 4
+      expect(m.total_diff string_with_escape_chars).to eq 6
+      expect(m.total_diff string_with_hex_escape).to eq 5
+    end
+  end
 end
