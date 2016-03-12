@@ -35,8 +35,11 @@ require 'pry'# --- Day 8: Matchsticks ---
 # memory for string values (0 + 3 + 7 + 1 = 11) is 23 - 11 = 12.
 
 class Matchstick
-  def initialize
-    # @strings = File.readlines(file)
+  def find_diff file
+    strings = File.readlines(file)
+    strings.map do |str|
+      diff(str.strip)
+    end.reduce(:+)
   end
 
   def total_chars string
@@ -48,14 +51,20 @@ class Matchstick
     # `eval(string).length`
     # but this presents a security issue, if `string` is something like `rm
     # -rf`
-    str = string.gsub(/\\x\d\d/, "*")
-    str.gsub!(/\\./, "*")
+    # eval(string).length
+    str = string.gsub(/(\\x[0-f][0-f]|\\\\|\\\")/, "*")
     str.length - 2
+  end
+
+  def diff string
+    total = total_chars(string)
+    length = length(string)
+    total - length
   end
 
 end
 
 if $0 == __FILE__
-  # m = Matchstick.new("day8_input.txt")
+  m = Matchstick.new
+  p m.find_diff("day8_input.txt")
 end
-
