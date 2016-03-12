@@ -1,4 +1,4 @@
-# --- Day 8: Matchsticks ---
+require 'pry'# --- Day 8: Matchsticks ---
 
 # Space on the sleigh is limited this year, and so Santa will be bringing his
 # list as a digital copy. He needs to know how much space it will take up when
@@ -41,6 +41,16 @@ class Matchstick
 
   def total_chars string
     string.chars.count
+  end
+
+  def length string
+    # you could do:
+    # `eval(string).length`
+    # but this presents a security issue, if `string` is something like `rm
+    # -rf`
+    str = string.gsub(/\\x\d\d/, "*")
+    str.gsub!(/\\./, "*")
+    str.length - 2
   end
 
 end
