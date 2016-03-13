@@ -32,15 +32,6 @@ describe Matchstick do
     end
   end
 
-  describe "#diff" do
-    it "returns the difference in total length and length" do
-      expect(m.diff empty_string).to eq 2
-      expect(m.diff normal_string).to eq 2
-      expect(m.diff string_with_escape_chars).to eq 3
-      expect(m.diff string_with_hex_escape).to eq 5
-    end
-  end
-
   describe "#find_diff" do
     it "returns the diff" do
       expect(m.find_diff "day8_test_input.txt").to eq 12
@@ -53,15 +44,6 @@ describe Matchstick do
       expect(m.total_encoding normal_string).to eq 9
       expect(m.total_encoding string_with_escape_chars).to eq 16
       expect(m.total_encoding string_with_hex_escape).to eq 11
-    end
-  end
-
-  describe "#total_diff" do
-    it "returns the difference in total length and length" do
-      expect(m.total_diff empty_string).to eq 4
-      expect(m.total_diff normal_string).to eq 4
-      expect(m.total_diff string_with_escape_chars).to eq 6
-      expect(m.total_diff string_with_hex_escape).to eq 5
     end
   end
 end

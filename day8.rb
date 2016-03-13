@@ -1,4 +1,4 @@
-require 'pry'# --- Day 8: Matchsticks ---
+# --- Day 8: Matchsticks ---
 
 # Space on the sleigh is limited this year, and so Santa will be bringing his
 # list as a digital copy. He needs to know how much space it will take up when
@@ -56,51 +56,37 @@ class Matchstick
   def find_diff file
     strings = File.readlines(file)
     strings.map do |str|
-      diff(str.strip)
+      str.strip!
+      total_chars(str) - length(str)
     end.reduce(:+)
   end
 
   def find_encoding_diff file
     strings = File.readlines(file)
     strings.map do |str|
-      total_diff(str.strip)
+      str.strip!
+      total_encoding(str) - total_chars(str)
     end.reduce(:+)
   end
 
   def total_chars string
-    string.chars.count
+    string.size
   end
 
   def length string
-    # you could do:
-    # `eval(string).length`
-    # but this presents a security issue, if `string` is something like `rm
-    # -rf`
-    # eval(string).length
+    # you could do `eval(string).length`
+    # but this presents a security issue, e.g. if `string` `rm -rf`
     str = string.gsub(/(\\x[0-f][0-f]|\\\\|\\\")/, "*")
     str.length - 2
   end
 
   def total_encoding string
-    string.dump.chars.length
+    string.dump.size
   end
-
-  def diff string
-    total = total_chars(string)
-    length = length(string)
-    total - length
-  end
-
-  def total_diff string
-    encoding = total_encoding(string)
-    chars = total_chars(string)
-    encoding - chars
-  end
-
 end
 
 if $0 == __FILE__
   m = Matchstick.new
-  p m.find_diff("day8_input.txt")
-  p m.find_encoding_diff("day8_input.txt")
+  p m.find_diff("day8_input.txt") # 1342
+  p m.find_encoding_diff("day8_input.txt") # 2074
 end
