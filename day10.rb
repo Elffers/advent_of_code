@@ -1,4 +1,3 @@
-require 'pry'
 # --- Day 10: Elves Look, Elves Say ---
 
 # Today, the Elves are playing a game called look-and-say. They take turns
@@ -20,7 +19,7 @@ require 'pry'
 # the length of the result?
 
 def sequence num
-  digits = num.to_s.chars
+  digits = num.chars
   output = ""
   current = digits.first
   count = 0
@@ -29,24 +28,27 @@ def sequence num
     if digit == current
       count += 1
     else
-      output += count.to_s + current
+      output << count.to_s << current
       current = digit
       count = 1
     end
   end
 
-  output += count.to_s + current
+  output << count.to_s << current
 end
 
 def run num, iterations
-  iterations.times do
+  iterations.times do |i|
+    # puts i
     num = sequence num
+    # puts "size", num.size
+    # puts "----"
   end
   num
 end
 
 if __FILE__ == $0
-  response = run(1113122113, 50)
+  response = run("1113122113", 40)
   p response.size
 end
 
