@@ -20,7 +20,7 @@
 # example.
 
 # What is the distance of the shortest route?
-#
+
 require 'set'
 
 class Router

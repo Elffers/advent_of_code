@@ -1,6 +1,5 @@
 require_relative 'day9'
 
-
 describe "Router" do
   let(:input) { StringIO.new("London to Dublin = 464\nLondon to Belfast = 518\nDublin to Belfast = 141\n").readlines }
   let(:r) { Router.new(input) }
