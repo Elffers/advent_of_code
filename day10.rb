@@ -19,12 +19,11 @@
 # the length of the result?
 
 def sequence num
-  digits = num.chars
   output = ""
-  current = digits.first
+  current = num[0]
   count = 0
 
-  digits.each do |digit|
+  num.each_char do |digit|
     if digit == current
       count += 1
     else
