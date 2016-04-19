@@ -38,11 +38,9 @@ end
 
 def run num, iterations
   iterations.times do |i|
-    # puts i
     num = sequence num
-    # puts "size", num.size
-    # puts "----"
   end
+
   num
 end
 
