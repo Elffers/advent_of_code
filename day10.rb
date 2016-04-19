@@ -46,6 +46,14 @@ def run num, iterations
   num
 end
 
+# def look_and_say(input)
+#   # gsub uses C, and using the block creates the string in place
+#   # $& represents the whole match result. In this case, due to nesting, it's
+#   # the same as $1
+#   # \2 is the nested capture group
+#   input.gsub(/((.)\2*)/) { "#{$&.size}#{$2}" }
+# end
+
 if __FILE__ == $0
   response = run("1113122113", 40)
   p response.size
