@@ -48,7 +48,7 @@
 
 def next_password password
   password = password.next
-  while !(valid? password)
+  until valid? password
     password = password.next
   end
   password
