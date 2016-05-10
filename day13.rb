@@ -51,8 +51,15 @@ class Seater
     end
   end
 
+  def add_me
+    guests = scores.keys
+    guests.each do |guest|
+      scores[guest]["myself"] = 0
+      scores["myself"][guest] = 0
+    end
+  end
+
   def happiest
-    parse
     scores.keys.permutation.to_a.map do |arrangement|
       score arrangement
     end.max
@@ -71,5 +78,7 @@ end
 if $0 == __FILE__
   input = File.readlines("day13_input.txt")
   s = Seater.new(input)
+  s.parse
+  s.add_me
   p s.happiest
 end

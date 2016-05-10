@@ -18,7 +18,7 @@ INPUT
 )
   }
 
-  let(:seater) { Seater.new input }
+  let(:seater) { Seater.new input.readlines }
 
   describe 'parse' do
     it 'creates hash of dependencies' do
@@ -50,6 +50,7 @@ INPUT
 
   describe "happiest" do
     it "finds best score" do
+      seater.parse
       expect(seater.happiest).to eq 330
     end
   end
