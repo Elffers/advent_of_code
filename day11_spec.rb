@@ -59,6 +59,12 @@ end
 describe "next_password?" do
   it "returns the next valid password" do
     expect(next_password "abcdefgh").to eq "abcdffaa"
-    # expect(next_password "ghijklmn").to eq "ghjaabcc"
+    expect(next_password "ghijklmn").to eq "ghjaabcc"
+  end
+end
+
+describe "next_try" do
+  it "works" do
+    expect(next_try "ghijklmn").to eq "ghjaaaaa"
   end
 end

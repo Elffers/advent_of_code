@@ -1,0 +1,24 @@
+load: 3.49  cmd: ruby 52417 running 58.08u 6.49s
+"ghjaabcc"
+  %   cumulative   self              self     total
+ time   seconds   seconds    calls  ms/call  ms/call  name
+ 43.06   108.31    108.31        1 108310.00 251530.00  Object#next_password
+ 19.41   157.14     48.83  7585801     0.01     0.02  Object#valid?
+ 18.61   203.96     46.82  7585801     0.01     0.01  Object#prohibited?
+  8.62   225.65     21.69  7586379     0.00     0.00  Regexp#=~
+  5.33   239.05     13.40  7586316     0.00     0.00  String#next
+  4.96   251.53     12.48  7585801     0.00     0.00  BasicObject#!
+  0.00   251.53      0.00       70     0.00     0.00  String#chars
+  0.00   251.53      0.00        5     0.00     0.00  Module#method_added
+  0.00   251.53      0.00      578     0.00     0.00  Object#has_double_repeated?
+  0.00   251.53      0.00        1     0.00     0.00  TracePoint#enable
+  0.00   251.53      0.00      515     0.00     0.00  String#==
+  0.00   251.53      0.00      489     0.00     0.00  Object#has_straight?
+  0.00   251.53      0.00       70     0.00     0.00  Array#each
+  0.00   251.53      0.00       70     0.00     0.00  Enumerable#each_cons
+  0.00   251.53      0.00        2     0.00     0.00  IO#set_encoding
+  0.00   251.53      0.00        1     0.00     0.00  Kernel#hash
+  0.00   251.53      0.00        1     0.00     0.00  String#inspect
+  0.00   251.53      0.00        1     0.00     0.00  Kernel#p
+  0.00   251.53      0.00        1     0.00     0.00  TracePoint#disable
+  0.00   251.53      0.00        1     0.00 251530.00  #toplevel

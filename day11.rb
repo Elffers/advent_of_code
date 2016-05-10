@@ -47,11 +47,20 @@
 # Your puzzle input is hepxcrrq.
 
 def next_password password
-  password = password.next
+  password = next_try password
   until valid? password
-    password = password.next
+    password = next_try password
   end
   password
+end
+
+def next_try password
+  if i = prohibited?(password)
+    letter = password[i]
+    tail = "a" * (password.length - i - 1)
+    return "#{password[0..i - 1]}#{letter.next}#{tail}"
+  end
+  password.next
 end
 
 def prohibited? password
@@ -70,7 +79,6 @@ def has_straight? password
 end
 
 def valid? password
-  return false if prohibited? password
   (has_double_repeated? password) && (has_straight? password)
 end
 
