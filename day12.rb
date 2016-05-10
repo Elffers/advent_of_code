@@ -21,37 +21,33 @@
 require 'json'
 
 def ary_sum array
-  nums = []
-  array.each do |el|
+  array.map do |el|
     case el
       # case statements use #===.
       # For Class, #=== is an alias of #instance_of
     when Integer
-      nums << el
+      el
     when String
-      nums << 0
+      0
     else
-      nums << obj_sum(el)
+      obj_sum el
     end
-  end
-  nums.reduce(:+)
+  end.reduce(:+)
 end
 
 def hash_sum hash
-  nums = []
-  hash.each do |k, v|
+  hash.map do |k, v|
     case v
     when "red"
       return 0
     when String
-      nums << 0
+      0
     when Integer
-      nums << v
+      v
     else
-      nums << obj_sum(v)
+      obj_sum v
     end
-  end
-  nums.reduce(:+)
+  end.reduce(:+)
 end
 
 def obj_sum obj
