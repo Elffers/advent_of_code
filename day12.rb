@@ -20,43 +20,28 @@
 
 require 'json'
 
-def ary_sum array
-  array.map do |el|
+def obj_sum obj
+  enum = case obj
+  when Array
+    obj.each
+  when Hash
+    obj.each_value
+  end
+
+  enum.map do |el|
     case el
-      # case statements use #===.
-      # For Class, #=== is an alias of #instance_of
+    when String
+      if obj.is_a?(Hash) && el == "red"
+        return 0
+      else
+        0
+      end
     when Integer
       el
-    when String
-      0
     else
       obj_sum el
     end
   end.reduce(:+)
-end
-
-def hash_sum hash
-  hash.map do |k, v|
-    case v
-    when "red"
-      return 0
-    when String
-      0
-    when Integer
-      v
-    else
-      obj_sum v
-    end
-  end.reduce(:+)
-end
-
-def obj_sum obj
-  case obj
-  when Array
-    ary_sum obj
-  when Hash
-    hash_sum obj
-  end
 end
 
 def sum json
