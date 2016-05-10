@@ -18,9 +18,56 @@
 
 # What is the sum of all numbers in the document?
 
-def sum json_string
-  matches = json_string.scan(/-?\d+/)
-  matches.map { |num| num.to_i }.reduce(:+)
+require 'json'
+
+def ary_sum array
+  nums = []
+  array.each do |el|
+    case el
+      # case statements use #===.
+      # For Class, #=== is an alias of #instance_of
+    when Integer
+      nums << el
+    when String
+      nums << 0
+    else
+      nums << obj_sum(el)
+    end
+  end
+  nums.reduce(:+)
 end
 
-p sum File.read('day12_input.txt')
+def hash_sum hash
+  nums = []
+  hash.each do |k, v|
+    case v
+    when "red"
+      return 0
+    when String
+      nums << 0
+    when Integer
+      nums << v
+    else
+      nums << obj_sum(v)
+    end
+  end
+  nums.reduce(:+)
+end
+
+def obj_sum obj
+  case obj
+  when Array
+    ary_sum obj
+  when Hash
+    hash_sum obj
+  end
+end
+
+def sum json
+  obj = JSON.parse json
+  obj_sum obj
+end
+
+if __FILE__ == $0
+  p sum File.read('day12_input.txt')
+end
