@@ -28,20 +28,20 @@ def obj_sum obj
     obj.each_value
   end
 
-  enum.map do |el|
+  enum.reduce(0) do |acc, el|
     case el
     when String
       if obj.is_a?(Hash) && el == "red"
         return 0
       else
-        0
+        acc
       end
     when Integer
-      el
+      acc + el
     else
-      obj_sum el
+      acc + obj_sum(el)
     end
-  end.reduce(:+)
+  end
 end
 
 def sum json
