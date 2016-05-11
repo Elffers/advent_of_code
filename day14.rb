@@ -1,3 +1,4 @@
+require 'pry'
 # --- Day 14: Reindeer Olympics ---
 
 # This year is the Reindeer Olympics! Reindeer can fly at high speeds, but
@@ -39,13 +40,38 @@ class Racer
     @input.each do |line|
       /^(?<name>\w+) \D+(?<speed>\d+) \D+(?<time>\d+) \D+(?<rest>\d+)/ =~ line
       reindeer[name][:speed] = speed.to_i
-      reindeer[name][:time] = time.to_i
+      reindeer[name][:interval] = time.to_i
       reindeer[name][:rest] = rest.to_i
     end
+  end
+
+  def distance time, name
+    speed = reindeer[name][:speed]
+    interval = reindeer[name][:interval]
+    rest = reindeer[name][:rest]
+
+    reps, partial = time.divmod(interval + rest)
+    if partial < interval
+      distance = reps * speed * interval + speed * partial
+    else
+      distance = (reps + 1) * speed * interval
+    end
+
+    distance
+  end
+
+  def race time
+    reindeer.keys.map do |deer|
+      distance time, deer
+    end.max
   end
 end
 
 
-if __FILE__ == $0
 
+if __FILE__ == $0
+  input = File.readlines("day14_input.txt")
+  racer = Racer.new input
+  racer.parse
+  p racer.race 2503
 end
