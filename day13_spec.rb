@@ -20,9 +20,12 @@ INPUT
 
   let(:seater) { Seater.new input.readlines }
 
+  before do
+    seater.parse
+  end
+
   describe 'parse' do
     it 'creates hash of dependencies' do
-      seater.parse
       expected = {
         "Alice"=>{"Bob"=>54,
                   "Carol"=>-79,
@@ -43,14 +46,12 @@ INPUT
 
   describe "score" do
     it "scores happiness" do
-      seater.parse
       expect(seater.score ["Alice", "Bob", "Carol", "David"]).to eq 330
     end
   end
 
   describe "happiest" do
     it "finds best score" do
-      seater.parse
       expect(seater.happiest).to eq 330
     end
   end

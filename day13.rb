@@ -43,11 +43,13 @@ class Seater
   def parse
     @input.each do |line|
       /(?<person>\w+) would (?<sign>\w+)\s(?<score>\d+) .+ (?<neighbor>\w+)\./ =~ line
+      score = score.to_i
+
       if sign == "lose"
-        score = score.to_i * -1
+        score *= -1
       end
 
-      scores[person][neighbor] = score.to_i
+      scores[person][neighbor] = score
     end
   end
 
@@ -60,7 +62,7 @@ class Seater
   end
 
   def happiest
-    scores.keys.permutation.to_a.map do |arrangement|
+    scores.keys.permutation.map do |arrangement|
       score arrangement
     end.max
   end
