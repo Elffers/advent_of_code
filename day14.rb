@@ -28,6 +28,29 @@ require 'pry'
 # Given the descriptions of each reindeer (in your puzzle input), after
 # exactly 2503 seconds, what distance has the winning reindeer traveled?
 
+# --- Part Two ---
+
+# Seeing how reindeer move in bursts, Santa decides he's not pleased with the
+# old scoring system.
+
+# Instead, at the end of each second, he awards one point to the reindeer
+# currently in the lead. (If there are multiple reindeer tied for the lead,
+# they each get one point.) He keeps the traditional 2503 second time limit,
+# of course, as doing otherwise would be entirely ridiculous.
+
+# Given the example reindeer from above, after the first second, Dancer is in
+# the lead and gets one point. He stays in the lead until several seconds into
+# Comet's second burst: after the 140th second, Comet pulls into the lead and
+# gets his first point. Of course, since Dancer had been in the lead for the
+# 139 seconds before that, he has accumulated 139 points by the 140th second.
+
+# After the 1000th second, Dancer has accumulated 689 points, while poor
+# Comet, our old champion, only has 312. So, with the new scoring system,
+# Dancer would win (if the race ended at 1000 seconds).
+
+# Again given the descriptions of each reindeer (in your puzzle input), after
+# exactly 2503 seconds, how many points does the winning reindeer have?
+
 class Racer
   attr_accessor :reindeer
 
@@ -60,6 +83,24 @@ class Racer
     distance
   end
 
+  def score time
+   reindeer.each do |deer, v|
+     v[:score] = 0
+     v[:distance] = 0
+   end
+
+   (1..time).each do |sec|
+     reindeer.each do |deer, v|
+       v[:distance] = distance(sec, deer)
+     end
+
+     lead = reindeer.sort_by { |d, v| v[:distance] }.last.first
+     reindeer[lead][:score] += 1
+   end
+
+   reindeer.values.map { |v| v[:score] }.max
+  end
+
   def race time
     reindeer.keys.map do |deer|
       distance time, deer
@@ -67,11 +108,10 @@ class Racer
   end
 end
 
-
-
 if __FILE__ == $0
   input = File.readlines("day14_input.txt")
   racer = Racer.new input
   racer.parse
   p racer.race 2503
+  p racer.score 2503
 end

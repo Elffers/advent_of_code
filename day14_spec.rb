@@ -41,4 +41,13 @@ INPUT
       expect(racer.race 1000).to eq 1120
     end
   end
+
+  describe "score" do
+    it "awards points to deer in lead" do
+      racer.parse
+      racer.score 1000
+      expect(racer.reindeer["Comet"][:score]).to eq 311
+      expect(racer.reindeer["Dancer"][:score]).to eq 689
+    end
+  end
 end
