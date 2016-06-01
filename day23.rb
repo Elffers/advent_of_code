@@ -4,7 +4,7 @@ class Assembler
 
   def initialize input
     @instructions = input.map { |line| line.strip! }
-    @registers = { "a" => 0, "b" => 0 }
+    @registers = { "a" => 1, "b" => 0 }
   end
 
   def parse
