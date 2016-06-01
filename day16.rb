@@ -54,7 +54,13 @@ class Aunt
 
   def no_contradiction? clues, things
     things.all? do |thing, num|
-      clues[thing] == num
+      if thing == "cat" || thing == "tree"
+        clues[thing] < num
+      elsif thing == "pomerianian" || thing == "goldfish"
+        clues[thing] > num
+      else
+        clues[thing] == num
+      end
     end
   end
 end
