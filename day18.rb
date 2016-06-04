@@ -49,12 +49,20 @@ class Display
     end
   end
 
+  def light_corners(grid)
+    grid[0][0] = "#"
+    grid[0][max] = "#"
+    grid[max][0] = "#"
+    grid[max][max] = "#"
+  end
+
   def count_lit
     grid.flatten.map { |x| x.count("#") }.reduce(:+)
   end
 
   def change
     new_grid = []
+    light_corners(grid)
     grid.each.with_index do |row, i|
       new_row = ""
       # for each row, find number of adjacent lights that are on
@@ -78,6 +86,7 @@ class Display
       end
       new_grid << new_row
     end
+    light_corners(new_grid)
     self.grid = new_grid
   end
 
@@ -170,6 +179,6 @@ if __FILE__ == $0
   input = File.readlines('day18_input.txt')
   d = Display.new input
   d.animate 100
-  p d.grid
+  d.grid
   p d.count_lit
 end

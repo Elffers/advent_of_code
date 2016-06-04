@@ -14,23 +14,23 @@ INPUT
 
   let(:output1) { StringIO.new(
 <<GRID
-..##..
-..##.#
+#.##.#
+####.#
 ...##.
 ......
-#.....
-#.##..
+#...#.
+#.####
 GRID
   ).readlines.map { |x| x.strip! } }
 
-  let(:output4) { StringIO.new(
+  let(:output5) { StringIO.new(
 <<GRID
-......
-......
-..##..
-..##..
-......
-......
+##.###
+.##..#
+.##...
+.##...
+#.#...
+##...#
 GRID
   ).readlines.map { |x| x.strip! } }
 
@@ -39,15 +39,15 @@ GRID
 
   describe "count_lit" do
     it "counts number of lights on" do
-      display.animate 4
-      expect(display.count_lit).to eq 4
+      display.animate 5
+      expect(display.count_lit).to eq 17
     end
   end
 
   describe "animate" do
     it "changes correctly after given number of steps" do
-      display.animate 4
-      expect(display.grid).to eq output4
+      display.animate 5
+      expect(display.grid).to eq output5
     end
   end
 
