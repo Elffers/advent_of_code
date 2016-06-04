@@ -21,7 +21,10 @@ INPUT
 #...#.
 #.####
 GRID
-  ).readlines.map { |x| x.strip! } }
+  ).readlines.map do |line|
+    line.strip.split("").map { |light| light == "#" }
+  end
+  }
 
   let(:output5) { StringIO.new(
 <<GRID
@@ -32,7 +35,10 @@ GRID
 #.#...
 ##...#
 GRID
-  ).readlines.map { |x| x.strip! } }
+  ).readlines.map do |line|
+    line.strip.split("").map { |light| light == "#" }
+  end
+  }
 
   let(:display) { Display.new input }
   let(:grid) { display.grid }

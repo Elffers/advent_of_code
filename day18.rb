@@ -39,7 +39,10 @@ class Display
 
   def initialize input
     # Array of strings
-    @grid = input.map { |line| line.strip! }
+    @grid = input.map do |line|
+      line.strip.split("").map { |light| light == "#" }
+    end
+
     @max = input.size - 1
   end
 
@@ -50,39 +53,31 @@ class Display
   end
 
   def light_corners(grid)
-    grid[0][0] = "#"
-    grid[0][max] = "#"
-    grid[max][0] = "#"
-    grid[max][max] = "#"
+    grid[0][0] = true
+    grid[0][max] = true
+    grid[max][0] =  true
+    grid[max][max] = true
   end
 
   def count_lit
-    grid.flatten.map { |x| x.count("#") }.reduce(:+)
+    grid.flatten.count(true)
   end
 
   def change
     new_grid = []
     light_corners(grid)
     grid.each.with_index do |row, i|
-      new_row = ""
+      new_row = []
       # for each row, find number of adjacent lights that are on
-      row.each_char.with_index do |light, j|
+      row.each_with_index do |light, j|
         lighted = lit_neighbors i, j
-        new_light = case light
-        when "#"
-          if lighted == 2 || lighted == 3
-            "#"
+        new_light =
+          if light
+            lighted.between? 2, 3
           else
-            "."
+            lighted == 3
           end
-        when "."
-          if lighted == 3
-            "#"
-          else
-            "."
-          end
-        end
-        new_row += new_light
+        new_row << new_light
       end
       new_grid << new_row
     end
@@ -92,8 +87,9 @@ class Display
 
   def lit_neighbors i, j
     neighbors = find_neighbors i, j
-    neighbors.count("#")
+    neighbors.count(true)
   end
+
 
   def find_neighbors(i,j)
     neighbors = []
