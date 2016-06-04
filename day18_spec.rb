@@ -64,42 +64,10 @@ GRID
     end
   end
 
-  describe 'lit_neighbors_count' do
+  describe 'lit_neighbors' do
     it 'works' do
       expect(display.lit_neighbors(0, 0)).to eq 1
       expect(display.lit_neighbors(5, 0)).to eq 2
-    end
-  end
-
-  describe "find_neighbors" do
-    it "returns list of neighbors if not an edge case" do
-      expect(display.find_neighbors(1, 1).count).to eq 8
-    end
-
-    it "returns list of neighbors for left edge" do
-      expect(display.find_neighbors(1, 5).count).to eq 5
-    end
-
-    it "returns list of neighbors for right edge" do
-      expect(display.find_neighbors(1, 0).count).to eq 5
-    end
-
-    it "returns list of neighbors for top edge" do
-      expect(display.find_neighbors(0, 1).count).to eq 5
-    end
-
-    it "returns list of neighbors for bottom edge" do
-      expect(display.find_neighbors(5, 1).count).to eq 5
-    end
-
-    it "returns list of neighbors for top corners" do
-      expect(display.find_neighbors(0, 0).count).to eq 3
-      expect(display.find_neighbors(0, 5).count).to eq 3
-    end
-
-    it "returns list of neighbors for bottom corners" do
-      expect(display.find_neighbors(5, 0).count).to eq 3
-      expect(display.find_neighbors(5, 5).count).to eq 3
     end
   end
 end

@@ -85,89 +85,20 @@ class Display
     self.grid = new_grid
   end
 
-  def lit_neighbors i, j
-    neighbors = find_neighbors i, j
-    neighbors.count(true)
-  end
 
-
-  def find_neighbors(i,j)
-    neighbors = []
-    # top row
-    northwest = grid[i-1][j-1]
-    north = grid[i-1][j]
-    northeast = grid[i-1][j+1]
-
-    # same row
-    west = grid[i][j-1]
-    east = grid[i][j+1]
-
-    # bottom row
-    if i != max
-      southwest = grid[i+1][j-1]
-      south = grid[i+1][j]
-      southeast = grid[i+1][j+1]
-    end
-
-    if i > 0 && i < max &&  # Not in first or last row
-      if j > 0 && j < max # Not in first or last column
-        neighbors << north
-        neighbors << northwest
-        neighbors << northeast
-        neighbors << west
-        neighbors << east
-        neighbors << south
-        neighbors << southwest
-        neighbors << southeast
-      elsif j == max # On the right edge but not right corners
-        neighbors << north
-        neighbors << northwest
-        neighbors << west
-        neighbors << south
-        neighbors << southwest
-      elsif j == 0 # On the left edge but not left corners
-        neighbors << north
-        neighbors << northeast
-        neighbors << east
-        neighbors << south
-        neighbors << southeast
-      end
-
-    elsif i == 0 # in top row
-      if j == 0 # top left corner
-        neighbors << east
-        neighbors << southeast
-        neighbors << south
-      elsif j == max # top right corner
-        neighbors << west
-        neighbors << southwest
-        neighbors << south
-      else
-        neighbors << west
-        neighbors << east
-        neighbors << south
-        neighbors << southwest
-        neighbors << southeast
-      end
-    elsif i == max # in bottom row
-      if j == 0 # bottom left corner
-        neighbors << east
-        neighbors << northeast
-        neighbors << north
-      elsif j == max # bottom right corner
-        neighbors << west
-        neighbors << northwest
-        neighbors << north
-      else
-        neighbors << west
-        neighbors << east
-        neighbors << north
-        neighbors << northwest
-        neighbors << northeast
+  def lit_neighbors(i,j)
+    count = 0
+    [[-1, -1], [0, -1], [1, -1],
+     [-1,  0],          [1, 0],
+     [-1,  1], [0,  1], [1, 1]
+    ].each do |x_offset, y_offset|
+      x = i + x_offset
+      y = j + y_offset
+      if x.between?(0, max) && y.between?(0, max)
+        count += 1 if grid[x][y]
       end
     end
-
-    neighbors
+    count
   end
 end
 
