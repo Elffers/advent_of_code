@@ -30,22 +30,30 @@
 # Your puzzle input is 29000000.
 
 def count_presents(house_number)
-  factors_sum(house_number) * 10
+  factors_limited(house_number).reduce(:+) * 11
 end
 
-def factors_sum(num)
-  1.upto(Math.sqrt(num)).select { |i| (num % i).zero? }.inject(0) do |sum, factor|
-    complement = num/factor
-    if factor == complement
-      sum + factor
-    else
-      sum + factor + complement
-    end
+def factors(num)
+  1.upto(Math.sqrt(num)).select {|i| (num % i).zero?}.inject([]) do |f, i|
+    f << i
+    f << num / i unless i == num / i
+    f
   end
 end
 
+def factors_limited(num)
+  culled = []
+  factors(num).sort.each do |f|
+    if (f * 50) >= num
+      culled << f
+    end
+  end
+  culled
+end
+
+
 def find_house(guess)
-  1.upto(guess).each do |num|
+  600_000.upto(guess).each do |num|
     presents = count_presents num
     p presents: presents, guess: num
     return num if presents >= 29_000_000
