@@ -34,16 +34,19 @@ def count_presents(house_number)
 end
 
 def factors(num)
-  1.upto(Math.sqrt(num)).select {|i| (num % i).zero?}.inject([]) do |f, i|
-    f << i
-    f << num / i unless i == num / i
-    f
+  1.upto(Math.sqrt(num)).select {|i| (num % i).zero?}.flat_map do |factor|
+    complement = num / factor
+    if factor == complement
+      factor
+    else
+      [factor, complement]
+    end
   end
 end
 
 def factors_limited(num)
   culled = []
-  factors(num).sort.each do |f|
+  factors(num).each do |f|
     if (f * 50) >= num
       culled << f
     end
@@ -61,7 +64,15 @@ def find_house(guess)
 end
 
 p find_house 1_000_000
+# started at 1
 # 665280
 # real	1m12.955s
 # user	1m8.206s
 # sys	0m2.636s
+
+# Part 2: started at 600_000
+# 705600
+
+# real	0m15.120s
+# user	0m14.437s
+# sys	0m0.404s
