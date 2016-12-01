@@ -30,7 +30,6 @@
 # away.  R2, R2, R2 leaves you 2 blocks due South of your starting position,
 # which is 2 blocks away.  R5, L5, R5, R3 leaves you 12 blocks away.  How many
 # blocks away is Easter Bunny HQ?
-#
 
 class Traveler
   attr_accessor :facing, :x, :y
@@ -78,14 +77,24 @@ class Traveler
       end
     end
   end
-end
 
-def sanitize input
-  input.strip.split(",")
+  def follow instructions
+    instructions.each do |instr|
+      move instr
+    end
+  end
+
+  def calculate_distance
+    x.abs + y.abs
+  end
+
 end
 
 if $0 == __FILE__
-  input = File.read('day1_input.txt')
-  directions = sanitize input
-  calculate_distance directions
+  input = File.read('day01_input.txt')
+  instructions = input.strip.split(",")
+
+  t = Traveler.new
+  t.follow instructions
+  p t.calculate_distance
 end
