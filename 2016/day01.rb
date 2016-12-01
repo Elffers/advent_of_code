@@ -30,14 +30,29 @@
 # away.  R2, R2, R2 leaves you 2 blocks due South of your starting position,
 # which is 2 blocks away.  R5, L5, R5, R3 leaves you 12 blocks away.  How many
 # blocks away is Easter Bunny HQ?
+#
+# --- Part Two ---
+
+# Then, you notice the instructions continue on the back of the Recruiting
+# Document. Easter Bunny HQ is actually at the first location you visit twice.
+
+# For example, if your instructions are R8, R4, R4, R8, the first location you
+# visit twice is 4 blocks away, due East.
+
+# How many blocks away is the first location you visit twice?
+
+#
 
 class Traveler
-  attr_accessor :facing, :x, :y
+  attr_accessor :facing, :x, :y, :visited
 
   def initialize
     @facing = "north"
     @x = 0
     @y = 0
+    @visited = Hash.new do |h, row|
+      h[row] = Hash.new false # y => visited
+    end
   end
 
   def move instruction
@@ -47,15 +62,19 @@ class Traveler
     if dir == "R"
       case facing
       when "north"
+        visit_horiz(blocks)
         self.facing = "east"
         self.x += blocks
       when "east"
+        visit_vert(-blocks)
         self.facing = "south"
         self.y -= blocks
       when "south"
+        visit_horiz(-blocks)
         self.facing = "west"
         self.x -= blocks
       when "west"
+        visit_vert(blocks)
         self.facing = "north"
         self.y += blocks
       end
@@ -63,22 +82,54 @@ class Traveler
     if dir == "L"
       case facing
       when "north"
+        visit_horiz(-blocks)
         self.facing = "west"
         self.x -= blocks
       when "west"
+        visit_vert(-blocks)
         self.facing = "south"
         self.y -= blocks
       when "south"
+        visit_horiz(blocks)
         self.facing = "east"
         self.x += blocks
       when "east"
+        visit_vert(blocks)
         self.facing = "north"
         self.y += blocks
       end
     end
   end
 
+  def visit_vert(blocks)
+    start = [blocks, y].min
+    stop = [blocks, y].max
+    (start..stop).each do |block|
+      if visited[x][block] == true
+        return [x, block]
+      end
+      visited[x][block] = true
+    end
+  end
+
+  def visit_horiz(blocks)
+    start = [blocks, x].min
+    stop = [blocks, x].max
+    (start..stop).each do |block|
+      if visited[block][y] == true
+        return [block, y]
+      end
+      visited[block][y] = true
+    end
+  end
+
   def follow instructions
+    instructions.each do |instr|
+      move instr
+    end
+  end
+
+  def find_visited instructions
     instructions.each do |instr|
       move instr
     end

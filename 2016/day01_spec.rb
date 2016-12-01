@@ -5,6 +5,8 @@ describe Traveler do
 
   describe "move" do
     it "moves to the correct coordinates" do
+      expect(t.visited[t.x][t.y]).to eq false
+
       t.move "R1"
 
       expect(t.x).to eq 1
@@ -28,6 +30,8 @@ describe Traveler do
       expect(t.x).to eq(0)
       expect(t.y).to eq(0)
       expect(t.facing).to eq "north"
+
+      expect(t.visited[t.x][t.y]).to eq true
 
       t.move "L1"
 
@@ -84,4 +88,31 @@ describe Traveler do
       expect(t.calculate_distance).to eq 12
     end
   end
+
+  describe "visit" do
+    it "populates visited graph for horizontal move" do
+      t.move "R2"
+
+      expect(t.visited[0][0]).to eq true
+      expect(t.visited[1][0]).to eq true
+      expect(t.visited[2][0]).to eq true
+      expect(t.visited[3][0]).to eq false
+    end
+
+    it "populates visited graph for vertical move" do
+      t.move "R1"
+      t.move "R1"
+
+      expect(t.visited[0][0]).to eq true
+      expect(t.visited[1][0]).to eq true
+      expect(t.visited[1][-1]).to eq true
+      expect(t.visited[1][1]).to eq false
+    end
+
+    xit "calculates how many blocks from start" do
+      instructions = %w[R8 R4 R4 R8]
+      expect(t.find_visited instructions).to eq 4
+    end
+  end
+
 end
