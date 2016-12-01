@@ -44,94 +44,96 @@
 #
 
 class Traveler
-  attr_accessor :facing, :x, :y, :visited
+  attr_accessor :facing, :x, :y, :instructions
 
   def initialize
     @facing = "north"
     @x = 0
     @y = 0
-    @visited = Hash.new do |h, row|
-      h[row] = Hash.new false # y => visited
+    @instructions = []
+  end
+
+  def parse instructions
+    instructions.each do |instr|
+      /(?<dir>[R,L])(?<blocks>\d+)/ =~ instr
+      instruction = Instruction.new(dir, blocks.to_i)
+      @instructions << instruction
     end
   end
 
   def move instruction
-    /(?<dir>[R,L])(?<blocks>\d+)/ =~ instruction
-    blocks = blocks.to_i
-
-    if dir == "R"
+    blocks = instruction.blocks
+    if instruction.dir == "R"
       case facing
       when "north"
-        visit_horiz(blocks)
         self.facing = "east"
         self.x += blocks
       when "east"
-        visit_vert(-blocks)
         self.facing = "south"
         self.y -= blocks
       when "south"
-        visit_horiz(-blocks)
         self.facing = "west"
         self.x -= blocks
       when "west"
-        visit_vert(blocks)
         self.facing = "north"
         self.y += blocks
       end
     end
-    if dir == "L"
+    if instruction.dir == "L"
       case facing
       when "north"
-        visit_horiz(-blocks)
         self.facing = "west"
         self.x -= blocks
       when "west"
-        visit_vert(-blocks)
         self.facing = "south"
         self.y -= blocks
       when "south"
-        visit_horiz(blocks)
         self.facing = "east"
         self.x += blocks
       when "east"
-        visit_vert(blocks)
         self.facing = "north"
         self.y += blocks
       end
     end
   end
 
-  def visit_vert(blocks)
-    start = [blocks, y].min
-    stop = [blocks, y].max
-    (start..stop).each do |block|
-      if visited[x][block] == true
-        return [x, block]
-      end
-      visited[x][block] = true
+  def peek_four instructions
+    lines = Hash.new { |h, k| h[k] = [] }
+
+    instructions.each do |instr|
+      lines[instr.dir] << instr.blocks
     end
+
+    return if lines.keys.count != 1
+
+    lengths = lines.values.flatten
+
+    return if lengths[0] < lengths[2]
+    return if lengths.last < lengths[1]
+
+    new_instr = instructions.dup
+    new_instr.pop
+    new_last = new_instr[1]
+    new_instr << new_last
   end
 
-  def visit_horiz(blocks)
-    start = [blocks, x].min
-    stop = [blocks, x].max
-    (start..stop).each do |block|
-      if visited[block][y] == true
-        return [block, y]
-      end
-      visited[block][y] = true
-    end
-  end
-
-  def follow instructions
+  def follow_instructions
     instructions.each do |instr|
       move instr
     end
   end
 
-  def find_visited instructions
-    instructions.each do |instr|
-      move instr
+  def find_visited
+    instructions.each_cons(4) do |set|
+      moves = peek_four(set)
+      if moves
+        moves.each do |m|
+          move m
+        end
+        return calculate_distance
+      else
+        move(set.first)
+      end
     end
   end
 
@@ -139,13 +141,29 @@ class Traveler
     x.abs + y.abs
   end
 
+  class Instruction
+    attr_accessor :dir, :blocks
+
+    def initialize(dir, blocks)
+      @dir = dir
+      @blocks = blocks
+    end
+
+    def to_s
+      dir + blocks.to_s
+    end
+  end
+
+
 end
 
 if $0 == __FILE__
-  input = File.read('day01_input.txt')
-  instructions = input.strip.split(",")
+  input = File.read('day01_input.txt').strip.split(",")
 
   t = Traveler.new
-  t.follow instructions
-  p t.calculate_distance
+  t.parse input
+  # t.follow_instructions
+  # p t.calculate_distance
+
+  p t.find_visited
 end

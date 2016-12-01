@@ -5,53 +5,52 @@ describe Traveler do
 
   describe "move" do
     it "moves to the correct coordinates" do
-      expect(t.visited[t.x][t.y]).to eq false
+      instruction = Traveler::Instruction.new("R", 1)
 
-      t.move "R1"
+      t.move instruction
 
       expect(t.x).to eq 1
       expect(t.y).to eq 0
       expect(t.facing).to eq "east"
 
-      t.move "R1"
+      t.move instruction
 
       expect(t.x).to eq 1
       expect(t.y).to eq(-1)
       expect(t.facing).to eq "south"
 
-      t.move "R1"
+      t.move instruction
 
       expect(t.x).to eq(0)
       expect(t.y).to eq(-1)
       expect(t.facing).to eq "west"
 
-      t.move "R1"
+      t.move instruction
 
       expect(t.x).to eq(0)
       expect(t.y).to eq(0)
       expect(t.facing).to eq "north"
 
-      expect(t.visited[t.x][t.y]).to eq true
-
-      t.move "L1"
+      instruction = Traveler::Instruction.new("L", 1)
+      t.move instruction
 
       expect(t.x).to eq(-1)
       expect(t.y).to eq(0)
       expect(t.facing).to eq "west"
 
-      t.move "L1"
+      t.move instruction
 
       expect(t.x).to eq(-1)
       expect(t.y).to eq(-1)
       expect(t.facing).to eq "south"
 
-      t.move "L1"
+      t.move instruction
 
       expect(t.x).to eq(0)
       expect(t.y).to eq(-1)
       expect(t.facing).to eq "east"
 
-      t.move "L1"
+      t.move instruction
 
       expect(t.x).to eq(0)
       expect(t.y).to eq(0)
@@ -61,8 +60,8 @@ describe Traveler do
 
   describe 'follow_instructions' do
     it "puts you at correct destination" do
-      instructions = %w[R2 L3]
-      t.follow instructions
+      t.parse %w[R2 L3]
+      t.follow_instructions
       expect(t.x).to eq 2
       expect(t.y).to eq 3
       expect(t.facing).to eq "north"
@@ -71,47 +70,76 @@ describe Traveler do
 
   describe 'calculate_distance' do
     it "calculates how many blocks from start" do
-      instructions = %w[R2 L3]
-      t.follow instructions
+      t.parse %w[R2 L3]
+      t.follow_instructions
       expect(t.calculate_distance).to eq 5
     end
 
     it "calculates how many blocks from start" do
-      instructions = %w[R2 R2 R2]
-      t.follow instructions
+      t.parse %w[R2 R2 R2]
+      t.follow_instructions
       expect(t.calculate_distance).to eq 2
     end
 
     it "calculates how many blocks from start" do
-      instructions = %w[R5 L5 R5 R3]
-      t.follow instructions
+      t.parse %w[R5 L5 R5 R3]
+      t.follow_instructions
       expect(t.calculate_distance).to eq 12
     end
   end
 
-  describe "visit" do
-    it "populates visited graph for horizontal move" do
-      t.move "R2"
-
-      expect(t.visited[0][0]).to eq true
-      expect(t.visited[1][0]).to eq true
-      expect(t.visited[2][0]).to eq true
-      expect(t.visited[3][0]).to eq false
+  describe "peek_four" do
+    it "returns false if not all dirs are the same" do
+      t.parse %w[R8 R4 R4 L8]
+      expect(t.peek_four t.instructions).to eq nil
     end
 
-    it "populates visited graph for vertical move" do
-      t.move "R1"
-      t.move "R1"
-
-      expect(t.visited[0][0]).to eq true
-      expect(t.visited[1][0]).to eq true
-      expect(t.visited[1][-1]).to eq true
-      expect(t.visited[1][1]).to eq false
+    it "returns nil if there is no intersection" do
+      t.parse %w[R8 R4 R4 R2]
+      expect(t.peek_four t.instructions).to eq nil
     end
 
-    xit "calculates how many blocks from start" do
-      instructions = %w[R8 R4 R4 R8]
-      expect(t.find_visited instructions).to eq 4
+    it "returns nil if there is no intersection" do
+      t.parse %w[R1 R3 R5 R5]
+      expect(t.peek_four t.instructions).to eq nil
+    end
+
+    it "returns nil if there is no intersection" do
+      t.parse %w[L1 L3 L3 L5]
+      expect(t.peek_four t.instructions).to eq nil
+    end
+
+    it "returns true if there is an intersection" do
+      t.parse %w[R8 R4 R4 R8]
+      actual = t.peek_four t.instructions
+      expect(actual.map(&:to_s)).to eq %w[R8 R4 R4 R4]
+    end
+
+    it "returns true if there is an intersection" do
+      t.parse  %w[L8 L4 L6 L4]
+      actual = t.peek_four t.instructions
+      expect(actual.map(&:to_s)).to eq %w[L8 L4 L6 L4]
+    end
+  end
+
+  describe "find_visited" do
+    it "finds distance from first visited" do
+      t.parse %w[R8 R4 R4 R8]
+      expect(t.find_visited).to eq 4
+      expect(t.facing).to eq "north"
+    end
+
+    it "finds distance from first visited" do
+      t.parse %w[L1 R8 R4 R4 R8]
+      expect(t.find_visited).to eq 5
+      expect(t.facing).to eq "west"
+    end
+
+    it "finds distance from first visited" do
+      t.parse %w[L1 L2 L8 R4 R4 R8]
+      expect(t.find_visited).to eq 5
+      p [t.x, t.y]
+      expect(t.facing).to eq "north"
     end
   end
 
