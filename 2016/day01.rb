@@ -44,13 +44,14 @@
 #
 
 class Traveler
-  attr_accessor :facing, :x, :y, :instructions
+  attr_accessor :facing, :x, :y, :instructions, :last_four
 
   def initialize
     @facing = "north"
     @x = 0
     @y = 0
     @instructions = []
+    @last_four = []
   end
 
   def parse instructions
@@ -97,24 +98,32 @@ class Traveler
     end
   end
 
-  def peek_four instructions
-    lines = Hash.new { |h, k| h[k] = [] }
-
-    instructions.each do |instr|
-      lines[instr.dir] << instr.blocks
+  def update_last_four(instr)
+    # could add current coords here?
+    if last_four.size == 4
+      last_four.shift
     end
 
-    return if lines.keys.count != 1
+    last_four << instr
+  end
 
-    lengths = lines.values.flatten
+  def check_last_four #last_four
+    return if last_four.size < 4
+    a, b, c, d = last_four
 
-    return if lengths[0] < lengths[2]
-    return if lengths.last < lengths[1]
+    # check to see if the last three turns were in the same direction
+
+    return if [b.dir, c.dir, d.dir].uniq.length > 1
+    return if a.blocks < c.blocks
+    return if d.blocks < b.blocks
 
     new_instr = instructions.dup
     new_instr.pop
     new_last = new_instr[1]
     new_instr << new_last
+
+    # return distance from last intersection
+    d.blocks - b.blocks
   end
 
   def follow_instructions
@@ -124,16 +133,32 @@ class Traveler
   end
 
   def find_visited
-    instructions.each_cons(4) do |set|
-      moves = peek_four(set)
-      if moves
-        moves.each do |m|
-          move m
-        end
+    instructions.each do |instr|
+      move instr
+      p [instr.to_s, facing, calculate_distance, [x, y]]
+      update_last_four instr
+
+      if blocks = check_last_four
+        backtrack blocks
+        p [x, y]
         return calculate_distance
-      else
-        move(set.first)
       end
+    end
+  end
+
+  def backtrack blocks
+    # construct instruction
+    # blocks is the diff returned from check last four
+    # direction is reverse of current facing
+    case facing
+    when "north"
+      self.y -= blocks
+    when "south"
+      self.y += blocks
+    when "east"
+      self.x -= blocks
+    when "west"
+      self.x += blocks
     end
   end
 
@@ -153,8 +178,6 @@ class Traveler
       dir + blocks.to_s
     end
   end
-
-
 end
 
 if $0 == __FILE__
@@ -162,8 +185,10 @@ if $0 == __FILE__
 
   t = Traveler.new
   t.parse input
-  # t.follow_instructions
-  # p t.calculate_distance
+  t.follow_instructions
+  p t.calculate_distance
 
-  p t.find_visited
+  r = Traveler.new
+  r.parse input
+  p r.find_visited
 end
