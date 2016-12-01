@@ -59,4 +59,5 @@ class Cookie
       ingredients[name][:calories] = calories.to_i
     end
   end
+
 end

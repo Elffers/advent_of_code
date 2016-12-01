@@ -32,8 +32,13 @@ INPUT
           calories: 3
         },
       }
-
+p cookie.ingredients
       expect(cookie.ingredients).to eq expected
+    end
+  end
+
+  describe "score" do
+    xit "returns score" do
     end
   end
 end
