@@ -63,7 +63,6 @@ class Traveler
   end
 
   def move instruction
-
     blocks = instruction.blocks
 
     if instruction.dir == "R"
@@ -113,6 +112,10 @@ class Traveler
     self.y -= blocks
   end
 
+  # Marks each block between start and stop coordinates as visited. Returns
+  # coordinates of current block if it has been visited before, otherwise
+  # returns false.
+
   def mark_visited(start, stop)
     x1, y1 = start
     x2, y2 = stop
@@ -122,7 +125,6 @@ class Traveler
       max = [y1, y2].max
       (min + 1 ...max).each do |block|
         if visited[x1][block] == true
-          p [block, y1]
           return [x1, block]
         else
           visited[x1][block] = true
@@ -135,7 +137,6 @@ class Traveler
       max = [x1, x2].max
       (min + 1 ...max).each do |block|
         if visited[block][y1] == true
-          p [block, y1]
           return [block, y1]
         else
           visited[block][y1] = true
@@ -143,8 +144,11 @@ class Traveler
       end
     end
 
-    # mark start and stop as visited after to avoid counting endpoints twice
-    # during traversal
+    # Mark start and stop coords visited after to avoid counting endpoints
+    # twice during traversal.
+    # NOTE: Marking start as true is only relevant for the first direction;
+    # everywhere else it will already be true since it will have been the
+    # ending point of the last instruction.
     visited[x1][y1] = true
 
     if visited[x2][y2] == true
@@ -157,25 +161,20 @@ class Traveler
   end
 
   def follow_instructions
-    instructions.each do |instr|
-      p [instr.to_s, facing, calculate_distance, [x, y]]
-      move instr
-    end
+    instructions.each { |instr| move instr }
   end
 
   def find_visited
     instructions.each do |instr|
+
       start = [x, y]
-
       move instr
-
       stop = [x, y]
 
-      visits = mark_visited(start, stop)
+      visited_coords = mark_visited(start, stop)
 
-      unless visits == false
-        a, b = visits
-        p [a, b]
+      unless visited_coords == false
+        a, b = visited_coords
         self.x = a
         self.y = b
         return calculate_distance
