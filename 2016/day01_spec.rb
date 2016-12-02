@@ -89,7 +89,6 @@ describe Traveler do
   end
 
   ############
-  #
   describe "mark_visited" do
     it "updates visited grid up to but not including final coordinate" do
       start = [0, 0]
@@ -100,8 +99,10 @@ describe Traveler do
       expect(t.visited[0][0]).to eq true
       expect(t.visited[0][1]).to eq true
       expect(t.visited[0][2]).to eq true
-      expect(t.visited[0][3]).to eq false
+      expect(t.visited[0][3]).to eq true
+    end
 
+    it "updates visited grid up to but not including final coordinate" do
       start = [0, -2]
       stop = [3, -2]
 
@@ -110,11 +111,11 @@ describe Traveler do
       expect(t.visited[0][-2]).to eq true
       expect(t.visited[1][-2]).to eq true
       expect(t.visited[2][-2]).to eq true
-      expect(t.visited[3][-2]).to eq false
+      expect(t.visited[3][-2]).to eq true
     end
   end
 
-  xdescribe "find_visited" do
+  describe "find_visited" do
     it "finds distance from first visited" do
       t.parse %w[R8 R4 R4 R8]
       expect(t.find_visited).to eq 4
@@ -148,15 +149,14 @@ describe Traveler do
     it "finds distance from first visited" do
       t.parse %w[R6 R6 R5 R2 R4 L2 L4 R3]
       # does not cross until after the most recent 4
-      expect(t.find_visited).to eq 2
+      expect(t.find_visited).to eq 1
       expect(t.facing).to eq "north"
     end
 
-    xit "finds distance from first visited" do
+    it "finds distance from first visited" do
       t.parse %w[R2 L5 L4 L5 R4 R1 L4 R5 R3 R1 L1 L1 R4 L4 L1 R4 L4 R4 L3 R5 R4 R1 R3 L1 L1 R1 L2 R5 L4 L3 R1 L2 L2 R192 L3 R5 R48 R5 L2 R76 R4 R2 R1 L1 L5 L1 R185 L5 L1 R5 L4 R1 R3 L4 L3 R1 L5 R4 L4 R4 R5 L3 L1 L2 L4 L3 L4 R2 R2 L3 L5 R2 R5 L1 R1 L3 L5 L3 R4 L4 R3 L1 R5 L3 R2 R4 R2 L1 R3 L1 L3 L5 R4 R5 R2 R2 L5 L3 L1 L1 L5 L2 L3 R3 R3 L3 L4 L5 R2 L1 R1 R3 R4 L2 R1 L1 R3 R3 L4 L2 R5 R5 L1 R4 L5 L5 R1 L5 R4 R2 L1 L4 R1 L1 L1 L5 R3 R4 L2 R1 R2 R1 R1 R3 L5 R1 R4]
-      t.find_visited
-      # expect(t.find_visited).to eq 5
-      expect(t.facing).to eq "north"
+      expect(t.find_visited).to eq 141
+      expect(t.facing).to eq "west"
     end
   end
 

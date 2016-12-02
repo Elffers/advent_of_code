@@ -63,7 +63,6 @@ class Traveler
   end
 
   def move instruction
-    start_coords = [x, y]
 
     blocks = instruction.blocks
 
@@ -99,41 +98,82 @@ class Traveler
         self.y += blocks
       end
     end
-
-    stop_coords = [x, y]
   end
-
 
   def mark_visited(start, stop)
     x1, y1 = start
     x2, y2 = stop
 
     if x1 - x2 == 0
-      (y1...y2).each do |y|
-        visited[x1][y] = true
+      min = [y1, y2].min
+      max = [y1, y2].max
+      (min + 1 ...max).each do |block|
+        if visited[x1][block] == true
+          p [block, y1]
+          return [x1, block]
+        else
+          visited[x1][block] = true
+        end
       end
     end
+
     if y1 - y2 == 0
-      (x1...x2).each do |x|
-        visited[x][y1] = true
+      min = [x1, x2].min
+      max = [x1, x2].max
+      (min + 1 ...max).each do |block|
+        if visited[block][y1] == true
+          p [block, y1]
+          return [block, y1]
+        else
+          visited[block][y1] = true
+        end
       end
     end
+
+    # mark start and stop as visited
+    visited[x1][y1] = true
+
+    if visited[x2][y2] == true
+      return [x2, y2]
+    else
+      visited[x2][y2] = true
+    end
+
+    false
   end
 
   def follow_instructions
     instructions.each do |instr|
+      p [instr.to_s, facing, calculate_distance, [x, y]]
       move instr
     end
   end
 
-  # def find_visited
-  #   instructions.each do |instr|
-  #     move instr
-  #     p [instr.to_s, facing, calculate_distance, [x, y]]
-  #       return calculate_distance
-  #     end
-  #   end
-  # end
+  def find_visited
+    instructions.each do |instr|
+      start = [x, y]
+      p "start: #{start}"
+      p "BEFORE visited: #{visited}"
+      p "--------------------"
+
+      move instr
+
+      stop = [x, y]
+      p "stop: #{stop}"
+      p "AFTER visited: #{visited}"
+      p "--------------------"
+
+      visits = mark_visited(start, stop)
+
+      unless visits == false
+        a, b = visits
+        p [a, b]
+        self.x = a
+        self.y = b
+        return calculate_distance
+      end
+    end
+  end
 
   def calculate_distance
     x.abs + y.abs
@@ -154,7 +194,7 @@ class Traveler
 end
 
 if $0 == __FILE__
-  input = File.read('day01_input.txt').strip.split(",")
+  input = File.read('day01.in').strip.split(",")
 
   t = Traveler.new
   t.parse input
@@ -165,3 +205,6 @@ if $0 == __FILE__
   r.parse input
   p r.find_visited
 end
+
+#232 not right
+#142 not right
