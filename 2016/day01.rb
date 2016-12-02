@@ -185,7 +185,7 @@ class Traveler
         self.x = a
         self.y = b
 
-        return calculate_distance
+        return [x, y]
       end
     end
   end
@@ -219,5 +219,6 @@ if $0 == __FILE__
 
   r = Traveler.new
   r.parse input
-  p "distance to first visited: #{r.find_visited}"
+  r.find_visited
+  p "distance to first visited: #{r.calculate_distance}"
 end
