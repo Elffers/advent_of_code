@@ -69,35 +69,48 @@ class Traveler
     if instruction.dir == "R"
       case facing
       when "north"
-        self.facing = "east"
-        self.x += blocks
+        move_east blocks
       when "east"
-        self.facing = "south"
-        self.y -= blocks
+        move_south blocks
       when "south"
-        self.facing = "west"
-        self.x -= blocks
+        move_west blocks
       when "west"
-        self.facing = "north"
-        self.y += blocks
+        move_north blocks
       end
     end
+
     if instruction.dir == "L"
       case facing
       when "north"
-        self.facing = "west"
-        self.x -= blocks
+        move_west blocks
       when "west"
-        self.facing = "south"
-        self.y -= blocks
+        move_south blocks
       when "south"
-        self.facing = "east"
-        self.x += blocks
+        move_east blocks
       when "east"
-        self.facing = "north"
-        self.y += blocks
+        move_north blocks
       end
     end
+  end
+
+  def move_east blocks
+    self.facing = "east"
+    self.x += blocks
+  end
+
+  def move_west blocks
+    self.facing = "west"
+    self.x -= blocks
+  end
+
+  def move_north blocks
+    self.facing = "north"
+    self.y += blocks
+  end
+
+  def move_south blocks
+    self.facing = "south"
+    self.y -= blocks
   end
 
   def mark_visited(start, stop)
@@ -130,7 +143,8 @@ class Traveler
       end
     end
 
-    # mark start and stop as visited
+    # mark start and stop as visited after to avoid counting endpoints twice
+    # during traversal
     visited[x1][y1] = true
 
     if visited[x2][y2] == true
@@ -152,16 +166,10 @@ class Traveler
   def find_visited
     instructions.each do |instr|
       start = [x, y]
-      p "start: #{start}"
-      p "BEFORE visited: #{visited}"
-      p "--------------------"
 
       move instr
 
       stop = [x, y]
-      p "stop: #{stop}"
-      p "AFTER visited: #{visited}"
-      p "--------------------"
 
       visits = mark_visited(start, stop)
 
@@ -191,6 +199,7 @@ class Traveler
       dir + blocks.to_s
     end
   end
+
 end
 
 if $0 == __FILE__
