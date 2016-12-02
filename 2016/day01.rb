@@ -44,14 +44,14 @@
 #
 
 class Traveler
-  attr_accessor :facing, :x, :y, :instructions, :last_four
+  attr_accessor :facing, :x, :y, :instructions, :visited
 
   def initialize
     @facing = "north"
     @x = 0
     @y = 0
     @instructions = []
-    @last_four = []
+    @visited = Hash.new { |h, row| h[row] = Hash.new false }
   end
 
   def parse instructions
@@ -63,7 +63,10 @@ class Traveler
   end
 
   def move instruction
+    start_coords = [x, y]
+
     blocks = instruction.blocks
+
     if instruction.dir == "R"
       case facing
       when "north"
@@ -96,34 +99,25 @@ class Traveler
         self.y += blocks
       end
     end
+
+    stop_coords = [x, y]
   end
 
-  def update_last_four(instr)
-    # could add current coords here?
-    if last_four.size == 4
-      last_four.shift
+
+  def mark_visited(start, stop)
+    x1, y1 = start
+    x2, y2 = stop
+
+    if x1 - x2 == 0
+      (y1...y2).each do |y|
+        visited[x1][y] = true
+      end
     end
-
-    last_four << instr
-  end
-
-  def check_last_four #last_four
-    return if last_four.size < 4
-    a, b, c, d = last_four
-
-    # check to see if the last three turns were in the same direction
-
-    return if [b.dir, c.dir, d.dir].uniq.length > 1
-    return if a.blocks < c.blocks
-    return if d.blocks < b.blocks
-
-    new_instr = instructions.dup
-    new_instr.pop
-    new_last = new_instr[1]
-    new_instr << new_last
-
-    # return distance from last intersection
-    d.blocks - b.blocks
+    if y1 - y2 == 0
+      (x1...x2).each do |x|
+        visited[x][y1] = true
+      end
+    end
   end
 
   def follow_instructions
@@ -132,35 +126,14 @@ class Traveler
     end
   end
 
-  def find_visited
-    instructions.each do |instr|
-      move instr
-      p [instr.to_s, facing, calculate_distance, [x, y]]
-      update_last_four instr
-
-      if blocks = check_last_four
-        backtrack blocks
-        p [x, y]
-        return calculate_distance
-      end
-    end
-  end
-
-  def backtrack blocks
-    # construct instruction
-    # blocks is the diff returned from check last four
-    # direction is reverse of current facing
-    case facing
-    when "north"
-      self.y -= blocks
-    when "south"
-      self.y += blocks
-    when "east"
-      self.x -= blocks
-    when "west"
-      self.x += blocks
-    end
-  end
+  # def find_visited
+  #   instructions.each do |instr|
+  #     move instr
+  #     p [instr.to_s, facing, calculate_distance, [x, y]]
+  #       return calculate_distance
+  #     end
+  #   end
+  # end
 
   def calculate_distance
     x.abs + y.abs

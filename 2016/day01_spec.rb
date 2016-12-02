@@ -88,53 +88,33 @@ describe Traveler do
     end
   end
 
-  describe "check_last_four" do
+  ############
+  #
+  describe "mark_visited" do
+    it "updates visited grid up to but not including final coordinate" do
+      start = [0, 0]
+      stop = [0, 3]
 
-    def execute
-      t.instructions.each do |instr|
-        t.move instr
-        t.update_last_four instr
-      end
-    end
+      t.mark_visited(start, stop)
 
-    it "returns false if not all dirs are the same" do
-      t.parse %w[R8 R4 R4 L8]
-      execute
-      expect(t.check_last_four).to eq nil
-    end
+      expect(t.visited[0][0]).to eq true
+      expect(t.visited[0][1]).to eq true
+      expect(t.visited[0][2]).to eq true
+      expect(t.visited[0][3]).to eq false
 
-    it "returns nil if there is no intersection" do
-      t.parse %w[R8 R4 R4 R2]
-      execute
-      expect(t.check_last_four).to eq nil
-    end
+      start = [0, -2]
+      stop = [3, -2]
 
-    it "returns nil if there is no intersection" do
-      t.parse %w[R1 R3 R5 R5]
-      execute
-      expect(t.check_last_four).to eq nil
-    end
+      t.mark_visited(start, stop)
 
-    it "returns nil if there is no intersection" do
-      t.parse %w[L1 L3 L3 L5]
-      execute
-      expect(t.check_last_four).to eq nil
-    end
-
-    it "returns true if there is an intersection" do
-      t.parse %w[R8 R4 R4 R8]
-      execute
-      expect(t.check_last_four).to eq 4
-    end
-
-    it "returns true if there is an intersection" do
-      t.parse  %w[L8 L4 L6 L4]
-      execute
-      expect(t.check_last_four).to eq 0
+      expect(t.visited[0][-2]).to eq true
+      expect(t.visited[1][-2]).to eq true
+      expect(t.visited[2][-2]).to eq true
+      expect(t.visited[3][-2]).to eq false
     end
   end
 
-  describe "find_visited" do
+  xdescribe "find_visited" do
     it "finds distance from first visited" do
       t.parse %w[R8 R4 R4 R8]
       expect(t.find_visited).to eq 4
