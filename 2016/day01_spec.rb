@@ -90,7 +90,7 @@ describe Traveler do
 
   ############
   describe "mark_visited" do
-    it "updates visited grid up to but not including final coordinate" do
+    it "updates visited grid with all coords between start and stop, inclusive" do
       start = [0, 0]
       stop = [0, 3]
 
@@ -102,7 +102,7 @@ describe Traveler do
       expect(t.visited[0][3]).to eq true
     end
 
-    it "updates visited grid up to but not including final coordinate" do
+    it "updates visited grid with all coords between start and stop, inclusive" do
       start = [0, -2]
       stop = [3, -2]
 

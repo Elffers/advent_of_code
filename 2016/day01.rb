@@ -41,8 +41,6 @@
 
 # How many blocks away is the first location you visit twice?
 
-#
-
 class Traveler
   attr_accessor :facing, :x, :y, :instructions, :visited
 
@@ -121,31 +119,34 @@ class Traveler
     x2, y2 = stop
 
     if x1 - x2 == 0
-      min = [y1, y2].min
-      max = [y1, y2].max
-      (min + 1 ...max).each do |block|
-        if visited[x1][block] == true
-          return [x1, block]
-        else
-          visited[x1][block] = true
+      blocks = block_range y1, y2
+      row = x1
+
+      blocks.each do |block|
+        if visited[row][block] == true
+          return [row, block]
         end
+
+        visited[row][block] = true
       end
     end
 
     if y1 - y2 == 0
-      min = [x1, x2].min
-      max = [x1, x2].max
-      (min + 1 ...max).each do |block|
-        if visited[block][y1] == true
-          return [block, y1]
-        else
-          visited[block][y1] = true
+      blocks = block_range x1, x2
+      col = y1
+
+      blocks.each do |block|
+        if visited[block][col] == true
+          return [block, col]
         end
+
+        visited[block][col] = true
       end
     end
 
     # Mark start and stop coords visited after to avoid counting endpoints
     # twice during traversal.
+
     # NOTE: Marking start as true is only relevant for the first direction;
     # everywhere else it will already be true since it will have been the
     # ending point of the last instruction.
@@ -160,13 +161,19 @@ class Traveler
     false
   end
 
+  def block_range start, stop
+    min = [start, stop].min
+    max = [start, stop].max
+
+    (min + 1...max)
+  end
+
   def follow_instructions
     instructions.each { |instr| move instr }
   end
 
   def find_visited
     instructions.each do |instr|
-
       start = [x, y]
       move instr
       stop = [x, y]
@@ -177,6 +184,7 @@ class Traveler
         a, b = visited_coords
         self.x = a
         self.y = b
+
         return calculate_distance
       end
     end
@@ -207,12 +215,9 @@ if $0 == __FILE__
   t = Traveler.new
   t.parse input
   t.follow_instructions
-  p t.calculate_distance
+  p "distance: #{t.calculate_distance}"
 
   r = Traveler.new
   r.parse input
-  p r.find_visited
+  p "distance to first visited: #{r.find_visited}"
 end
-
-#232 not right
-#142 not right
