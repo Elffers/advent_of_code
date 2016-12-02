@@ -24,6 +24,31 @@
 # So, in this example, the bathroom code is 1985.
 
 # Your puzzle input is the instructions from the document you found at the front desk. What is the bathroom code?
+# --- Part Two ---
+
+# You finally arrive at the bathroom (it's a several minute walk from the
+# lobby so visitors can behold the many fancy conference rooms and water
+# coolers on this floor) and go to punch in the code. Much to your bladder's
+# dismay, the keypad is not at all like you imagined it. Instead, you are
+# confronted with the result of hundreds of man-hours of
+# bathroom-keypad-design meetings:
+
+#     1
+#   2 3 4
+# 5 6 7 8 9
+#   A B C
+#     D
+# You still start at "5" and stop when you're at an edge, but given the same
+# instructions as above, the outcome is very different:
+
+# You start at "5" and don't move at all (up and left are both edges), ending
+# at 5.  Continuing from "5", you move right twice and down three times
+# (through "6", "7", "B", "D", "D"), ending at D.  Then, from "D", you move
+# five more times (through "D", "B", "C", "C", "B"), ending at B.  Finally,
+# after five more moves, you end at 3.  So, given the actual keypad layout,
+# the code would be 5DB3.
+
+# Using the same instructions in your puzzle input, what is the correct bathroom code?
 
 class Decoder
   attr_accessor :instructions, :code
@@ -49,6 +74,69 @@ class Decoder
   MIN = 0
   MAX = 2
 
+  FANCY_KEYPAD = [
+        %w[1],
+      %w[2 3 4],
+    %w[5 6 7 8 9],
+      %w[A B C],
+        %w[D]
+  ]
+
+  FANCY_KEYPAD_INDEX = {
+    '1' => {'U': nil,
+            'D': '3',
+            'L': nil,
+            'R': nil },
+    '2' => {'U': nil,
+            'D': '6',
+            'L': nil,
+            'R': '3'},
+    '3' => {'U': '1',
+            'D': '7',
+            'L': '2',
+            'R': '4'},
+    '4' => {'U': nil,
+            'D': '8',
+            'L': '3',
+            'R': nil},
+    '5' => {'U': nil,
+            'D': nil,
+            'L': nil,
+            'R': '6'},
+    '6' => {'U': '2',
+            'D': 'A',
+            'L': '5',
+            'R': '7'},
+    '7' => {'U': '3',
+            'D': 'B',
+            'L': '6',
+            'R': '8'},
+    '8' => {'U': '4',
+            'D': 'C',
+            'L': '7',
+            'R': '9'},
+    '9' => {'U': nil,
+            'D': nil,
+            'L': '8',
+            'R': nil},
+    'A' => {'U': '6',
+            'D': nil,
+            'L': nil,
+            'R': 'B'},
+    'B' => {'U': '7',
+            'D': 'D',
+            'L': 'A',
+            'R': 'C'},
+    'C' => {'U': '8',
+            'D': nil,
+            'L': 'B',
+            'R': nil},
+    'D' => {'U': 'B',
+            'D': nil,
+            'L': nil,
+            'R': nil }
+  }
+
   def initialize
     @code = []
   end
@@ -69,17 +157,27 @@ class Decoder
         # p "current:", KEYPAD[x][y]
       when "D"
         x += 1 if x < MAX
-        # p "current:", KEYPAD[x][y]
       when "L"
         y -= 1 if y > MIN
-        # p "current:", KEYPAD[x][y]
       when "R"
         y += 1 if y < MAX
-        # p "current:", KEYPAD[x][y]
       end
     end
 
     KEYPAD[x][y]
+  end
+
+  def decode2 key, instr
+    while !instr.empty?
+      move = instr.shift
+
+      # p "key: #{key}, move: #{move}"
+      if suivant = FANCY_KEYPAD_INDEX[key][move.to_sym]
+        key = suivant
+      end
+    end
+
+    key
   end
 
   def find_code
@@ -87,6 +185,18 @@ class Decoder
     while !instructions.empty?
       instr = instructions.shift
       key = decode start, instr
+      start = key
+      code << key
+    end
+
+    code.join
+  end
+
+  def find_code2
+    start = '5'
+    while !instructions.empty?
+      instr = instructions.shift
+      key = decode2 start, instr
       start = key
       code << key
     end
@@ -102,4 +212,10 @@ if $0 == __FILE__
   d = Decoder.new
   d.parse instructions
   p d.find_code
+
+  h = Decoder.new
+  h.parse instructions
+
+  p h.find_code2
+# 67B61 not right?
 end
