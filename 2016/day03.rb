@@ -10,6 +10,20 @@
 
 # In your puzzle input, how many of the listed triangles are possible?
 
+# --- Part Two ---
+
+# Now that you've helpfully marked up their design documents, it occurs to you that triangles are specified in groups of three vertically. Each set of three numbers in a column specifies a triangle. Rows are unrelated.
+
+# For example, given the following specification, numbers with the same hundreds digit would be part of the same triangle:
+
+# 101 301 501
+# 102 302 502
+# 103 303 503
+# 201 401 601
+# 202 402 602
+# 203 403 603
+# In your puzzle input, and instead reading by columns, how many of the listed triangles are possible?
+
 def valid_triangle? triple
   a, b, c = triple
   return false if a + b <= c
@@ -18,7 +32,8 @@ def valid_triangle? triple
   true
 end
 
-def count_valid_triangles input
+def count_valid_triangles
+  input = File.readlines('day03.in').map { |x| x.split(" ").map { |n| n.to_i } }
   count = 0
 
   input.each do |triple|
@@ -45,9 +60,26 @@ def count_valid_by_col input
   count
 end
 
-if $0 == __FILE__
-  input = File.readlines('day03.in').map { |x| x.split(" ").map { |n| n.to_i } }
+def count_valid_from_stream
+  count = 0
+  File.foreach('day03.in') do |line|
+    /(?<a>\d+)\s+(?<b>\d+)\s+(?<c>\d+)/ =~ line
+    triple = [a, b, c].map { |x| x.to_i }
+    count += 1 if valid_triangle? triple
+  end
 
-  p count_valid_triangles input
-  p count_valid_by_col input #1406 is too low
+  count
+end
+
+
+# if $0 == __FILE__
+#   p count_valid_triangles
+#   # p count_valid_by_col input
+# end
+
+require 'benchmark'
+n = 1000
+Benchmark.bm do |x|
+  x.report { n.times { count_valid_triangles } }
+  x.report { n.times { count_valid_from_stream } }
 end
