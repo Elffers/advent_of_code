@@ -44,6 +44,20 @@
 class Traveler
   attr_accessor :facing, :x, :y, :instructions, :visited
 
+  TURN_LEFT = {
+    'north' => 'west',
+    'south' => 'east',
+    'east' => 'north',
+    'west' => 'south',
+  }
+
+  TURN_RIGHT = {
+    'north' => 'east',
+    'south' => 'west',
+    'east' => 'south',
+    'west' => 'north',
+  }
+
   def initialize
     @facing = "north"
     @x = 0
@@ -60,54 +74,48 @@ class Traveler
     end
   end
 
-  def move instruction
+  def follow instruction
     blocks = instruction.blocks
 
     if instruction.dir == "R"
-      case facing
-      when "north"
-        move_east blocks
-      when "east"
-        move_south blocks
-      when "south"
-        move_west blocks
-      when "west"
-        move_north blocks
-      end
-    end
-
-    if instruction.dir == "L"
-      case facing
-      when "north"
-        move_west blocks
-      when "west"
-        move_south blocks
-      when "south"
-        move_east blocks
-      when "east"
-        move_north blocks
-      end
+      self.facing = TURN_RIGHT[facing]
+      move blocks
+    elsif instruction.dir == "L"
+      self.facing = TURN_LEFT[facing]
+      move blocks
     end
   end
 
-  def move_east blocks
-    self.facing = "east"
-    self.x += blocks
+  def move blocks
+    case facing
+    when 'east'
+      self.x += blocks
+    when 'west'
+      self.x -= blocks
+    when 'north'
+      self.y += blocks
+    when 'south'
+      self.y -= blocks
+    end
   end
 
-  def move_west blocks
-    self.facing = "west"
-    self.x -= blocks
+  def follow_instructions
+    instructions.each { |instr| follow instr }
   end
 
-  def move_north blocks
-    self.facing = "north"
-    self.y += blocks
+  def calculate_distance
+    x.abs + y.abs
   end
 
-  def move_south blocks
-    self.facing = "south"
-    self.y -= blocks
+  ##################
+  # Part 2 methods #
+  ##################
+
+  def block_range start, stop
+    min = [start, stop].min
+    max = [start, stop].max
+
+    (min + 1...max)
   end
 
   # Marks each block between start and stop coordinates as visited. Returns
@@ -161,21 +169,10 @@ class Traveler
     false
   end
 
-  def block_range start, stop
-    min = [start, stop].min
-    max = [start, stop].max
-
-    (min + 1...max)
-  end
-
-  def follow_instructions
-    instructions.each { |instr| move instr }
-  end
-
   def find_visited
     instructions.each do |instr|
       start = [x, y]
-      move instr
+      follow instr
       stop = [x, y]
 
       visited_coords = mark_visited(start, stop)
@@ -190,9 +187,6 @@ class Traveler
     end
   end
 
-  def calculate_distance
-    x.abs + y.abs
-  end
 
   class Instruction
     attr_accessor :dir, :blocks

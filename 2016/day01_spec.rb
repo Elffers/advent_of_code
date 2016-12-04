@@ -3,54 +3,54 @@ require_relative 'day01'
 describe Traveler do
   let(:t) { Traveler.new }
 
-  describe "move" do
+  describe "follow" do
     it "moves to the correct coordinates" do
       instruction = Traveler::Instruction.new("R", 1)
 
-      t.move instruction
+      t.follow instruction
 
       expect(t.x).to eq 1
       expect(t.y).to eq 0
       expect(t.facing).to eq "east"
 
-      t.move instruction
+      t.follow instruction
 
       expect(t.x).to eq 1
       expect(t.y).to eq(-1)
       expect(t.facing).to eq "south"
 
-      t.move instruction
+      t.follow instruction
 
       expect(t.x).to eq(0)
       expect(t.y).to eq(-1)
       expect(t.facing).to eq "west"
 
-      t.move instruction
+      t.follow instruction
 
       expect(t.x).to eq(0)
       expect(t.y).to eq(0)
       expect(t.facing).to eq "north"
 
       instruction = Traveler::Instruction.new("L", 1)
-      t.move instruction
+      t.follow instruction
 
       expect(t.x).to eq(-1)
       expect(t.y).to eq(0)
       expect(t.facing).to eq "west"
 
-      t.move instruction
+      t.follow instruction
 
       expect(t.x).to eq(-1)
       expect(t.y).to eq(-1)
       expect(t.facing).to eq "south"
 
-      t.move instruction
+      t.follow instruction
 
       expect(t.x).to eq(0)
       expect(t.y).to eq(-1)
       expect(t.facing).to eq "east"
 
-      t.move instruction
+      t.follow instruction
 
       expect(t.x).to eq(0)
       expect(t.y).to eq(0)
