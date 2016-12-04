@@ -43,4 +43,13 @@ describe Decrypter do
       expect(d.find_sum rooms).to eq 1514
     end
   end
+
+  describe 'decrypt' do
+    it 'decrypts name' do
+      name = 'qzmt-zixmtkozy-ivhz'
+      id = '343'
+
+      expect(d.decrypt(name, id)).to eq 'very encrypted name'
+    end
+  end
 end
