@@ -51,157 +51,80 @@
 # Using the same instructions in your puzzle input, what is the correct bathroom code?
 
 class Decoder
-  attr_accessor :instructions, :code
+  attr_accessor :instructions, :keypad
 
   KEYPAD = [
-    [1, 2, 3],
-    [4, 5, 6],
-    [7, 8, 9]
+    %w[1 2 3],
+    %w[4 5 6],
+    %w[7 8 9]
   ]
-
-  KEYPAD_INDEX = {
-    1 => [0, 0],
-    2 => [0, 1],
-    3 => [0, 2],
-    4 => [1, 0],
-    5 => [1, 1],
-    6 => [1, 2],
-    7 => [2, 0],
-    8 => [2, 1],
-    9 => [2, 2],
-  }
-
-  MIN = 0
-  MAX = 2
 
   FANCY_KEYPAD = [
-        %w[1],
-      %w[2 3 4],
+    %w[* * 1 * *],
+    %w[* 2 3 4 *],
     %w[5 6 7 8 9],
-      %w[A B C],
-        %w[D]
+    %w[* A B C *],
+    %w[* * D * *]
   ]
 
-  FANCY_KEYPAD_INDEX = {
-    '1' => {'U': nil,
-            'D': '3',
-            'L': nil,
-            'R': nil },
-    '2' => {'U': nil,
-            'D': '6',
-            'L': nil,
-            'R': '3'},
-    '3' => {'U': '1',
-            'D': '7',
-            'L': '2',
-            'R': '4'},
-    '4' => {'U': nil,
-            'D': '8',
-            'L': '3',
-            'R': nil},
-    '5' => {'U': nil,
-            'D': nil,
-            'L': nil,
-            'R': '6'},
-    '6' => {'U': '2',
-            'D': 'A',
-            'L': '5',
-            'R': '7'},
-    '7' => {'U': '3',
-            'D': 'B',
-            'L': '6',
-            'R': '8'},
-    '8' => {'U': '4',
-            'D': 'C',
-            'L': '7',
-            'R': '9'},
-    '9' => {'U': nil,
-            'D': nil,
-            'L': '8',
-            'R': nil},
-    'A' => {'U': '6',
-            'D': nil,
-            'L': nil,
-            'R': 'B'},
-    'B' => {'U': '7',
-            'D': 'D',
-            'L': 'A',
-            'R': 'C'},
-    'C' => {'U': '8',
-            'D': nil,
-            'L': 'B',
-            'R': nil},
-    'D' => {'U': 'B',
-            'D': nil,
-            'L': nil,
-            'R': nil }
-  }
-
-  def initialize
-    @code = []
+  def initialize keypad
+    @keypad = keypad
   end
 
   def parse instructions
     @instructions = instructions.map { |x| x.strip.chars }
   end
 
-  def decode start, instr
-    x, y = KEYPAD_INDEX[start]
+  def decode current, instr
+    x, y = current
 
     while !instr.empty?
       move = instr.shift
 
       case move
       when "U"
-        x -= 1 if x > MIN
-        # p "current:", KEYPAD[x][y]
+        new_x = x - 1
+        x = new_x if valid? new_x, y
       when "D"
-        x += 1 if x < MAX
+        new_x = x + 1
+        x = new_x if valid? new_x, y
       when "L"
-        y -= 1 if y > MIN
+        new_y = y - 1
+        y = new_y if valid? x, new_y
       when "R"
-        y += 1 if y < MAX
+        new_y = y + 1
+        y = new_y if valid? x, new_y
       end
     end
 
-    KEYPAD[x][y]
+    [x, y]
   end
 
-  def decode2 key, instr
-    while !instr.empty?
-      move = instr.shift
+  def valid? x, y
+    max = keypad.size
 
-      # p "key: #{key}, move: #{move}"
-      if suivant = FANCY_KEYPAD_INDEX[key][move.to_sym]
-        key = suivant
-      end
-    end
-
-    key
+    x >= 0 &&
+    x < max &&
+    y >= 0 &&
+    y < max &&
+    keypad[x][y] != '*'
   end
 
-  def find_code
-    start = 5
+  # start is an array of indexes [x, y]
+  def find_code start
+    current = start
+    code = ""
+
     while !instructions.empty?
       instr = instructions.shift
-      key = decode start, instr
-      start = key
-      code << key
+      current = decode current, instr
+
+      x, y = current
+      key = keypad[x][y]
+      code += key
     end
 
-    code.join
-  end
-
-  def find_code2
-    start = '5'
-    while !instructions.empty?
-      instr = instructions.shift
-      key = decode2 start, instr
-      start = key
-      code << key
-    end
-
-    code.join
+    code
   end
 
 end
@@ -209,13 +132,12 @@ end
 if $0 == __FILE__
   instructions = File.readlines('day02.in')
 
-  d = Decoder.new
+  d = Decoder.new Decoder::KEYPAD
   d.parse instructions
-  p d.find_code
+  p d.find_code [1, 1]
 
-  h = Decoder.new
+  h = Decoder.new Decoder::FANCY_KEYPAD
   h.parse instructions
 
-  p h.find_code2
-# 67B61 not right?
+  p h.find_code [2, 0]
 end
