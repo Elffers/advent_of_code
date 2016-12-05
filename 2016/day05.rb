@@ -8,7 +8,7 @@
 # time by finding the MD5 hash of some Door ID (your puzzle input) and an
 # increasing integer index (starting with 0).
 
-# A hash indicates the next character in the password if its hexadecimal
+# A hash indicates the next character in the password if its digestadecimal
 # representation starts with five zeroes. If it does, the sixth character in
 # the hash is the next character of the password.
 
@@ -57,45 +57,23 @@
 require 'digest'
 
 class PasswordGenerator
-  attr_accessor :md5, :id
+  attr_accessor :md5, :id, :password
 
   def initialize door_id
     @id = door_id
     @md5 = Digest::MD5.new
+    @password = []
   end
 
-  def build_password
-    password = ""
+  def search
     index = 0
 
-    while password.length < 8
+    until password_complete?
       hash = id + index.to_s
-      hex = md5.hexdigest hash
+      digest = md5.hexdigest hash
 
-      if hex.start_with? "00000"
-        password += hex[5]
-      end
-
-      index += 1
-    end
-    password
-  end
-
-  def build_password2
-    password = Array.new 8
-    index = 0
-
-    while password.any? { |x| x.nil? }
-      hash = id + index.to_s
-      hex = md5.hexdigest hash
-
-      if hex.start_with? "00000"
-        position = hex[5]
-        char = hex[6]
-
-        if valid? position
-          password[position.to_i] = char if password[position.to_i].nil?
-        end
+      if digest.start_with? "00000"
+        yield digest
       end
 
       index += 1
@@ -104,14 +82,34 @@ class PasswordGenerator
     password.join
   end
 
+  def password_complete?
+    password.length == 8 && password.all?
+  end
+
+  def build_password_in_order
+    search do |digest|
+      password << digest[5]
+    end
+  end
+
+  def build_password_random_order
+    search do |digest|
+      position = digest[5]
+      char = digest[6]
+
+      if password[position.to_i].nil? && valid?(position)
+        password[position.to_i] = char
+      end
+    end
+  end
+
   def valid? position
     /\d/ =~ position && position.to_i < 8
   end
 end
 
-
 if $0 == __FILE__
   pg = PasswordGenerator.new 'uqwqemis'
-  p pg.build_password
-  p pg.build_password2
+  p pg.build_password_in_order
+  p pg.build_password_random_order
 end
