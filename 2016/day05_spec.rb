@@ -9,4 +9,11 @@ describe PasswordGenerator do
       expect(pg.build_password).to eq expected
     end
   end
+
+  describe 'build_password2' do
+    it "builds password" do
+      expected = '05ace8e3'
+      expect(pg.build_password2).to eq expected
+    end
+  end
 end
