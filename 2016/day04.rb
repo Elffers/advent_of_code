@@ -36,13 +36,19 @@
 # What is the sector ID of the room where North Pole objects are stored?
 
 class Decrypter
-  ALPHA = %w[a b c d e f g h i j k l m n o p q r s t u v w x y z]
+  attr_accessor :rooms
+  ALPHA = ('a'..'z').to_a
 
-  def parse_room room
-    /(?<name>\D+)(?<id>\d+)\[(?<checksum>\w+)/ =~ room
+  def initialize
+    @rooms = []
+  end
+
+  def parse_room encoding
+    /(?<name>\D+)(?<id>\d+)\[(?<checksum>\w+)/ =~ encoding
     actual_checksum = find_checksum name
     if actual_checksum == checksum
-      return id.to_i
+      room = Room.new name, id.to_i
+      rooms << room
     end
   end
 
@@ -59,11 +65,13 @@ class Decrypter
       grouped_by_counts[count] << char
     end
 
+    # Traverse groups of letters by highest count
     max_counts = grouped_by_counts.keys.sort.reverse
 
     actual_checksum = ""
 
     max_counts.each do |count|
+      # Sort array of letters for each key to ensure alphabetization
       grouped_by_counts[count].sort.each do |char|
         actual_checksum += char
         return actual_checksum if actual_checksum.size == 5
@@ -71,28 +79,14 @@ class Decrypter
     end
   end
 
-  def find_sum rooms
-    sum = 0
-    rooms.each do |room|
-      if id = parse_room(room)
-        sum += id
-      end
+  def filter_rooms encodings
+    encodings.each do |encoding|
+      parse_room encoding
     end
-
-    sum
   end
 
-  def decrypt_rooms rooms
-    rooms.each do |room|
-      /(?<name>\D+)(?<id>\d+)\[(?<checksum>\w+)/ =~ room
-      actual_checksum = find_checksum name
-      if actual_checksum == checksum
-        decrypted = decrypt name, id
-        if /north/ =~ decrypted
-          return [decrypted, id]
-        end
-      end
-    end
+  def find_sum
+    rooms.map(&:id).reduce(:+)
   end
 
   def decrypt name, id
@@ -107,12 +101,32 @@ class Decrypter
       end
     end.join
   end
+
+  def decrypt_rooms
+    rooms.each do |room|
+      decrypted = decrypt room.name, room.id
+      if /north/ =~ decrypted
+        return [decrypted, room.id]
+      end
+    end
+  end
+
+  class Room
+    attr_accessor :name, :id
+
+    def initialize name, id
+      @name = name
+      @id = id
+    end
+  end
 end
 
 
 if $0 == __FILE__
-  rooms = File.readlines('day04.in')
+  encodings = File.readlines('day04.in')
   d = Decrypter.new
-  # p d.find_sum rooms
-  p d.decrypt_rooms rooms
+  d.filter_rooms encodings
+
+  p d.find_sum
+  p d.decrypt_rooms
 end

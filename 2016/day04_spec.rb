@@ -17,30 +17,37 @@ describe Decrypter do
   end
 
   describe 'parse_room' do
-    it "returns id if valid room" do
-      room = 'aaaaa-bbb-z-y-x-123[abxyz]'
-      expect(d.parse_room room).to eq 123
+    it "returns adds valid room to rooms" do
+      encoding = 'aaaaa-bbb-z-y-x-123[abxyz]'
+      d.parse_room encoding
+      expect(d.rooms.map(&:id)).to eq [123]
 
-      room = 'a-b-c-d-e-f-g-h-987[abcde]'
-      expect(d.parse_room room).to eq 987
+      encoding = 'a-b-c-d-e-f-g-h-987[abcde]'
+      d.parse_room encoding
+      expect(d.rooms.map(&:id)).to eq [123, 987]
 
-      room = 'not-a-real-room-404[oarel]'
-      expect(d.parse_room room).to eq 404
+      encoding = 'not-a-real-room-404[oarel]'
+      d.parse_room encoding
+      expect(d.rooms.map(&:id)).to eq [123, 987, 404]
     end
 
     it "returns nil if not valid room" do
-      room = 'totally-real-room-200[decoy]'
-      expect(d.parse_room room).to eq nil
+      encoding = 'totally-real-room-200[decoy]'
+      d.parse_room encoding
+      expect(d.rooms).to be_empty
     end
   end
 
   describe 'find_sum' do
     it 'returns sum of room ids' do
-      rooms = ['aaaaa-bbb-z-y-x-123[abxyz]',
+      encodings = ['aaaaa-bbb-z-y-x-123[abxyz]',
                'a-b-c-d-e-f-g-h-987[abcde]',
                'not-a-real-room-404[oarel]',
                'totally-real-room-200[decoy]']
-      expect(d.find_sum rooms).to eq 1514
+
+      d.filter_rooms encodings
+
+      expect(d.find_sum).to eq 1514
     end
   end
 
