@@ -39,10 +39,10 @@ def valid_triangle? triple
   true
 end
 
-def count_valid_triangles
-  input = File.readlines('day03.in').map { |x|
-    x.split(" ", 3).map { |n| n.to_i }
-  }
+def count_valid_triangles input
+  # input = File.readlines('day03.in').map { |x|
+    # x.split(" ", 3).map { |n| n.to_i }
+  # }
   count = 0
 
   input.each do |triple|
@@ -57,15 +57,9 @@ end
 def count_valid_by_col input
   count = 0
   input.each_slice(3) do |slice| # 3 by 3
-    a, b, c = slice
-
-    triple1 = [a[0], b[0], c[0]]
-    triple2 = [a[1], b[1], c[1]]
-    triple3 = [a[2], b[2], c[2]]
-
-    count += 1 if valid_triangle? triple1
-    count += 1 if valid_triangle? triple2
-    count += 1 if valid_triangle? triple3
+    slice.transpose.each do |triple|
+      count += 1 if valid_triangle? triple
+    end
   end
 
   count
@@ -81,15 +75,17 @@ def count_valid_from_stream
   count
 end
 
-# if $0 == __FILE__
-#   input = File.readlines('day03.in').map { |x| x.split(" ").map { |n| n.to_i } }
-#   p count_valid_triangles input
-#   p count_valid_by_col input
-# end
-
-require 'benchmark'
-n = 1000
-Benchmark.bmbm do |x|
-  x.report { n.times { count_valid_triangles } }
-  x.report { n.times { count_valid_from_stream } }
+if $0 == __FILE__
+  input = File.readlines('day03.in').map { |x| x.split(" ").map { |n| n.to_i } }
+  p count_valid_triangles input
+  p count_valid_by_col input
+  # 917
+  # 1649
 end
+
+# require 'benchmark'
+# n = 1000
+# Benchmark.bmbm do |x|
+#   x.report { n.times { count_valid_triangles } }
+#   x.report { n.times { count_valid_from_stream } }
+# end
