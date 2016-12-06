@@ -72,11 +72,6 @@ class Traveler
     [dir, blocks.to_i]
   end
 
-  def follow dir, blocks
-    turn dir
-    move blocks
-  end
-
   def turn dir
     if dir == "R"
       self.facing = TURN_RIGHT[facing]
@@ -98,10 +93,17 @@ class Traveler
     end
   end
 
-  def follow_instructions input
+  def read_instructions input
     input.each do |instr|
       dir, blocks = parse instr
-      follow dir, blocks
+      turn dir
+      yield blocks
+    end
+  end
+
+  def follow_instructions input
+    read_instructions input do |blocks|
+      move blocks
     end
   end
 
@@ -114,21 +116,18 @@ class Traveler
   ##################
 
   def find_visited input
-    input.each do |instr|
-      parse instr
-      dir, blocks = parse instr
-      turn dir
-
+    read_instructions input do |blocks|
       visited << [x, y]
 
       blocks.times do
         move 1
 
         if visited.include? [x, y]
-          return calculate_distance
+          return
         else
           visited << [x, y]
         end
+
       end
     end
   end

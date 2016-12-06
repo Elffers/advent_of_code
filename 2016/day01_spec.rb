@@ -3,58 +3,6 @@ require_relative 'day01'
 describe Traveler do
   let(:t) { Traveler.new }
 
-  describe "follow" do
-    it "moves to the correct coordinates" do
-      t.follow "R", 1
-
-      expect(t.x).to eq 1
-      expect(t.y).to eq 0
-      expect(t.facing).to eq "east"
-
-      t.follow "R", 1
-
-      expect(t.x).to eq 1
-      expect(t.y).to eq(-1)
-      expect(t.facing).to eq "south"
-
-      t.follow "R", 1
-
-      expect(t.x).to eq(0)
-      expect(t.y).to eq(-1)
-      expect(t.facing).to eq "west"
-
-      t.follow "R", 1
-
-      expect(t.x).to eq(0)
-      expect(t.y).to eq(0)
-      expect(t.facing).to eq "north"
-
-      t.follow "L", 1
-
-      expect(t.x).to eq(-1)
-      expect(t.y).to eq(0)
-      expect(t.facing).to eq "west"
-
-      t.follow "L", 1
-
-      expect(t.x).to eq(-1)
-      expect(t.y).to eq(-1)
-      expect(t.facing).to eq "south"
-
-      t.follow "L", 1
-
-      expect(t.x).to eq(0)
-      expect(t.y).to eq(-1)
-      expect(t.facing).to eq "east"
-
-      t.follow "L", 1
-
-      expect(t.x).to eq(0)
-      expect(t.y).to eq(0)
-      expect(t.facing).to eq "north"
-    end
-  end
-
   describe 'follow_instructions' do
     it "puts you at correct destination" do
       input = %w[R2 L3]
@@ -82,40 +30,6 @@ describe Traveler do
       input = %w[R5 L5 R5 R3]
       t.follow_instructions input
       expect(t.calculate_distance).to eq 12
-    end
-  end
-
-  xdescribe "follow_and_mark" do
-    it "updates visited grid with all coords between start and stop, inclusive" do
-
-      t.follow_and_mark "R", 3
-
-      expect(t.visited.include? [0, 0]).to eq true
-      expect(t.visited.include? [1, 0]).to eq true
-      expect(t.visited.include? [2, 0]).to eq true
-      expect(t.visited.include? [3, 0]).to eq true
-    end
-
-    it "updates visited grid with all coords between start and stop, inclusive" do
-      t.x = 0
-      t.y = -2
-      t.facing = "north"
-
-      instruction = Traveler::Instruction.new("R", 3)
-
-      t.follow_and_mark instruction
-
-      expect(t.visited.include? [0, -2]).to eq true
-      expect(t.visited.include? [1, -2]).to eq true
-      expect(t.visited.include? [2, -2]).to eq true
-      expect(t.visited.include? [3, -2]).to eq true
-    end
-
-    it "returns distance from start if finds visited block" do
-      t.visited << [2, 0]
-      instruction = Traveler::Instruction.new("R", 3)
-
-      expect(t.follow_and_mark instruction).to eq 2
     end
   end
 
