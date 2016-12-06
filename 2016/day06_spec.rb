@@ -1,5 +1,5 @@
 require_relative 'day06'
-describe 'parse' do
+describe 'build' do
   let(:input) { StringIO.new(<<INPUT
 eedadn
 drvtee
@@ -28,6 +28,15 @@ INPUT
 
   it 'finds word' do
     expect(build t).to eq 'easter'
+  end
+
+  it 'works' do
+    col = t.first
+    expect(find_min col).to eq 'a'
+  end
+
+  it 'works' do
+    expect(build2 t).to eq 'advent'
   end
 end
 
