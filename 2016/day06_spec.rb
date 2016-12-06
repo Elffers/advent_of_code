@@ -1,5 +1,7 @@
 require_relative 'day06'
+
 describe 'build' do
+
   let(:input) { StringIO.new(<<INPUT
 eedadn
 drvtee
@@ -21,22 +23,12 @@ INPUT
                             ).readlines }
   let(:t) { transpose input }
 
-  it "returns highest count at each index" do
-    col = t.first
-    expect(find_max col).to eq 'e'
+  it 'returns word built with most frequently occuring characters' do
+    expect(most_frequent t).to eq 'easter'
   end
 
-  it 'finds word' do
-    expect(build t).to eq 'easter'
-  end
-
-  it 'works' do
-    col = t.first
-    expect(find_min col).to eq 'a'
-  end
-
-  it 'works' do
-    expect(build2 t).to eq 'advent'
+  it 'returns word built with least frequently occuring characters' do
+    expect(least_frequent t).to eq 'advent'
   end
 end
 

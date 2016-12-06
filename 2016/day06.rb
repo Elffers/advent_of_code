@@ -50,39 +50,36 @@ def transpose input
   input.map { |line| line.strip.chars }.transpose
 end
 
-def find_max col
+def frequency col, sort_order
   counts = Hash.new 0
   col.each do |char|
     counts[char] += 1
   end
-  counts.sort_by { |char, count| count }.last.first
-end
 
-def find_min col
-  counts = Hash.new 0
-  col.each do |char|
-    counts[char] += 1
-  end
-  counts.sort_by { |char, count| count }.first.first
+  col.send(sort_order) { |char| counts[char] }
 end
 
 def build cols
   cols.map do |col|
-    find_max col
+    yield col
   end.join
 end
 
-def build2 cols
-  cols.map do |col|
-    find_min col
-  end.join
+def most_frequent cols
+  build cols do |col|
+    frequency col, :max_by
+  end
 end
 
-
+def least_frequent cols
+  build cols do |col|
+    frequency col, :min_by
+  end
+end
 
 if $0 == __FILE__
   input = File.readlines('day06.in')
   cols =  transpose input
-  p build cols
-  p build2 cols
+  p most_frequent cols
+  p least_frequent cols
 end
