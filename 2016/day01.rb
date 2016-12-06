@@ -41,8 +41,10 @@
 
 # How many blocks away is the first location you visit twice?
 
+require 'set'
+
 class Traveler
-  attr_accessor :facing, :x, :y, :instructions, :visited
+  attr_accessor :facing, :x, :y, :visited
 
   TURN_LEFT = {
     'north' => 'west',
@@ -62,27 +64,24 @@ class Traveler
     @facing = "north"
     @x = 0
     @y = 0
-    @instructions = []
-    @visited = Hash.new { |h, row| h[row] = Hash.new false }
+    @visited = Set.new
   end
 
-  def parse instructions
-    instructions.each do |instr|
-      /(?<dir>[R,L])(?<blocks>\d+)/ =~ instr
-      instruction = Instruction.new(dir, blocks.to_i)
-      @instructions << instruction
-    end
+  def parse instr
+    /(?<dir>[R,L])(?<blocks>\d+)/ =~ instr
+    [dir, blocks.to_i]
   end
 
-  def follow instruction
-    blocks = instruction.blocks
+  def follow dir, blocks
+    turn dir
+    move blocks
+  end
 
-    if instruction.dir == "R"
+  def turn dir
+    if dir == "R"
       self.facing = TURN_RIGHT[facing]
-      move blocks
-    elsif instruction.dir == "L"
+    elsif dir == "L"
       self.facing = TURN_LEFT[facing]
-      move blocks
     end
   end
 
@@ -99,8 +98,11 @@ class Traveler
     end
   end
 
-  def follow_instructions
-    instructions.each { |instr| follow instr }
+  def follow_instructions input
+    input.each do |instr|
+      dir, blocks = parse instr
+      follow dir, blocks
+    end
   end
 
   def calculate_distance
@@ -111,108 +113,35 @@ class Traveler
   # Part 2 methods #
   ##################
 
-  def block_range start, stop
-    min = [start, stop].min
-    max = [start, stop].max
+  def find_visited input
+    input.each do |instr|
+      parse instr
+      dir, blocks = parse instr
+      turn dir
 
-    (min + 1...max)
-  end
+      visited << [x, y]
 
-  # Marks each block between start and stop coordinates as visited. Returns
-  # coordinates of current block if it has been visited before, otherwise
-  # returns false.
+      blocks.times do
+        move 1
 
-  def mark_visited(start, stop)
-    x1, y1 = start
-    x2, y2 = stop
-
-    if x1 - x2 == 0
-      blocks = block_range y1, y2
-      row = x1
-
-      blocks.each do |block|
-        if visited[row][block] == true
-          return [row, block]
+        if visited.include? [x, y]
+          return calculate_distance
+        else
+          visited << [x, y]
         end
-
-        visited[row][block] = true
-      end
-    end
-
-    if y1 - y2 == 0
-      blocks = block_range x1, x2
-      col = y1
-
-      blocks.each do |block|
-        if visited[block][col] == true
-          return [block, col]
-        end
-
-        visited[block][col] = true
-      end
-    end
-
-    # Mark start and stop coords visited after to avoid counting endpoints
-    # twice during traversal.
-
-    # NOTE: Marking start as true is only relevant for the first direction;
-    # everywhere else it will already be true since it will have been the
-    # ending point of the last instruction.
-    visited[x1][y1] = true
-
-    if visited[x2][y2] == true
-      return [x2, y2]
-    else
-      visited[x2][y2] = true
-    end
-
-    false
-  end
-
-  def find_visited
-    instructions.each do |instr|
-      start = [x, y]
-      follow instr
-      stop = [x, y]
-
-      visited_coords = mark_visited(start, stop)
-
-      unless visited_coords == false
-        a, b = visited_coords
-        self.x = a
-        self.y = b
-
-        return [x, y]
       end
     end
   end
-
-
-  class Instruction
-    attr_accessor :dir, :blocks
-
-    def initialize(dir, blocks)
-      @dir = dir
-      @blocks = blocks
-    end
-
-    def to_s
-      dir + blocks.to_s
-    end
-  end
-
 end
 
 if $0 == __FILE__
   input = File.read('day01.in').strip.split(",")
 
   t = Traveler.new
-  t.parse input
-  t.follow_instructions
+  t.follow_instructions input
   p "distance: #{t.calculate_distance}"
 
   r = Traveler.new
-  r.parse input
-  r.find_visited
+  r.find_visited input
   p "distance to first visited: #{r.calculate_distance}"
 end
