@@ -1,28 +1,29 @@
+def parse ip
+  seqs = ip.split(/\[|\]/)
+  evens, odds = seqs.partition.with_index { |seq, i| i.even? }
+
+  yield evens, odds
+end
+
 def abba? seq
   (/(\w)(\w)\2\1/ =~ seq) && ($1 != $2)
 end
 
 def supports_tls? ip
-  seqs = ip.split(/\[|\]/)
-
-  evens = seqs.select.with_index { |seq, i| i.even? && (abba? seq) }
-  odds = seqs.select.with_index { |seq, i| i.odd? && (abba? seq) }
-
-  !evens.empty? && odds.empty?
+  parse ip do |evens, odds|
+    evens.any? { |seq| abba? seq } &&
+    odds.none? { |seq| abba? seq }
+  end
 end
 
 # part 2
 
 def aba? seq
   abas = []
-  i = 0
-
-  while i < seq.length - 2
-    substring = seq[i..seq.length]
-    if /(\w)(\w)\1/ =~ substring && $1 != $2
+  seq.chars.each_cons(3) do |substring|
+    if /(\w)(\w)\1/ =~ substring.join && $1 != $2
       abas << $&
     end
-    i += 1
   end
 
   abas
@@ -35,16 +36,11 @@ def bab? seqs, aba
 end
 
 def supports_ssl? ip
-  seqs = ip.split(/\[|\]/)
-
-  evens = seqs.select.with_index { |seq, i| i.even? }
-  babs = seqs.select.with_index { |seq, i| i.odd? }
-
-  abas = evens.map { |seq| aba? seq }.flatten
-
-  abas.any? { |aba| bab? babs, aba }
+  parse ip do |evens, odds|
+    abas = evens.map { |seq| aba? seq }.flatten
+    abas.any? { |aba| bab? odds, aba }
+  end
 end
-
 
 # p supports_ssl? 'aba[bab]xyz'   #true
 # p supports_ssl? 'xyx[xyx]xyx'   #false
