@@ -1,84 +1,56 @@
-def parse line
-  words = line.split(/\[|\]/)
-  palindromes = []
-  non_palindromes = []
-  words.each_with_index do |w, i|
-    if has_palin w
-      if i.even?
-        palindromes << w
-      else
-        non_palindromes << w
-      end
-    end
-  end
-  p "palindromes: #{palindromes}"
-
-  line if !palindromes.empty? && non_palindromes.empty?
+def abba? seq
+  (/(\w)(\w)\2\1/ =~ seq) && ($1 != $2)
 end
 
-def has_palin word
-  (/(\w)(\w)\2\1/ =~ word) && ($1 != $2)
+def supports_tls? ip
+  seqs = ip.split(/\[|\]/)
+
+  evens = seqs.select.with_index { |seq, i| i.even? && (abba? seq) }
+  odds = seqs.select.with_index { |seq, i| i.odd? && (abba? seq) }
+
+  !evens.empty? && odds.empty?
 end
 
-# p parse 'abba[mnop]qrst'
-# p parse 'abcd[bddb]xyyx'
-# p parse 'aaaa[qwer]tyui'
-# p parse 'ioxxoj[asdfgh]zxcvbn'
-# p parse 'xdsqxnovprgovwzkus[fmadbfsbqwzzrzrgdg]aeqornszgvbizdm'
+# part 2
 
-# input = File.readlines('day07.in').map { |x| x.strip }
-# p input.count { |line| parse line }
-
-def aba? word
+def aba? seq
   abas = []
   i = 0
 
-  while i <= word.length - 3
-    substring = word[i..word.length]
+  while i < seq.length - 2
+    substring = seq[i..seq.length]
     if /(\w)(\w)\1/ =~ substring && $1 != $2
       abas << $&
     end
     i += 1
   end
+
   abas
 end
 
-def bab? words, aba
+def bab? seqs, aba
   a, b = aba.chars
   bab = b + a + b
-  words.each do |word|
-    return true if word.include? bab
-  end
-  nil
+  seqs.any? { |seq| seq.include? bab }
 end
 
-def parse2 line
-  words = line.split(/\[|\]/)
-  abas = []
-  babs = []
+def supports_ssl? ip
+  seqs = ip.split(/\[|\]/)
 
-  words.each_with_index do |w, i|
-    if i.even?
-      if x = aba?(w)
-        abas.concat x
-      end
-    else
-      babs << w
-    end
-  end
-  # p "abas: #{abas}"
+  evens = seqs.select.with_index { |seq, i| i.even? }
+  babs = seqs.select.with_index { |seq, i| i.odd? }
 
-  abas.each do |aba|
-    return line if bab? babs, aba
-  end
-  nil
+  abas = evens.map { |seq| aba? seq }.flatten
+
+  abas.any? { |aba| bab? babs, aba }
 end
 
 
-p parse2 'aba[bab]xyz' #yes
-p parse2 'xyx[xyx]xyx' #no
-p parse2 'aaa[kek]eke' #yes
-p parse2 'zazbz[bzb]cdb' #yes
+# p supports_ssl? 'aba[bab]xyz'   #true
+# p supports_ssl? 'xyx[xyx]xyx'   #false
+# p supports_ssl? 'aaa[kek]eke'   #true
+# p supports_ssl? 'zazbz[bzb]cdb' #true
 
 input = File.readlines('day07.in').map { |x| x.strip }
-p input.count { |line| parse2 line }
+p input.count { |ip| supports_tls? ip }
+p input.count { |ip| supports_ssl? ip }
