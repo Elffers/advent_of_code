@@ -64,4 +64,10 @@ if __FILE__ == $0
   end
 
   p a.count_lit
+
+  a.board.map(&:join).map do |line|
+    line.gsub!(".", " ")
+    puts line
+  end
+
 end
