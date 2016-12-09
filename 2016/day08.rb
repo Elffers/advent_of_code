@@ -22,31 +22,18 @@ class Auth
     end
 
     if instr['rotate row']
-      board[x] = shift board[x], y
+      board[x].rotate!(-y)
     end
 
     if instr['rotate column']
       t = board.transpose
-      shift t[x], y
-      t[x] = shift t[x], y
+      t[x].rotate!(-y)
       self.board = t.transpose
     end
   end
 
-  def shift row, n
-    length = row.length
-    new_row = ['.'] * length
-
-    row.each_with_index do |x, i|
-      shifted = (i + n) % length
-      new_row[shifted] = x
-    end
-
-    new_row
-  end
-
   def count_lit
-    board.flatten.count { |x| x == '#' }
+    board.flatten.count('#')
   end
 end
 
