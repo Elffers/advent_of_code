@@ -43,7 +43,7 @@ class BotManager
   def deliver id
     chips = bots[id]
     if (chips.count == 2) && queue[id]
-      abort id if chips.sort == [17, 61]
+      p id if chips.sort == [17, 61]
 
       low, hi = chips.sort
       bots[id].clear
@@ -78,7 +78,9 @@ if __FILE__ == $0
     b.parse instr
   end
 
-  loop do
+  while !b.queue.empty?
     b.execute
   end
+
+  p b.output.values_at("0", "1", "2").reduce(:*)
 end
