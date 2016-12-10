@@ -30,14 +30,32 @@ def decompressed_length input
   length
 end
 
-# input = "ADVENT"
-# input = "A(1x5)BC"
-# input = "A(1x5)BC"
-# input = "(3x3)XYZ"
-# input = "A(2x2)BCD(2x2)EFG" #11
-# input = "(6x1)(1x3)A" #6
-# input = "X(8x2)(3x3)ABCY"
+# part 2
 
-input = File.read('day9.in').strip
-p decompressed_length input #112830
+def recursive_decompress str
+  if str.length == 0
+    return str.length
+  end
+  if match_index = (/\(\d+x\d+\)/ =~ str)
+    # length += match_index
+
+    # substring = str[index..-1]
+
+    # decompress str
+  else
+    str.length
+  end
+end
+
+if __FILE__ == $0
+  # input = "ADVENT"
+  # input = "A(1x5)BC"
+  # input = "A(1x5)BC"
+  # input = "(3x3)XYZ"
+  # input = "A(2x2)BCD(2x2)EFG" #11
+  # input = "(6x1)(1x3)A" #6
+  # input = "X(8x2)(3x3)ABCY"
+  input = File.read('day9.in').strip
+  p decompressed_length input #112830
+end
 
