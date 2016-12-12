@@ -38,11 +38,18 @@ def recursive_decompress str
     return str.length
   end
   if match_index = (/\((?<chars>\d+)x(?<iter>\d+)\)/ =~ str)
+    # Find start and stop index of compressed substring
     start_index = match_index + $&.length
     stop_index = start_index + chars.to_i
     compressed = str[start_index...stop_index]
+
+    # Save remaining substring not included by marker
     cdr = str[stop_index..-1]
+
+    # Recursively decompress everything covered by marker
     decompressed_length = iter.to_i * recursive_decompress(compressed)
+
+    # match_index is the same as length of substring preceding matched marker
     match_index + decompressed_length + recursive_decompress(cdr)
   else
     return str.length
@@ -51,7 +58,7 @@ end
 
 if __FILE__ == $0
   input = File.read('day9.in').strip
-  p decompressed_length input #112830
+  p decompressed_length input
   p recursive_decompress input
 end
 
