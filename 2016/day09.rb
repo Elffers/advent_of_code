@@ -1,4 +1,5 @@
 require 'strscan'
+require 'pry'
 
 def decompressed_length input
   s = StringScanner.new input
@@ -33,17 +34,19 @@ end
 # part 2
 
 def recursive_decompress str
+  # null case
   if str.length == 0
     return str.length
   end
-  if match_index = (/\(\d+x\d+\)/ =~ str)
-    # length += match_index
-
-    # substring = str[index..-1]
-
-    # decompress str
+  if match_index = (/\((?<chars>\d+)x(?<iter>\d+)\)/ =~ str)
+    start_index = match_index + $&.length
+    stop_index = start_index + chars.to_i
+    compressed = str[start_index...stop_index]
+    cdr = str[stop_index..-1]
+    decompressed_length = iter.to_i * recursive_decompress(compressed)
+    match_index + decompressed_length + recursive_decompress(cdr)
   else
-    str.length
+    return str.length
   end
 end
 
@@ -57,5 +60,6 @@ if __FILE__ == $0
   # input = "X(8x2)(3x3)ABCY"
   input = File.read('day9.in').strip
   p decompressed_length input #112830
+  p recursive_decompress input
 end
 
