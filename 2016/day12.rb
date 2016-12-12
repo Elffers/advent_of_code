@@ -1,10 +1,8 @@
-require 'pry'
-
 class Assembler
   attr_accessor :registers
 
   def initialize
-    @registers = Hash.new 0
+    @registers = {"a"=>0, "b"=>0, "d"=>0, "c"=>0}
   end
 
   def parse input
@@ -12,70 +10,41 @@ class Assembler
 
     while i < input.size
       line = input[i]
-      parts = line.split(' ')
+      instr, x, y = line.split(' ')
 
-      if line['cpy']
-        copy parts
+      case instr
+      when 'cpy'
+        copy x, y
         i += 1
-      end
-
-      if line['inc']
-        increment parts
+      when 'inc'
+        registers[x] += 1
         i += 1
-      end
-
-      if line['dec']
-        decrement parts
+      when 'dec'
+        registers[x] -= 1
         i += 1
-      end
-
-      if line['jnz']
-        offset = jump parts
+      when 'jnz'
+        offset = jump x, y
         i += offset
       end
     end
   end
 
-  def copy parts
-    val = parts[1]
-    reg = parts[2]
-    if /\d+/ =~ val
-      val = val.to_i
+  def copy val, reg
+    if value = registers[val]
+      registers[reg] = value
     else
-      val = registers[val]
-    end
-
-    registers[reg] = val
-  end
-
-  def increment parts
-    reg = parts[1]
-    registers[reg] += 1
-  end
-
-  def decrement parts
-    reg = parts[1]
-    registers[reg] -= 1
-  end
-
-  def jump parts
-    reg = parts[1]
-    offset = parts[2]
-
-    if !zero? reg
-      return offset.to_i
-    else
-      return 1
+      registers[reg] = val.to_i
     end
   end
 
-  def zero? reg
-    if /\d+/ =~ reg
-      return reg.to_i == 0
+  def jump reg, offset
+    if registers[reg] != 0
+      offset.to_i
     else
-      return registers[reg] == 0
+      1
     end
   end
+
 end
 
 if __FILE__ == $0
