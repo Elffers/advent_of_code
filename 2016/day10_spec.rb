@@ -53,6 +53,8 @@ INPUT
         b.parse instr
       end
 
+      b.execute
+
       expect(b.output["0"]).to eq 5
       expect(b.output["1"]).to eq 2
       expect(b.output["2"]).to eq 3

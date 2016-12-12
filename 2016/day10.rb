@@ -28,7 +28,7 @@ class BotManager
   def enqueue instr
     parts = instr.split " "
 
-    bot_id = parts[1]
+    bot_id      = parts[1]
     low_dest    = parts[5]
     low_dest_id = parts[6]
     hi_dest     = parts[10]
@@ -50,21 +50,23 @@ class BotManager
 
       instr = queue[id]
 
-      hi_dest_id = instr[:hi][:id]
-      if instr[:hi][:dest] == "output"
-        output[hi_dest_id] = hi
-      else
-        bots[hi_dest_id] << hi
-      end
+      hi_instr= instr[:hi]
+      deliver_to hi_instr, hi
 
-      low_dest_id = instr[:low][:id]
-      if instr[:low][:dest] == "output"
-        output[low_dest_id] = low
-      else
-        bots[low_dest_id] << low
-      end
+      low_instr= instr[:low]
+      deliver_to low_instr, low
 
       self.queue.delete id
+    end
+  end
+
+  def deliver_to instr, chip
+    id = instr[:id]
+
+    if instr[:dest] == "output"
+      output[id] = chip
+    else
+      bots[id] << chip
     end
   end
 
