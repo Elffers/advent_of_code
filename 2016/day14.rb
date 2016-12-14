@@ -16,8 +16,9 @@ class KeyGenerator
       p indices.last
 
       digest = md5.hexdigest(salt + i.to_s)
+      superdigest = superhash digest
 
-      if /(.)\1\1/ =~ digest
+      if /(.)\1\1/ =~ superdigest
         if match? i, $1
           indices << i
         end
@@ -31,23 +32,33 @@ class KeyGenerator
   def match? i, char
     pentuple = char * 5
 
-    digests = (i+1 ..1000+i).map do |j|
+    (i+1 ..1000+i).each do |j|
       key = salt + j.to_s
-      md5.hexdigest key
+      digest = superhash(md5.hexdigest key)
+      if digest.include? pentuple
+        p j
+        return true
+      end
     end
+    false
+  end
 
-    digests.any? { |d| d.include? pentuple }
+  def superhash digest
+    2016.times do
+      digest = md5.hexdigest digest
+    end
+    digest
   end
 
 end
 
 if $0 == __FILE__
-  salt = 'qzyelonm'
-  kg = KeyGenerator.new salt
-  p kg.find_index
-  #
-  # salt = 'abc'
+  # salt = 'qzyelonm'
   # kg = KeyGenerator.new salt
   # p kg.find_index
+  #
+  salt = 'abc'
+  kg = KeyGenerator.new salt
+  p kg.find_index
   # # 22728
 end
