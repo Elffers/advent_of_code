@@ -11,15 +11,15 @@ class KeyGenerator
   def find_index
     i = 0
     indices = []
+    thousand = thousand_hashes
 
     while indices.size < 64
-      p indices.last
 
-      digest = md5.hexdigest(salt + i.to_s)
-      superdigest = superhash digest
+      digest = thousand.shift
+      thousand << md5.hexdigest(salt + (1000+i).to_s)
 
-      if /(.)\1\1/ =~ superdigest
-        if match? i, $1
+      if /(.)\1\1/ =~ digest
+        if match? $1, thousand
           indices << i
         end
       end
@@ -29,16 +29,19 @@ class KeyGenerator
     indices.last
   end
 
-  def match? i, char
+  def thousand_hashes
+    (0...1000).map do |x|
+      md5.hexdigest(salt + x.to_s)
+      # superhash(md5.hexdigest x)
+    end
+  end
+
+  def match? char, hashes
     pentuple = char * 5
 
-    (i+1 ..1000+i).each do |j|
-      key = salt + j.to_s
-      digest = superhash(md5.hexdigest key)
-      if digest.include? pentuple
-        p j
-        return true
-      end
+    hashes.each.with_index do |digest, i|
+      return true if digest.include? pentuple
+      # p i
     end
     false
   end
