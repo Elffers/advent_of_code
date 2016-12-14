@@ -15,8 +15,9 @@ class KeyGenerator
 
     while indices.size < 64
 
+      p indices.last
       digest = thousand.shift
-      thousand << md5.hexdigest(salt + (1000+i).to_s)
+      thousand << superhash(md5.hexdigest(salt + (1000+i).to_s))
 
       if /(.)\1\1/ =~ digest
         if match? $1, thousand
@@ -31,8 +32,8 @@ class KeyGenerator
 
   def thousand_hashes
     (0...1000).map do |x|
-      md5.hexdigest(salt + x.to_s)
-      # superhash(md5.hexdigest x)
+      # md5.hexdigest(salt + x.to_s)
+      superhash(md5.hexdigest(salt + x.to_s))
     end
   end
 
@@ -56,12 +57,13 @@ class KeyGenerator
 end
 
 if $0 == __FILE__
-  # salt = 'qzyelonm'
-  # kg = KeyGenerator.new salt
-  # p kg.find_index
-  #
-  salt = 'abc'
+  salt = 'qzyelonm'
   kg = KeyGenerator.new salt
   p kg.find_index
-  # # 22728
+  #
+  # salt = 'abc'
+  # kg = KeyGenerator.new salt
+  # p kg.find_index
+  # part 1: 22728
+  # part 2: 22551
 end
