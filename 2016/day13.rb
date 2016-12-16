@@ -19,11 +19,6 @@ class Maze
     bin.count("1").even?
   end
 
-  def valid? node
-    x, y = node.coords
-    x >= 0 && y >= 0
-  end
-
   def print
     x, y = dest
     y.times.map do |j|
@@ -43,7 +38,7 @@ class Maze
     up    = Node.new [x, y-1], dist
 
     [right, left, down, up].select do |node|
-      !visited.include?(node.coords) && open?(node.coords) && valid?(node)
+      !visited.include?(node.coords) && open?(node.coords) && node.valid?
     end
   end
 
@@ -78,6 +73,12 @@ class Node
     @coords = coords
     @dist = dist
   end
+
+  def valid?
+    x, y = coords
+    x >= 0 && y >= 0
+  end
+
 end
 
 
