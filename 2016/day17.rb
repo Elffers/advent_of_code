@@ -15,17 +15,23 @@ class Maze
     current = Node.new [0, 0], ""
     queue << current
 
+    paths = []
+
     while !queue.empty?
       current = queue.shift
 
-      return current.path if current.coords == @dest
-
-      nodes = valid_moves current
-      nodes.each do |node|
-        queue << node
+      # return current.path if current.coords == @dest
+      if current.coords == @dest
+        paths << current.path.length
+      else
+        nodes = valid_moves current
+        nodes.each do |node|
+          queue << node
+        end
       end
     end
 
+    paths.last
   end
 
   def valid_moves node
