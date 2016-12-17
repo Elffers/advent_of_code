@@ -1,68 +1,20 @@
-require 'pry'
+# list = [20, 15, 10, 5, 5]
+# target = 25
+list = [50, 44, 11, 49, 42, 46, 18, 32, 26, 40, 21, 7, 18, 43, 10, 47, 36, 24, 22, 40]
+target = 150
 
-def combinations sum, sizes
-  p sum: sum, sizes: sizes
+def count list, target
+  n = 2
   count = 0
-  sizes = sizes.dup
+  while n < list.size
+    count += list.combination(n).to_a.select do |combo|
+      combo.reduce(:+) == target
+    end.size
 
-  if sum <= 0
-    p count: 0
-    return 0
+    n += 1
   end
 
-  if sizes.empty?
-    p count: 0
-    return 0
-  end
-
-  if sizes.include? sum
-    dups = sizes.count(sum)
-    count += dups
-    sizes.delete(sum)
-    if sizes.empty?
-      p count: count
-      return count
-    end
-  end
-
-  if sizes.reduce(:+) == sum
-    count += 1
-    p count: count
-    return count
-  end
-
-  max_duplicates = sizes.count(sizes.first)
-  max = sizes.shift
-
-  count += max_duplicates * combinations(sum - max, sizes)
-
-  sizes.delete(max)
-  count += combinations(sum, sizes)
-
-  p count: count
   count
 end
 
-sizes = [
-  50,
-  44,
-  11,
-  49,
-  42,
-  46,
-  18,
-  32,
-  26,
-  40,
-  21,
-  7 ,
-  18,
-  43,
-  10,
-  47,
-  36,
-  24,
-  22,
-  40,
-].sort.reverse
-p combinations 150, sizes
+p count list, target
