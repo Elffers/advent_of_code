@@ -1,33 +1,39 @@
-def trap? index, previous_row
-  l = previous_row[index - 1]
-  r = previous_row[index + 1]
+def trap? index, row
+  left_index = index - 1
+  right_index = index + 1
 
-  l != r
+  l =  left_index < 0 ? 1 : row[left_index]
+  r =  right_index > row.length - 1 ? 1 : row[right_index]
+
+  l != r ? 0 : 1
 end
 
 def next_row row
-  padded_row = "." + row + "."
-  row.chars.map.with_index do |el, i|
-    if trap? i + 1, padded_row
-      '^'
-    else
-      '.'
-    end
-  end.join
+  row.map.with_index do |el, i|
+    trap? i, row
+  end
 end
 
 def count_safe row, total
-  count = row.count('.')
+  count = row.reduce(:+)
   i = 1
   while i < total
     row = next_row row
-    count += row.count '.'
+    count += row.reduce(:+)
     i += 1
   end
+
   count
+end
+
+def preprocess row
+  row.chars.map do |el|
+    el == '^' ? 0 : 1
+  end
 end
 
 if __FILE__ == $0
   row = '^^^^......^...^..^....^^^.^^^.^.^^^^^^..^...^^...^^^.^^....^..^^^.^.^^...^.^...^^.^^^.^^^^.^^.^..^.^'
+  row = preprocess row
   p count_safe row, 40000
 end
