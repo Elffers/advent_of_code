@@ -2,8 +2,7 @@ def trap? index, previous_row
   l = previous_row[index - 1]
   r = previous_row[index + 1]
 
-  l == '^' && r == '.' ||
-    r == '^' && l == '.'
+  l != r
 end
 
 def next_row row
@@ -30,5 +29,5 @@ end
 
 if __FILE__ == $0
   row = '^^^^......^...^..^....^^^.^^^.^.^^^^^^..^...^^...^^^.^^....^..^^^.^.^^...^.^...^^.^^^.^^^^.^^.^..^.^'
-  p count_safe row, 400000
+  p count_safe row, 40000
 end
