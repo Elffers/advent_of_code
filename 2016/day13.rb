@@ -1,12 +1,10 @@
-require 'pp'
 require 'set'
-class Maze
-  attr_accessor :input, :start, :dest, :visited, :queue
 
-  def initialize(input, dest)
+class Maze
+  attr_accessor :input, :visited, :queue
+
+  def initialize input
     @input = input
-    @start = [1, 1]
-    @dest = dest
     @visited = Set.new
     @queue = []
   end
@@ -17,15 +15,6 @@ class Maze
     a += input
     bin = a.to_s 2
     bin.count("1").even?
-  end
-
-  def print
-    x, y = dest
-    y.times.map do |j|
-      x.times.map do |i|
-        open?([i, j]) ? 'o' : '#'
-      end.join
-    end
   end
 
   def valid_neighbors current
@@ -42,27 +31,28 @@ class Maze
     end
   end
 
-  def shortest_path
-    current = Node.new start, 0
+  def shortest_path dest
+    current = Node.new [1, 1], 0
     queue << current
     visited << current.coords
-    candidates = []
+    count = 0 # part 2
 
     while !queue.empty?
       current = queue.shift
       x, y = current.coords
 
-      # return current.dist if [x, y] == dest
-      candidates << current if current.dist <= 50
+      p current.dist if [x, y] == dest # part 1
+
+      count += 1 if current.dist <= 50
 
       nodes = valid_neighbors current
-
       nodes.each do |node|
         queue << node
         visited << node.coords
       end
     end
-    candidates.size
+
+    count
   end
 end
 
@@ -78,16 +68,10 @@ class Node
     x, y = coords
     x >= 0 && y >= 0
   end
-
 end
 
-
 if __FILE__ == $0
-  dest = [7, 4]
-  m = Maze.new 10, dest
-  # p m.shortest_path
-
   dest = [31, 39]
-  m = Maze.new 1364, dest
-  p  m.shortest_path
+  m = Maze.new 1364
+  p  m.shortest_path dest
 end
