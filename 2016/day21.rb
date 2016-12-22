@@ -12,88 +12,60 @@ def swap_letters word, a, b
   word.tr!(a+b, b+a)
 end
 
-def rotate_left word, steps
+def rotate word, steps, right:
+  steps = -steps if right
   word.chars.rotate!(steps).join
-end
-
-def rotate_right word, steps
-  word.chars.rotate!(-steps).join
 end
 
 def reverse word, start, stop
   word[0,start] + word[start..stop].reverse + word[stop+1, word.size]
 end
 
-def move_position word, x, y
+def move_position word, x, y, r=false
+  x, y = y, x if r
   char = word[x]
   word.delete! char
   word.insert(y, char)
   word
 end
 
-def rotate_pos word, char, u=true
+def rotate_pos word, char, r=false
   index = word.index(char)
   rot = index + 1
   rot += 1 if index >= 4
 
-  rot = -rot if u
-
-  word.chars.rotate!(rot).join
-
+  word.chars.rotate!(-rot).join
 end
 
-def scramble word, input, u=true
+def scramble word, input, r=false
   input.each do |line|
+    word =
     if /swap\sposition\s(\d)\swith\sposition\s(\d)/ =~ line
-      if u
-        word = swap_position word, $1.to_i, $2.to_i
-      else
-        word = swap_position word, $2.to_i, $1.to_i
-      end
+      x, y = $1.to_i, $2.to_i
+      swap_position word, x, y
 
     elsif /swap\sletter\s(\w)\swith\sletter\s(\w)/ =~ line
-      if u
-        word = swap_letters(word, $1, $2)
-      else
-        word = swap_letters(word, $2, $1)
-      end
+      x, y = $1, $2
+      swap_letters word, x, y
 
     elsif /rotate\sleft\s(\d)/ =~ line
-      if u
-        word = rotate_left word, $1.to_i
-      else
-        word = rotate_right word, $1.to_i
-      end
+      steps = $1.to_i
+      rotate word, steps, right: r
 
     elsif /rotate\sright\s(\d)/ =~ line
-      if u
-        word = rotate_right word, $1.to_i
-      else
-        word = rotate_left word, $1.to_i
-      end
+      steps = $1.to_i
+      rotate word, steps, right: !r
 
     elsif /rotate\sbased\son\sposition\sof\sletter\s(\w)/ =~ line
-      index = word.index($1)
-      index.times do
-        word = word.chars.rotate!(-1).join
-      end
-
-      word = word.chars.rotate!(-1).join
-
-      if index >= 4
-        word = word.chars.rotate!(-1).join
-      end
-      # rotate_pos word, $1, u
+      rotate_pos word, $1, r
 
     elsif /reverse\spositions\s(\d)\sthrough\s(\d)/ =~ line
-      word = reverse(word, $1.to_i, $2.to_i)
+      reverse(word, $1.to_i, $2.to_i)
 
     elsif /move\sposition\s(\d)\sto\sposition\s(\d)/ =~ line
-      if u
-        word = move_position word, $1.to_i, $2.to_i
-      else
-        word = move_position word, $2.to_i, $1.to_i
-      end
+      x, y = $1.to_i, $2.to_i
+      move_position word, x, y, r
+
     end
     p [word, line]
   end
@@ -104,17 +76,12 @@ end
 if __FILE__ == $0
   test_input = File.readlines('day21_test.in').map { |x| x.strip }
   word = 'abcde'
-  p scramble('abcde', test_input)
-  p scramble('decab', test_input.reverse, false)
+  p scramble(word, test_input)
+  # this isn't right
+  p scramble('decab', test_input.reverse, true)
 
   input = File.readlines('day21.in').map { |x| x.strip }
   word = 'abcdefgh'
   scrambled = 'aefgbcdh'
   p scramble(word, input) == scrambled
-  # p scramble(scrambled, input.reverse, false)
-
-  # scrambled = 'fbgdceah'
-  # p scramble(scrambled, input.reverse, false)
-
-  #hcfadgeb is wrong part 2
 end
