@@ -1,13 +1,9 @@
 require 'digest'
 
 class Maze
-  attr_accessor :passcode, :maze, :md5
 
   def initialize passcode
     @passcode = passcode
-    @maze = 4.times.map { '****'.chars }
-    @md5 = Digest::MD5.new
-    @dest = [3, 3]
   end
 
   def shortest_path
@@ -20,8 +16,8 @@ class Maze
     while !queue.empty?
       current = queue.shift
 
-      # return current.path if current.coords == @dest
-      if current.coords == @dest
+      if current.coords == [3, 3]
+        p current.path if paths.empty? # part 1
         paths << current.path.length
       else
         nodes = valid_moves current
@@ -31,7 +27,7 @@ class Maze
       end
     end
 
-    paths.last
+    paths.last # part 2
   end
 
   def valid_moves node
@@ -49,7 +45,8 @@ class Maze
   end
 
   def door_codes path
-    hash = md5.hexdigest(passcode + path)
+    md5 = Digest::MD5.new
+    hash = md5.hexdigest(@passcode + path)
     hash[0,4].chars
   end
 
