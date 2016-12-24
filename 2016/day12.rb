@@ -1,3 +1,4 @@
+require 'pry'
 class Assembler
   attr_accessor :registers
 
@@ -38,8 +39,10 @@ class Assembler
   end
 
   def jump reg, offset
-    if registers[reg] != 0
-      offset.to_i
+    reg = /\w/ =~ reg ? registers[reg] : reg
+    offset = /-?\d/ =~ offset ? offset.to_i : registers[offset]
+    if reg != 0
+      offset
     else
       1
     end
