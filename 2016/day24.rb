@@ -22,6 +22,7 @@ class Maze
     goals.delete "0"
     permutations = goals.permutation.map do |p|
       p.unshift "0"
+      p << "0" # part 2
     end
 
     permutations.map do |permutation|
