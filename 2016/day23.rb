@@ -4,14 +4,17 @@ class Assembler2 < Assembler
 
   def initialize
     super
-    registers['a'] = 7
+    registers['a'] = 12
   end
+
   def parse input
+    count = 0
     i = 0
 
     while i < input.size
       line = input[i]
       instr, x, y = line.split(' ')
+      p [i, line]
 
       case instr
       when 'cpy'
@@ -34,9 +37,12 @@ class Assembler2 < Assembler
           input[index] = new_instr
         end
         i += 1
-
       end
+      count +=1
+      p registers
+      p '----'
     end
+    p count
   end
 
   def toggle instr
