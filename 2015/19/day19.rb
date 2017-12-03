@@ -26,4 +26,49 @@
 
 # Your puzzle input describes all of the possible replacements and, at the bottom, the medicine molecule for which you need to calibrate the machine. How many distinct molecules can be created after all the different ways you can do one replacement on the medicine molecule?
 
+require 'set'
+require 'strscan'
 
+class Machine
+  attr_accessor :molecule, :translations, :generated, :ss
+
+  def initialize input
+    @translations, @molecule = process input
+    @generated = Set.new
+    @ss = StringScanner.new @molecule
+  end
+
+  def calibrate
+    pattern = Regexp.new(/[A-Z][a-z]?/)
+    while !ss.eos?
+      key = ss.scan(pattern)
+      pre = ss.pre_match
+      post = ss.rest
+
+      translations[key].each do |t|
+        mol = pre + t + post
+        generated.add mol
+      end
+    end
+  end
+
+  def process input
+    raw_trans, raw_mol = input.split("\n\n")
+    molecule = raw_mol.strip
+    translations = Hash.new { |h, k| h[k] = [] }
+
+    raw_trans.split("\n").each do |pair|
+      k, v = pair.split(" => ")
+      translations[k] << v
+    end
+
+    [translations, molecule]
+  end
+end
+
+if __FILE__ == $0
+  input = File.read('day19.in')
+  m = Machine.new(input)
+  m.calibrate
+  p m.generated.size
+end
