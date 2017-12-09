@@ -25,10 +25,8 @@ def parse chars
       while g != ">"
         if g == "!"
           chars.shift
-        end
-
-        # count garbage characters
-        if !"!>".include? g
+        else
+          # count garbage characters
           count += 1
         end
         g = chars.shift
