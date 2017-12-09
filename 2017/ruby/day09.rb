@@ -1,52 +1,43 @@
 input = File.read('../day9.in').strip
-$groups = ""
 
 chars = input.chars
 
-# remove all garbage
 def parse chars
+  # part 1
+  score       = 0
+  stack_depth = 0
+
+  # part 2
   count = 0
+
   while !chars.empty?
     char = chars.shift
     case char
-    when "<"
+
+    when "{" # start group
+      stack_depth += 1
+    when "}"
+      score += stack_depth
+      stack_depth -= 1
+    when "<"  # deal with garbage
       g = chars.shift
+
       while g != ">"
         if g == "!"
           chars.shift
         end
 
+        # count garbage characters
         if !"!>".include? g
           count += 1
         end
-
         g = chars.shift
       end
-    else
-      $groups += char
+
     end
   end
-  count
+
+  [score, count]
 end
 
 p parse chars
-
-def score groups
-  stack = []
-  chars = groups.chars
-  score = 0
-
-  while !chars.empty?
-    char = chars.shift
-    case char
-    when "{" # start group
-      stack.push char
-    when "}"
-      score += stack.size
-      stack.pop
-    end
-  end
-  score
-end
-
-p score $groups
