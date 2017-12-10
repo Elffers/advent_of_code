@@ -1,41 +1,59 @@
-# lengths = File.read("../day10.in").strip.split(",").map { |x| x.to_i }
-# s = (0..255).to_a
+input = File.read("../day10.in").chomp
+lengths = input.split(",").map { |x| x.to_i }
+list = (0..255).to_a
 
-lengths = [3, 4, 1, 5]
-s = (0..4).to_a
+pos = 0
+skip = 0
 
-def twist lengths, s
-  size = s.size
-  pos = 0
-  skip = 0
+def knot lengths, list, pos, skip
+  lens = lengths.dup
 
-  while !lengths.empty?
-    len = lengths.shift
-    s = s.cycle(2).to_a
+  size = list.size
 
-    sublist = s[pos, len]
-    # p sublist: sublist
+  while !lens.empty?
+    len = lens.shift
+    list = list.cycle(2).to_a
+
+    sublist = list[pos, len]
     sublist.reverse!
 
     cdr_start = (pos + len) % size
     cdr_end = size - len
-    cdr = s[cdr_start, cdr_end]
-    # p cdr: cdr
+    cdr = list[cdr_start, cdr_end]
 
-    s = sublist.concat cdr
-    s = s.rotate(-pos)
-    # p s: s
+    list = sublist.concat cdr
+    list = list.rotate(-pos)
 
     pos = (pos + len + skip)%size
-    # p pos: pos
     skip += 1
   end
-  [s, pos, skip]
+  [list, pos, skip]
 end
 
-result = twist(lengths, s)
-p result
-s = result.first
+result = knot(lengths, list, pos, skip)
+l = result.first
 
-p s[0] * s[1]
+p l[0] * l[1]
 
+# Part 2
+
+ascii = input.chars.map { |x| x.ord }
+tail = [17, 31, 73, 47, 23]
+lengths = ascii.concat tail
+
+pos = 0
+skip = 0
+
+64.times do
+  list, pos, skip = knot(lengths, list, pos, skip)
+end
+
+dense = list.each_slice(16).map do |slice|
+  slice.reduce(:^)
+end
+
+knot_hash = dense.map { |num| num.to_s 16 }.join
+
+p knot_hash
+
+# a9d0e68649d0174c8756a59ba21d4dc6
