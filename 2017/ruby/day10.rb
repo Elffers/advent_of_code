@@ -52,7 +52,7 @@ dense = list.each_slice(16).map do |slice|
   slice.reduce(:^)
 end
 
-knot_hash = dense.map { |num| num.to_s 16 }.join
+knot_hash = dense.map { |num| format "%02x", num }.join
 
 p knot_hash
 
