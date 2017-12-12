@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"strings"
-	// "strconv"
 )
 
 func score(input string) (score int, garbage int) {
@@ -39,7 +38,7 @@ func score(input string) (score int, garbage int) {
 }
 
 func main() {
-	input, err := ioutil.ReadFile("day9.in")
+	input, err := ioutil.ReadFile("../../day9.in")
 
 	if err == nil {
 		input := strings.TrimSpace(string(input))
