@@ -34,20 +34,38 @@ def move_scanner
 end
 
 $layers = (0..$firewall.keys.last).to_a
-penalty = 0
 
-while !$layers.empty?
-  packet = $layers.shift
-
-  state = $firewall[packet]
-  if !state.nil?
-
-    if state[:scanner] == 1
-      penalty += (packet * state[:range])
+def move_packet
+  penalty = 0
+  $layers.each do |packet|
+    state = $firewall[packet]
+    if !state.nil?
+      if state[:scanner] == 1
+        penalty += (packet * state[:range])
+      end
     end
-  end
+    move_scanner
 
-  move_scanner
+  end
+  penalty
 end
 
-p penalty
+penalty = move_packet
+p "Part 1: #{penalty}"
+
+delay = 0
+ok = false
+
+until ok
+  ok = true
+  $firewall.each do |layer, v|
+    range = v[:range]
+    if (layer + delay) % (2*range - 2) == 0
+      ok = false
+      delay += 1
+      break
+    end
+  end
+end
+
+p "Part 2: #{delay}"
