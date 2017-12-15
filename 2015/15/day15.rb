@@ -42,22 +42,38 @@ require 'pry'
 #
 
 class Cookie
-  attr_accessor :ingredients
+  attr_accessor :ingredients, :properties
 
   def initialize input
-    @input = input.map { |line| line.strip! }
     @ingredients = Hash.new { |h, k| h[k] = {} }
+    @properties = Hash.new { |h, k| h[k] = [] }
+    parse input
   end
 
-  def parse
-    @input.each do |line|
+  def score
+  end
+
+  private
+
+  def parse input
+    input.each do |line|
       /(?<name>\w+): capacity (?<capacity>-?\d+), durability (?<durability>-?\d+), flavor (?<flavor>-?\d+), texture (?<texture>-?\d+), calories (?<calories>-?\d+)/ =~ line
-      ingredients[name][:capacity] = capacity.to_i
+      ingredients[name][:capacity]   = capacity.to_i
       ingredients[name][:durability] = durability.to_i
-      ingredients[name][:flavor] = flavor.to_i
-      ingredients[name][:texture] = texture.to_i
-      ingredients[name][:calories] = calories.to_i
+      ingredients[name][:flavor]     = flavor.to_i
+      ingredients[name][:texture]    = texture.to_i
+      ingredients[name][:calories]   = calories.to_i
+
+      properties[:capacity] << capacity.to_i
+      properties[:durability] << durability.to_i
+      properties[:flavor] << flavor.to_i
+      properties[:texture] << texture.to_i
     end
   end
 
 end
+
+input = File.readlines("day15.in")
+c = Cookie.new input
+p c.ingredients
+p c.properties

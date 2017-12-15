@@ -48,12 +48,40 @@
 
 # [1, 2, 3, 5, 7, 13, 17, 19, 23, 29, 31, 37, 41, 43, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113]
 
-# input:
-# Hit Points: 104
-# Damage: 8
-# Armor: 1
-#
-def combos(presents)
-  target = presents.reduce(:+) / 3
+# Dagger        8     4       0
+# Shortsword   10     5       0
+# Warhammer    25     6       0
+# Longsword    40     7       0
+# Greataxe     74     8       0
+# Leather      13     0       1
+# Chainmail    31     0       2
+# Splintmail   53     0       3
+# Bandedmail   75     0       4
+# Platemail   102     0       5
+# Damage +1    25     1       0
+# Damage +2    50     2       0
+# Damage +3   100     3       0
+# Defense +1   20     0       1
+# Defense +2   40     0       2
+# Defense +3   80     0       3
 
+weapons, armors, rings = File.read("items.in").chomp.split("\n\n")
+weapons, armors, rings = [weapons, armors, rings].map do |list|
+  list.strip.split
 end
+p [weapons, armors, rings]
+
+
+me = {
+  points: 100,
+  damage: 8,
+  armor: 1
+}
+boss = {
+  points: 104,
+  damage: 8,
+  armor: 1
+}
+
+damage = me[:damage] - boss[:armor]
+

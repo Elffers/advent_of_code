@@ -30,16 +30,19 @@ require 'set'
 require 'strscan'
 
 class Machine
-  attr_accessor :molecule, :translations, :generated, :ss
+  attr_accessor :molecule, :translations, :count
 
-  def initialize input
-    @translations, @molecule = process input
-    @generated = Set.new
-    @ss = StringScanner.new @molecule
+  def initialize mol, trans
+    @molecule = mol
+    @translations = trans
   end
 
-  def calibrate
-    pattern = Regexp.new(/[A-Z][a-z]?/)
+  # Returns set of all possible molecules generated from one replacement
+  def calibrate mol
+    pattern = Regexp.new(/e|[A-Z][a-z]?/)
+    ss = StringScanner.new mol
+    generated = Set.new
+
     while !ss.eos?
       key = ss.scan(pattern)
       pre = ss.pre_match
@@ -47,28 +50,73 @@ class Machine
 
       translations[key].each do |t|
         mol = pre + t + post
-        generated.add mol
+        generated << mol
       end
     end
+
+    generated
   end
 
-  def process input
-    raw_trans, raw_mol = input.split("\n\n")
-    molecule = raw_mol.strip
-    translations = Hash.new { |h, k| h[k] = [] }
+  def shortest_path
+    steps = 0
+    until molecule == "e"
+      translations.each do |k, v|
+        scanned = molecule.scan(k)
 
-    raw_trans.split("\n").each do |pair|
-      k, v = pair.split(" => ")
-      translations[k] << v
+        p scanned: scanned, k: k, t: translations[k]
+
+        steps += scanned.size
+        molecule.gsub!(k, translations[k])
+        p molecule, steps
+      end
     end
-
-    [translations, molecule]
+    steps
   end
+
+end
+
+def process input
+  raw_trans, raw_mol = input.split("\n\n")
+  molecule = raw_mol.strip
+  translations = Hash.new { |h, k| h[k] = [] }
+
+  raw_trans.split("\n").each do |pair|
+    k, v = pair.split(" => ")
+    translations[k] << v
+  end
+
+  [molecule, translations]
+end
+
+def reprocess input
+  raw_trans, raw_mol = input.split("\n\n")
+  molecule = raw_mol.strip
+  translations = Hash.new
+
+  raw_trans.split("\n").each do |pair|
+    k, v = pair.split(" => ")
+    translations[v] = k
+  end
+
+  # sorted = {}
+  # translations.sort_by { |k,v| -k.size }.map do |k, v|
+  #   sorted[k] = v
+  # end
+
+  [molecule, translations]
 end
 
 if __FILE__ == $0
   input = File.read('day19.in')
-  m = Machine.new(input)
-  m.calibrate
-  p m.generated.size
+  # mol, trans = process input
+  # m = Machine.new(mol, trans)
+  # # part 1
+  # mols = m.calibrate m.molecule
+  # p mols.size
+
+  # part 2
+  mol, trans = reprocess input
+  m = Machine.new(mol, trans)
+  p m.translations
+  # p m.shortest_path
 end
