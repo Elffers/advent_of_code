@@ -40,22 +40,19 @@
 # total score of the highest-scoring cookie you can make?
 
 input = File.readlines("day15.in")
-ingredients = []
 properties = Hash.new { |h, k| h[k] = [] }
 input.each do |line|
   /(?<name>\w+): capacity (?<capacity>-?\d+), durability (?<durability>-?\d+), flavor (?<flavor>-?\d+), texture (?<texture>-?\d+), calories (?<calories>-?\d+)/ =~ line
-
-  # ingredients.push [capacity.to_i, durability.to_i, flavor.to_i, texture.to_i]
   properties[:capacity] << capacity.to_i
   properties[:durability] << durability.to_i
   properties[:flavor] << flavor.to_i
   properties[:texture] << texture.to_i
+  properties[:calories] << calories.to_i
 end
-p ingredients
-p properties
-total = 100
 
+total = 100
 max = 0
+max_calories = 0
 
 (1..100).each do |a|
   rest1 = 100 - a
@@ -69,6 +66,9 @@ max = 0
           durability = properties[:durability].zip([a, b, c, d]).map { |x, y| x * y }.reduce(:+)
           flavor = properties[:flavor].zip([a, b, c, d]).map { |x, y| x * y }.reduce(:+)
           texture = properties[:texture].zip([a, b, c, d]).map { |x, y| x * y }.reduce(:+)
+
+          calories = properties[:calories].zip([a, b, c, d]).map { |x, y| x * y }.reduce(:+)
+
           scores = [capacity,durability,flavor,texture]
           scores.each_with_index do |x, i|
             if x < 0
@@ -79,14 +79,19 @@ max = 0
           score = scores.reduce(:*)
           if score > max
             max = score
-            p max: max
-            p a, b
-            p [capacity,durability,flavor,texture]
           end
+          if calories == 500
+            if score > max_calories
+              max_calories = score
+            end
+          end
+
+
         end
       end
     end
   end
 end
 
-p max
+p "Part 1: #{max}"
+p "Part 2: #{max_calories}"
