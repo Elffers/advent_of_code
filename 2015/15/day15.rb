@@ -1,4 +1,3 @@
-require 'pry'
 # --- Day 15: Science for Hungry People ---
 
 # Today, you set out on the task of perfecting your milk-dunking cookie recipe.
@@ -39,41 +38,55 @@ require 'pry'
 
 # Given the ingredients in your kitchen and their properties, what is the
 # total score of the highest-scoring cookie you can make?
-#
-
-class Cookie
-  attr_accessor :ingredients, :properties
-
-  def initialize input
-    @ingredients = Hash.new { |h, k| h[k] = {} }
-    @properties = Hash.new { |h, k| h[k] = [] }
-    parse input
-  end
-
-  def score
-  end
-
-  private
-
-  def parse input
-    input.each do |line|
-      /(?<name>\w+): capacity (?<capacity>-?\d+), durability (?<durability>-?\d+), flavor (?<flavor>-?\d+), texture (?<texture>-?\d+), calories (?<calories>-?\d+)/ =~ line
-      ingredients[name][:capacity]   = capacity.to_i
-      ingredients[name][:durability] = durability.to_i
-      ingredients[name][:flavor]     = flavor.to_i
-      ingredients[name][:texture]    = texture.to_i
-      ingredients[name][:calories]   = calories.to_i
-
-      properties[:capacity] << capacity.to_i
-      properties[:durability] << durability.to_i
-      properties[:flavor] << flavor.to_i
-      properties[:texture] << texture.to_i
-    end
-  end
-
-end
 
 input = File.readlines("day15.in")
-c = Cookie.new input
-p c.ingredients
-p c.properties
+ingredients = []
+properties = Hash.new { |h, k| h[k] = [] }
+input.each do |line|
+  /(?<name>\w+): capacity (?<capacity>-?\d+), durability (?<durability>-?\d+), flavor (?<flavor>-?\d+), texture (?<texture>-?\d+), calories (?<calories>-?\d+)/ =~ line
+
+  # ingredients.push [capacity.to_i, durability.to_i, flavor.to_i, texture.to_i]
+  properties[:capacity] << capacity.to_i
+  properties[:durability] << durability.to_i
+  properties[:flavor] << flavor.to_i
+  properties[:texture] << texture.to_i
+end
+p ingredients
+p properties
+total = 100
+
+max = 0
+
+(1..100).each do |a|
+  rest1 = 100 - a
+  (1..rest1).each do |b|
+    rest2 = 100 - b
+    (1..rest2).each do |c|
+      rest3 = 100 - c
+      (1..rest3).each do |d|
+        if a + b + c + d == total
+          capacity = properties[:capacity].zip([a, b, c, d]).map { |x, y| x * y }.reduce(:+)
+          durability = properties[:durability].zip([a, b, c, d]).map { |x, y| x * y }.reduce(:+)
+          flavor = properties[:flavor].zip([a, b, c, d]).map { |x, y| x * y }.reduce(:+)
+          texture = properties[:texture].zip([a, b, c, d]).map { |x, y| x * y }.reduce(:+)
+          scores = [capacity,durability,flavor,texture]
+          scores.each_with_index do |x, i|
+            if x < 0
+              scores[i] = 0
+            end
+          end
+
+          score = scores.reduce(:*)
+          if score > max
+            max = score
+            p max: max
+            p a, b
+            p [capacity,durability,flavor,texture]
+          end
+        end
+      end
+    end
+  end
+end
+
+p max
