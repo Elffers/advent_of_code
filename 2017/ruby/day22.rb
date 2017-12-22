@@ -5,7 +5,6 @@ $grid = File.readlines("../day22.in").map { |x| x.strip }
 # #..
 # ...
 # TEST
-
 # $grid = input.split("\n").map { |x| x.strip }
 # p $grid
 
@@ -52,6 +51,19 @@ def turn_right dir
   end
 end
 
+def turn_back dir
+  case dir
+  when $dirs[:up]
+    $dirs[:down]
+  when $dirs[:down]
+    $dirs[:up]
+  when $dirs[:left]
+    $dirs[:right]
+  when $dirs[:right]
+    $dirs[:left]
+  end
+end
+
 def burst x, y, dir
   node = $map[x][y]
 
@@ -70,12 +82,44 @@ def burst x, y, dir
   [x, y, dir]
 end
 
+$states = {
+  "." => "W",
+  "W" => "#",
+  "#" => "F",
+  "F" => ".",
+}
+
+def burst2 x, y, dir
+  node = $map[x][y]
+
+  if node == "#"
+    dir = turn_right dir
+  elsif node == "."
+    dir = turn_left dir
+  elsif node == "W"
+    $infections += 1
+  elsif node == "F"
+    dir = turn_back dir
+  end
+  $map[x][y] = $states[node]
+
+  y += dir.first
+  x += dir.last
+
+  [x, y, dir]
+end
+
 x, y = n, n
 $infections = 0
 dir = $dirs[:up]
 
-10000.times do
-  x, y, dir = burst x, y, dir
-  # puts $grid.join "\n"
+# 10000.times do
+#   x, y, dir = burst x, y, dir
+#   # puts $grid.join "\n"
+# end
+# p $infections
+
+10000000.times do
+  x, y, dir = burst2 x, y, dir
 end
 p $infections
