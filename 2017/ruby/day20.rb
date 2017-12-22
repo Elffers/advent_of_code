@@ -2,8 +2,10 @@ require 'pp'
 
 input = File.readlines("../day20.in").map { |x| x.chomp }
 # input = <<TEST
-# p=< 3,0,0>, v=< 2,0,0>, a=<-1,0,0>
-# p=< 4,0,0>, v=< 0,0,0>, a=<-2,0,0>
+# p=<-6,0,0>, v=< 3,0,0>, a=< 0,0,0>
+# p=<-4,0,0>, v=< 2,0,0>, a=< 0,0,0>
+# p=<-2,0,0>, v=< 1,0,0>, a=< 0,0,0>
+# p=< 3,0,0>, v=<-1,0,0>, a=< 0,0,0>
 # TEST
 # input = input.split("\n")
 
@@ -36,11 +38,30 @@ end
 
 mins = Array.new(points.size)
 
+# loop do
+#   points.each_with_index do |point, i|
+#     point.step
+#     mins[i] = point.dist
+#   end
+#   m = mins.min
+#   p min: m, i: mins.index(m)
+# end
+
 loop do
-  points.each_with_index do |point, i|
+# 5.times do
+  seen = Hash.new { |h, k| h[k] = [] }
+
+  points.each do |point|
     point.step
-    mins[i] = point.dist
+    seen[point.pt] << point
   end
-  m = mins.min
-  p min: m, i: mins.index(m)
+  seen.each do |k, v|
+    if v.size > 1
+      v.each do |point|
+        points.delete point
+      end
+    end
+  end
+
+  p points.size
 end
