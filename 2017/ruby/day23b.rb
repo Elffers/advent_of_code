@@ -13,9 +13,10 @@ loop do
       if d * e == b
         f = false
       end
-      e -= 1
+      e += 1
     end
-    d -= 1
+
+    d += 1
   end
 
   if !f
