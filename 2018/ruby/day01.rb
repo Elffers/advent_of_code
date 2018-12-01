@@ -1,4 +1,4 @@
-input = File.readlines("inputs/day1.in").map { |x| x.strip.to_i }
+input = File.readlines("../inputs/day1.in").map { |x| x.strip.to_i }
 p "Part 1: #{input.reduce(:+)}"
 
 current  = 0
