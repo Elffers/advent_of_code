@@ -1,15 +1,6 @@
 input = File.readlines("/Users/hhh/JungleGym/advent_of_code/2018/inputs/day2.in").map { |x| x. strip }
 twos = 0
 threes = 0
-# input = [
-#   "abcdef",
-#   "bababc",
-#   "abbcde",
-#   "abcccd",
-#   "aabcdd",
-#   "abcdee",
-#   "ababab",
-# ]
 
 input.each do |x|
   counts = Hash.new 0
@@ -28,17 +19,7 @@ input.each do |x|
   threes += 1 if unique_counts.include? 3
 end
 
-p twos * threes
-
-# input = %w[
-# abcde
-# fghij
-# klmno
-# pqrst
-# fguij
-# axcye
-# wvxyz
-# ]
+p "Part 1: #{twos * threes}"
 
 match = []
 input.each do |x|
@@ -49,4 +30,5 @@ input.each do |x|
   end
 end
 
-p match.first.chars.zip(match.last.chars).select  {|a, b| a == b }.map { |a, b| a }.join
+letters = match.first.chars.zip(match.last.chars).select  {|a, b| a == b }.map { |a, b| a }.join
+p "Part 2: #{letters}"
