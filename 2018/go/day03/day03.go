@@ -31,6 +31,28 @@ func Overlap(claims map[int]Claim) int {
 	return overlaps
 }
 
+func Unclaimed(claims map[int]Claim) int {
+	fabric := Populate(claims)
+
+	overlap := make(map[int]bool)
+	for _, row := range fabric {
+		for _, col := range row {
+			if len(col) > 1 {
+				for _, id := range col {
+					overlap[id] = true
+				}
+			}
+		}
+	}
+
+	for id, _ := range claims {
+		if _, ok := overlap[id]; !ok {
+			return id
+		}
+	}
+
+	return 0
+}
 
 func main() {
 	input, err := ioutil.ReadFile("/Users/hhh/JungleGym/advent_of_code/2018/inputs/day3.in")
@@ -40,6 +62,7 @@ func main() {
 	claims := formatInput(string(input))
 
 	fmt.Printf("Day 3 Part 1: %+v\n", Overlap(claims))
+	fmt.Printf("Day 3 Part 2: %+v\n", Unclaimed(claims))
 }
 
 type Claim struct {
@@ -47,7 +70,6 @@ type Claim struct {
 	Y int
 	Width int
 	Length int
-	Overlap bool
 }
 
 func formatInput(input string) map[int]Claim {
@@ -58,7 +80,7 @@ func formatInput(input string) map[int]Claim {
 		var id, x, y, w, l int
 		// #1 @ 749,666: 27x15
 		fmt.Sscanf(line, "#%d @ %d,%d: %dx%d", &id, &x, &y, &w, &l)
-		c := Claim{x, y, w, l, false}
+		c := Claim{x, y, w, l}
 
 		claims[id] = c
 	}
