@@ -1,46 +1,50 @@
-require 'pp'
 input = File.readlines("/Users/hhh/JungleGym/advent_of_code/2018/inputs/day3.in")
 # input = File.readlines("/Users/hhh/JungleGym/advent_of_code/2018/inputs/day3test.in")
 
-claims = []
-#1 @ 1,3: 4x4
+claims = {}
 
 input.map do |line|
   /(?<id>\d+) @ (?<x>\d+),(?<y>\d+): (?<w>\d+)x(?<l>\d+)/ =~ line
   claim = {
-    id: id.to_i,
     x: x.to_i,
     y: y.to_i,
     width: w.to_i,
-    length: l.to_i
+    length: l.to_i,
   }
-  claims << claim
-  # id, line.split(" @ ").last.strip
+  claims[id] = claim
 end
 
-cloth = Hash.new{ |h, k| h[k] = Hash.new 0 }
-
+cloth = Hash.new{ |h, k| h[k] = Hash.new { |m, n| m[n] = [] } }
 overlaps = 0
-claims.each do |claim|
+
+claims.each do |id, claim|
   x, y, w, l = claim[:x], claim[:y], claim[:width], claim[:length]
-  p [x, y, w, l]
   (x...x+w).each do |i|
     (y...y+l).each do |j|
-      cloth[j][i] += 1
+      if !cloth[j][i].empty?
+        cloth[j][i].each do |claim_id|
+          claims[claim_id][:overlapped] = true
+          claims[id][:overlapped] = true
+        end
+      end
+
+      cloth[j][i] << id
     end
   end
-
-  # p "CLOTH: "
-  # pp cloth
-# p "overlaps: #{overlaps}"
 end
 
 cloth.each do |col, row|
   row.each do |pt, val|
-    if val > 1
+    if val.size > 1
       overlaps += 1
     end
   end
 end
 
-p overlaps
+p "Part 1: #{overlaps}"
+
+claim_id, _ = claims.find do |id, claim|
+  !claim[:overlapped]
+end
+
+p "Part 2: #{claim_id}"
