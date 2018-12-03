@@ -25,7 +25,9 @@ func Overlap(claims map[int]Claim) (int, int) {
 	for _, row := range fabric {
 		for _, col := range row {
 			if len(col) > 1 {
+				// Part 1
 				overlaps++
+				// Part 2
 				for _, claim_id := range col {
 					claimed[claim_id] = true
 				}
@@ -33,6 +35,7 @@ func Overlap(claims map[int]Claim) (int, int) {
 		}
 	}
 
+	// Part 2
 	for id, _ := range claims {
 		if _, ok := claimed[id]; !ok {
 			unclaimed = id

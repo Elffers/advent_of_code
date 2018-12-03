@@ -62,7 +62,6 @@ func HamOne(ids []string) string {
 	return ""
 }
 
-
 func main() {
 	test_ids := []string{
 		"abcdef",
@@ -85,6 +84,6 @@ func main() {
 	fmt.Printf("Day 2 Part 2: %+v\n", HamOne(ids))
 }
 
-func formatInput(input string) []string{
+func formatInput(input string) []string {
 	return strings.Split(input, "\n")
 }
