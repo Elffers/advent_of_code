@@ -13,8 +13,7 @@ import (
 // asleep in a given minute
 func GuardSchedule(logs []LogEntry) map[int]map[int]int {
 	guards := make(map[int]map[int]int)
-	guard := 0
-	sleepAt := 0
+	guard, sleepAt := 0, 0
 
 	for _, log := range logs {
 		if strings.Contains(log.Event, "Guard") {
@@ -53,8 +52,7 @@ func FindSleepiest(logs []LogEntry) int {
 	}
 
 	// Find guard who slept the most total minutes
-	var sleepiest int
-	var max int
+	sleepiest, max := 0, 0
 	for id, total := range totals {
 		if total > max {
 			sleepiest = id
@@ -67,9 +65,9 @@ func FindSleepiest(logs []LogEntry) int {
 
 	return sleepiest * sleepiestMin
 }
+
 func sleepiestMinute(log map[int]int) (minute, count int) {
-	var sleepiestMin int
-	var maxCount int
+	sleepiestMin, maxCount := 0, 0
 	for min, count := range log {
 		if count > maxCount {
 			sleepiestMin = min
@@ -105,7 +103,6 @@ func FindMostPredictablySleepy(logs []LogEntry) int {
 
 func main() {
 	input, err := ioutil.ReadFile("/Users/hhh/JungleGym/advent_of_code/2018/inputs/day4.in")
-	// input, err := ioutil.ReadFile("/Users/hhh/JungleGym/advent_of_code/2018/inputs/day4test.in")
 	if err != nil {
 		panic(err)
 	}
@@ -120,7 +117,7 @@ func formatInput(input string) []LogEntry {
 	logs := []LogEntry{}
 
 	for _, line := range lines {
-		if line != "" { // wat
+		if line != "" {
 			r, _ := regexp.Compile(`\[(?P<timestamp>.+)\] (?P<event>.+)`)
 			match := r.FindStringSubmatch(line)
 			event := match[2]
