@@ -6,10 +6,11 @@ import (
 	"strings"
 	"math"
 )
-func FindLargestArea(coords [][]int) int {
+func FindLargestArea(coords [][]int) (int, int) {
 	l, r, t, b := findBounds(coords)
 	infinite := make(map[int]bool)
 	areas := make(map[int]int)
+	inRegion := 0
 	// var grid [500][500][]int // only needed for visualization/debugging
 
 	for i := 0; i <= r; i++ {
@@ -32,6 +33,15 @@ func FindLargestArea(coords [][]int) int {
 					}
 				}
 			}
+
+			// Part 2
+			sumDist := 0
+			for _, coord := range coords {
+				sumDist += distance(pt, coord)
+			}
+			if sumDist < 10000 {
+				inRegion++
+			}
 		}
 	}
 
@@ -44,7 +54,7 @@ func FindLargestArea(coords [][]int) int {
 		}
 	}
 
-	return maxArea
+	return maxArea, inRegion
 }
 
 func findBounds(coords [][]int) (l, r, t, b int) {
