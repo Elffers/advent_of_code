@@ -11,15 +11,11 @@ func FindLargestArea(coords [][]int) (int, int) {
 	infinite := make(map[int]bool)
 	areas := make(map[int]int)
 	inRegion := 0
-	// var grid [500][500][]int // only needed for visualization/debugging
 
 	for i := 0; i <= r; i++ {
 		for j := 0; j <= b; j++ {
 			pt := []int{i, j}
 			closestPoints := findClosest(pt, coords)
-
-			// populate grid
-			// grid[j][i] = closestPoints
 
 			// count area for each coordinate
 			if len(closestPoints) == 1 {
@@ -88,11 +84,12 @@ func distance(pt1, pt2 []int) int {
 }
 
 func findClosest(pt []int, coords [][]int) (pts []int) {
-	min := 100000
-	distances := make(map[int][]int)
 	// {
-	// 	dist := []int{indexes}
+	// 	dist := []int{coords at dist from pt}
 	// }
+	distances := make(map[int][]int)
+	min := 100000
+
 	for i, pt2 := range coords {
 		dist := distance(pt, pt2)
 		if dist < min {

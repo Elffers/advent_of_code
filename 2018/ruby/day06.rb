@@ -1,6 +1,4 @@
-require 'pp'
-points = File.readlines("/Users/hhh/JungleGym/advent_of_code/2018/inputs/day6.in").map { |x| x.strip.split(",").map { |n| n.to_i} }
-# points = File.readlines("/Users/hhh/JungleGym/advent_of_code/2018/inputs/day6test.in").map { |x| x.strip.split(",").map { |n| n.to_i} }
+points = File.readlines("../inputs/day6.in").map { |x| x.strip.split(",").map { |n| n.to_i} }
 
 # find distance between two points
 def find_distance(a, b)
@@ -21,7 +19,6 @@ def find_closest(a, points)
 
   min = distances.keys.min
 
-  # return all points at shortest distance from a
   distances[min]
 end
 
@@ -29,21 +26,21 @@ end
 left, right = points.map { |x, y| x }.minmax
 top, bottom = points.map { |x, y| y }.minmax
 
-grid = Hash.new { |h, k| h[k] = [] }
 infinite = {}
+areas = Hash.new 0
 in_region = 0 # Part 2
 
-# Populate grid with closest point(s)
 (left..right).each do |x|
   (top..bottom).each do |y|
     pt = [x, y]
-
     closest_pts = find_closest(pt, points)
-    grid[pt] = closest_pts
 
-    if (x == left || x == right || y == top || y == bottom) && closest_pts.size == 1
-      closest_pts.each do |c|
-        infinite[c] = true
+    if closest_pts.size == 1
+      coord = closest_pts.first
+      areas[coord] += 1
+
+      if (x == left || x == right || y == top || y == bottom)
+        infinite[coord] = true
       end
     end
 
@@ -54,20 +51,11 @@ in_region = 0 # Part 2
 end
 
 # count total points that are closest to input points
-counts = Hash.new 0
-grid.each do |pt, closest_to|
-  if closest_to.size > 1
-    next
-  end
-  point = closest_to.first
-  counts[point] += 1 if !infinite[point]
-end
-
 bounded = (1...points.size).to_a - infinite.keys
 
-areas = bounded.map do |x|
-  counts[x]
-end
+max_area = bounded.map do |x|
+  areas[x]
+end.max
 
-p "Part 1: #{areas.max}"
+p "Part 1: #{max_area}"
 p "Part 2: #{in_region}"
