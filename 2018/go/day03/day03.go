@@ -6,6 +6,7 @@ import (
 	"strings"
 )
 
+// Populate each coordinate of fabric grid with list of ids of each claim
 func Populate(claims map[int]Claim) (fabric [1000][1000][]int) {
 	for id, claim := range claims {
 		for i := claim.X; i < claim.X+claim.Width; i++ {
