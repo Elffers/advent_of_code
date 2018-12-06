@@ -1,4 +1,4 @@
-polymer = File.read("./inputs/day5.in").strip.chars
+polymer = File.read("../inputs/day5.in").strip.chars
 # polymer = "dabAcCaCBAcCcaDA".chars
 
 # codepoint difference between upper and lowercase letters is 32
