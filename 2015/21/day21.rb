@@ -46,42 +46,143 @@
 
 # You have 100 hit points. The boss's actual stats are in your puzzle input. What is the least amount of gold you can spend and still win the fight?
 
-# [1, 2, 3, 5, 7, 13, 17, 19, 23, 29, 31, 37, 41, 43, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113]
+class Player
+  attr_accessor :points, :damage, :armor, :name, :spent
 
-# Dagger        8     4       0
-# Shortsword   10     5       0
-# Warhammer    25     6       0
-# Longsword    40     7       0
-# Greataxe     74     8       0
-# Leather      13     0       1
-# Chainmail    31     0       2
-# Splintmail   53     0       3
-# Bandedmail   75     0       4
-# Platemail   102     0       5
-# Damage +1    25     1       0
-# Damage +2    50     2       0
-# Damage +3   100     3       0
-# Defense +1   20     0       1
-# Defense +2   40     0       2
-# Defense +3   80     0       3
+  def initialize(points:, damage:, armor:, name:)
+    @points = points
+    @damage = damage
+    @armor = armor
+    @name = name
+    @spent = 0
+  end
 
-weapons, armors, rings = File.read("items.in").chomp.split("\n\n")
-weapons, armors, rings = [weapons, armors, rings].map do |list|
-  list.strip.split
+  def attack(opponent)
+    damage = @damage -  opponent.armor
+    if damage > 0
+      opponent.points -= damage
+    else
+      opponent.points -= 1
+    end
+  end
+
+  def buy(item)
+    self.damage += item.damage
+    self.armor += item.armor
+    self.spent += item.cost
+  end
 end
-p [weapons, armors, rings]
 
+class Item
+  attr_accessor :cost, :damage, :armor, :name
 
-me = {
-  points: 100,
-  damage: 8,
-  armor: 1
-}
-boss = {
-  points: 104,
-  damage: 8,
-  armor: 1
-}
+  def initialize(cost:, damage:, armor:, name:)
+    @cost = cost
+    @damage = damage
+    @armor = armor
+    @name = name
+  end
+end
 
-damage = me[:damage] - boss[:armor]
+WEAPONS = [
+  Item.new(cost: 8,  damage: 4, armor: 0, name: "dagger"),
+  Item.new(cost: 10, damage: 5, armor: 0, name: "shortsword"),
+  Item.new(cost: 25, damage: 6, armor: 0, name: "warhammer"),
+  Item.new(cost: 40, damage: 7, armor: 0, name: "longsword"),
+  Item.new(cost: 74, damage: 8, armor: 0, name: "greataxe"),
+]
 
+ARMOR = [
+  Item.new(cost: 13,  damage: 0, armor: 1, name: "leather"),
+  Item.new(cost: 31,  damage: 0, armor: 2, name: "chainmail"),
+  Item.new(cost: 53,  damage: 0, armor: 3, name: "splintmail"),
+  Item.new(cost: 75,  damage: 0, armor: 4, name: "bandedmail"),
+  Item.new(cost: 102, damage: 0, armor: 5, name: "platemail"),
+]
+
+RINGS = [
+  Item.new(cost: 25,  damage: 1, armor: 0, name: "damage1"),
+  Item.new(cost: 50,  damage: 2, armor: 0, name: "damage2"),
+  Item.new(cost: 100, damage: 3, armor: 0, name: "damage3"),
+  Item.new(cost: 20,  damage: 0, armor: 1, name: "defense1"),
+  Item.new(cost: 40,  damage: 0, armor: 2, name: "defense2"),
+  Item.new(cost: 80,  damage: 0, armor: 3, name: "defense3"),
+]
+
+def play(player, enemy)
+  loop do
+    player.attack enemy
+    if enemy.points < 1
+      return player.name, player.spent
+    end
+
+    enemy.attack player
+    if player.points < 1
+      return "FAIL"
+    end
+  end
+end
+
+ring_combos = []
+RINGS.combination(0).each do |rc|
+  ring_combos.push rc
+end
+RINGS.combination(1).each do |rc|
+  ring_combos.push rc
+end
+RINGS.combination(2).each do |rc|
+  ring_combos.push rc
+end
+armor_combos = []
+ARMOR.combination(0).each do |a|
+  armor_combos.push a
+end
+ARMOR.combination(1).each do |a|
+  armor_combos.push a
+end
+
+item_combos = []
+
+WEAPONS.each do |weapon|
+  ring_combos.each do |rc|
+    armor_combos.each do |a|
+      combo = []
+      combo << a
+      combo << rc
+      combo << weapon
+      item_combos.push combo.flatten
+    end
+  end
+end
+
+win_costs= []
+fail_costs = []
+
+item_combos.each do |items|
+  me = Player.new(
+    points: 100,
+    damage: 0,
+    armor: 0,
+    name: "me"
+  )
+  boss = Player.new(
+    points: 104,
+    damage: 8,
+    armor: 1,
+    name: "boss"
+  )
+
+  items.each do |i|
+    me.buy i
+  end
+
+  res = play(me, boss)
+  if res != "FAIL"
+    win_costs << me.spent
+  else
+    fail_costs << me.spent
+  end
+end
+
+p "Part 1: #{win_costs.min}"
+p "Part 2: #{fail_costs.max}"
