@@ -3,19 +3,30 @@ input = File.read("/Users/hhh/JungleGym/advent_of_code/2018/inputs/day8.in").str
 
 def build_tree input
   sum = 0
+  value = 0
+
   c = input.shift
   mds = input.shift
+  children = Array.new c
 
-  c.times do
-    sum += (build_tree input)
+  c.times do |i|
+    s, v = build_tree input
+    children[i] = v
+    sum += s
   end
 
   mds.times do
     md = input.shift
+    if c == 0
+      value += md
+    end
+    value += children[md-1] if children[md-1]
     sum += md
   end
 
-  sum
+  [sum, value]
 end
 
-p build_tree input
+sum, value = build_tree input
+p "Part 1: #{sum}"
+p "Part 2: #{value}"
