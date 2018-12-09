@@ -58,7 +58,7 @@ class Player
   end
 
   def attack(opponent)
-    damage = @damage -  opponent.armor
+    damage = @damage - opponent.armor
     if damage > 0
       opponent.points -= damage
     else
