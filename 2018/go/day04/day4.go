@@ -102,7 +102,7 @@ func FindMostPredictablySleepy(logs []LogEntry) int {
 }
 
 func main() {
-	input, err := ioutil.ReadFile("/Users/hhh/JungleGym/advent_of_code/2018/inputs/day4.in")
+	input, err := ioutil.ReadFile("../../inputs/day4.in")
 	if err != nil {
 		panic(err)
 	}
