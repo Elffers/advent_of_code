@@ -4,7 +4,7 @@ input = File.readlines("/Users/hhh/JungleGym/advent_of_code/2018/inputs/day7.in"
 # input = File.readlines("/Users/hhh/JungleGym/advent_of_code/2018/inputs/day7test.in").map { |x| x.strip }
 
 graph = Hash.new { |h, k| h[k] = [] }
-reversed = Hash.new { |h, k| h[k] = [] }
+inverse = Hash.new { |h, k| h[k] = [] }
 # graph["E"] = []
 
 input.each do |line|
@@ -12,52 +12,56 @@ input.each do |line|
   /^Step ([A-Z]).+ step ([A-Z])/ =~ line
   graph[$1] << $2
   graph[$2]
-  reversed[$2] << $1
-  reversed[$1]
+  inverse[$2] << $1
+  inverse[$1]
 end
 
-# pp graph
-# pp reversed
+pp graph
+# pp inverse
 # {"C"=>["A", "F"], "A"=>["B", "D"], "B"=>["E"], "D"=>["E"], "F"=>["E"]}
 
-def find_roots(graph, reversed)
+def find_roots(graph, inverse)
   roots = []
   graph.keys.each do |key|
-    roots << key if reversed[key].empty?
+    roots << key if inverse[key].empty?
   end
+  p "roots: #{roots.sort.join}"
   roots.sort
 end
 
-roots = find_roots(graph, reversed)
-# p "root: #{roots.sort}"
+# Part 1
+def order_steps graph, inverse
+  roots = find_roots(graph, inverse)
 
-order = []
-current = roots.shift
+  order = []
+  current = roots.shift
 
-order << current
-to_visit = roots
+  order << current
+  queue = roots
 
-while current
-  edges = graph[current]
-  to_visit.concat edges
-  to_visit = to_visit.uniq.sort
+  while current
+    edges = graph[current]
+    queue.concat edges
+    queue = queue.uniq.sort
 
-  # p "to visit: #{to_visit.join}"
-  node = nil
-  loop do
-    node = to_visit.shift
-    preceding = reversed[node]
+    edge = nil
 
-    if preceding.all? { |x| order.include? x }
-      order << node
-      break
-    else
-      to_visit << node
+    loop do
+      edge = queue.shift
+      depends_on = inverse[edge]
+
+      if depends_on.all? { |x| order.include? x }
+        order << edge
+        break
+      else
+        queue << edge
+      end
     end
+
+    current = edge
   end
 
-  current = node
-
-  # puts "order: #{order.join}\n\n"
+  order.join
 end
-puts "Part 1: #{order.join}\n\n"
+
+puts "Part 1: #{order_steps graph, inverse}\n\n"
