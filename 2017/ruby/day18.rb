@@ -21,58 +21,50 @@ pos = 0
 loop do
   line = input[pos]
   instr, *args = line.split " "
+  a, b = args
 
   case instr
   when "set"
-    a, b = args
     if b.ord >= 97
       regs[a] = regs[b]
     else
       regs[a] = b.to_i
     end
-    pos += 1
   when "add"
-    a, b = args
     if b.ord >= 97
       regs[a] += regs[b]
     else
       regs[a] += b.to_i
     end
-    pos += 1
   when "mul"
-    a, b = args
     if b.ord >= 97
       regs[a] *= regs[b]
     else
       regs[a] *= b.to_i
     end
-    pos += 1
   when "mod"
-    a, b = args
     if b.ord >= 97
       regs[a] %= regs[b]
     else
       regs[a] %= b.to_i
     end
-    pos += 1
   when "snd"
-    reg = args.first
+    reg = a
     last_freq = regs[reg]
-    pos += 1
   when "rcv"
-    reg = args.first
+    reg = a
     if regs[reg] != 0
       p last_freq: last_freq
       break
     end
-    pos += 1
   when "jgz"
-    reg = args.first
+    reg = a
     offset = args.last.to_i
     if regs[reg] > 0
       pos += offset
-    else
-      pos += 1
+      next
     end
   end
+
+  pos += 1
 end
