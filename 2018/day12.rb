@@ -15,10 +15,18 @@ input[2,input.size - 1].each do |x|
   rule, val = x.split(" => ")
   RULES[rule] = val
 end
-# pp RULES
 
 def nextg(pots)
   next_gen = {}
+  min = pots.keys.min
+  max = pots.keys.max
+  # Have to add padding here to account for rule matching at the ends of
+  # current generation
+  pots[min-2] = "."
+  pots[min-1] = "."
+  pots[max+2] = "."
+  pots[max+1] = "."
+
   pots.each do |i, v|
     pattern = (i-2..i+2).map do |pot|
       if !pots[pot]
@@ -40,12 +48,15 @@ def nextg(pots)
   next_gen
 end
 
+i = 0
 20.times do
+  i += 1
+  if i % 1000 == 0
+    p i
+  end
   pots = nextg(pots)
-  puts pots.sort_by { |k, v| k }.map { |n| n.last }.join
+  # puts pots.sort_by { |k, v| k }.map { |n| n.last }.join
 end
-
-pp pots
 
 sum = 0
 pots.each do |k, v|
@@ -53,6 +64,4 @@ pots.each do |k, v|
     sum += k
   end
 end
-p sum
-# 2929 too low?
-# 2959 too low
+p "Part 1: #{sum}"
