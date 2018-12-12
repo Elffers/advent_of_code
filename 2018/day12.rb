@@ -27,6 +27,7 @@ def nextg(pots)
   pots[max+2] = "."
   pots[max+1] = "."
 
+  sum = 0
   pots.each do |i, v|
     pattern = (i-2..i+2).map do |pot|
       if !pots[pot]
@@ -40,28 +41,26 @@ def nextg(pots)
     val = RULES[pattern]
     if val
       next_gen[i] = val
+      if val == "#"
+        sum += i
+      end
     else
       next_gen[i] = "."
     end
   end
 
-  next_gen
-end
-
-i = 0
-20.times do
-  i += 1
-  if i % 1000 == 0
-    p i
-  end
-  pots = nextg(pots)
-  # puts pots.sort_by { |k, v| k }.map { |n| n.last }.join
+  [next_gen, sum]
 end
 
 sum = 0
-pots.each do |k, v|
-  if v == "#"
-    sum += k
+108.times do |i|
+  pots, next_sum = nextg(pots)
+  if i == 20
+    p "Part 1: #{sum}"
   end
+  sum = next_sum
 end
-p "Part 1: #{sum}"
+
+# diff is 52, starts repeating after 108 iterations
+sum += (50000000000 - 108) * 52
+p "Part 2: #{sum}"
