@@ -34,9 +34,11 @@ end
 def square_sum(i, j, dim, grid)
   sum = 0
   (i...i+dim).each do |x|
+    if x-1 >= 300
+      next
+    end
     (j...j+dim).each do |y|
-
-      if x > 300-dim || y > 300-dim
+      if y-1 >= 300
         next
       end
 
@@ -59,7 +61,7 @@ n = 300
   (1..n).each do |j|
 
     sum = square_sum(i, j, 3, grid)
-    # ms, mss = max_square_sum(i, j, 70, grid)
+    # ms, mss = max_square_sum(i, j, 300, grid)
 
     # if mss > max_square_sum
     #   max_square_sum = mss
@@ -75,4 +77,5 @@ n = 300
 end
 
 p "Part 1: #{max}, #{max_pts}"
-p "Part 2: #{max_square_sum}, #{max_square}"
+# p "Part 2: #{max_square_sum}, #{max_square}"
+p max_square_sum(224,222,100, grid)
