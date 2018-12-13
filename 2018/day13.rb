@@ -13,7 +13,7 @@ DIR = {
 }
 
 class Cart
-  attr_accessor :x, :y, :dir, :turn
+  attr_accessor :x, :y, :dir, :turn, :alive
 
   TURN = [0, 1, 2] # left, straight, right
 
@@ -22,6 +22,7 @@ class Cart
     @x = x
     @y = y
     @turn = 0 #index of turn
+    @alive = true
   end
 
   def turn_left
@@ -118,60 +119,65 @@ input.each_with_index do |line, y|
   end
 end
 
-# p grid
-
-t = 0
-crashed = false
-while !crashed
-
+alive = carts.size
+while alive > 1
   carts.sort_by! { |cart| cart.pos }
-  current_positions = carts.map { |c| c.pos }
+  current_positions = carts.map do |c|
+    c.alive ? c.pos : nil
+  end
 
   carts.each_with_index do |cart, i|
-    # p "position: #{cart.pos}, #{cart.current_dir}"
-    cart.move
+    if cart.alive
+      cart.move
 
-    track = grid[cart.x][cart.y]
-    if track.empty? || track.nil?
-      puts "ERROR"
-      exit
-    end
-    case track
-    when "\\"
-      if cart.dir == DIR[:up]
-        cart.turn_left
-      elsif cart.dir == DIR[:down]
-        cart.turn_left
-      elsif cart.dir == DIR[:right]
-        cart.turn_right
-      elsif cart.dir == DIR[:left]
-        cart.turn_right
+      track = grid[cart.x][cart.y]
+      if track.empty? || track.nil?
+        puts "ERROR"
+        exit
       end
-    when "/"
-      if cart.dir == DIR[:up]
-        cart.turn_right
-      elsif cart.dir == DIR[:down]
-        cart.turn_right
-      elsif cart.dir == DIR[:right]
-        cart.turn_left
-      elsif cart.dir == DIR[:left]
-        cart.turn_left
+      case track
+      when "\\"
+        if cart.dir == DIR[:up]
+          cart.turn_left
+        elsif cart.dir == DIR[:down]
+          cart.turn_left
+        elsif cart.dir == DIR[:right]
+          cart.turn_right
+        elsif cart.dir == DIR[:left]
+          cart.turn_right
+        end
+      when "/"
+        if cart.dir == DIR[:up]
+          cart.turn_right
+        elsif cart.dir == DIR[:down]
+          cart.turn_right
+        elsif cart.dir == DIR[:right]
+          cart.turn_left
+        elsif cart.dir == DIR[:left]
+          cart.turn_left
+        end
+      when "+"
+        cart.change_dir
       end
-    when "+"
-      cart.change_dir
-    end
 
-    if current_positions.include? cart.pos
-      p "Crashed at #{cart.pos}"
-      crashed = true
-      break
-    else
-      current_positions[i] = cart.pos
+      if current_positions.include? cart.pos
+        if alive == 17
+          p "Part 1: #{cart.pos}"
+        end
+
+        cart.alive = false
+        current_positions[i] = nil
+
+        j = current_positions.find_index(cart.pos)
+        current_positions[j] = nil
+        carts[j].alive = false
+
+        alive = carts.select { |c| c.alive }.size
+      else
+        current_positions[i] = cart.pos
+      end
     end
   end
-  t += 1
-  # p "tick: #{t}"
-  # puts
 end
-# 135, 23 wrong
-# 23,135 wrong
+
+p "Part 2: #{carts.select { |c| c.alive }.first.pos}"
