@@ -7,12 +7,16 @@ import (
 
 
 func main() {
-	input := "084601"
+	// input := "084601"
+	// input := []int{0,8,4,6,0,1}
+	input := "59414"
 	n, _ := strconv.Atoi(input)
+	fmt.Println(n)
 
 	scores := []int{3, 7}
 	i1, i2 := 0, 1
-	for i := 0; i < n; i++ {
+	for {
+		// for i := 0; i < n; i++ {
 		r1, r2 := scores[i1], scores[i2]
 		score := r1 + r2
 		a := score / 10
@@ -24,9 +28,24 @@ func main() {
 
 		i1 = (i1 + r1 + 1) % len(scores)
 		i2 = (i2 + r2 + 1) % len(scores)
+
+		if len(scores) >= len(input) {
+			n := len(scores) - len(input)
+			pattern := ""
+
+			for _, s := range scores[n:len(scores)] {
+				c := strconv.Itoa(s)
+				pattern = pattern +c
+				// fmt.Printf("pattern: %+v\n", pattern)
+			}
+			if pattern == input {
+				fmt.Printf("Part 2 pattern: %+v\n", n)
+				break
+			}
+
+		}
+
 	}
 	// Part 1
-	fmt.Println(scores[n:n+10])
-
-	// fmt.Printf("Day 14 Part 2: %+v\n", part2)
+	// fmt.Println(scores[n:n+10])
 }
