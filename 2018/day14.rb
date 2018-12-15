@@ -1,8 +1,6 @@
 input = File.readlines("/Users/hhh/JungleGym/advent_of_code/2018/inputs/day14.in")
 input = "084601"
-# input = "59414"
 target = input.chars.map { |x| x.to_i }
-# input = "59414"
 
 scores = {
   0 => 3,
@@ -24,24 +22,35 @@ loop do
 
     i += 1 # increment index
     j = i - target.size
-    pattern = (j...j + target.size).map do |idx|
-      scores[idx].to_s
-    end.join
-    if pattern == input
-      p "Part 2: #{j}"
-      break
+
+    found = true
+    while found
+      (0...target.size).each do |idx|
+        if scores[j+idx] != target[idx]
+          found = false
+        end
+      end
+      if found
+        p "Part 2: #{j}"
+        exit
+      end
     end
   end
 
   scores[i] = b
   i += 1
   j = i - target.size
-  pattern = (j...j + target.size).map do |idx|
-    scores[idx].to_s
-  end.join
-  if pattern == input
+  found = true
+  while found
+    (0...target.size).each do |idx|
+      if scores[j+idx] != target[idx]
+        found = false
+      end
+    end
+    if found
       p "Part 2: #{j}"
-    break
+      exit
+    end
   end
 
   i1 = (r1 + i1 + 1) % scores.size
