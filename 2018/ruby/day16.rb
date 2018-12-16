@@ -5,14 +5,16 @@ p1 = p1.split("\n\n").map { |x| x.strip }
 
 def find_opcodes before, input, after
   count = 0
+  codes = []
   OPCODES.each do |op|
     b = before.dup
     out = send(op, input, b)
     if out == after
       count += 1
+      codes << op
     end
   end
-  count
+  [count, codes]
 end
 
 OPCODES = %i[
@@ -156,15 +158,46 @@ end
 
 
 count = 0
+opcodes = {}
+
 p1.each do |sample|
   regs = sample.scanf("Before: [%d, %d, %d, %d]\n %d %d %d %d\nAfter: [%d, %d, %d, %d]")
   before = regs[0,4]
   input = regs[4, 4]
-  out = regs[8, 4]
-  codes = find_opcodes before, input, out
-  if codes >= 3
+  after = regs[8, 4]
+
+  num, codes = find_opcodes before, input, after
+  # p [num, codes]
+
+  if num == 1
+    code = input.first
+    opcodes[code] = codes.first
+  else
+    rest = codes - opcodes.values
+    if rest.size == 1
+      code = input.first
+      opcodes[code] = rest.first
+    end
+  end
+
+  # Part 1
+  if num >= 3
     count += 1
   end
 end
+
 p "Part 1: #{count}"
 
+instr = p2.strip.split("\n").map do |input|
+  input.split(" ").map { |x| x.to_i }
+end
+
+reg = [0, 0, 0, 0]
+while !instr.empty?
+  input = instr.shift
+  op = opcodes[input.first]
+  out = send(op, input, reg)
+  reg = out
+end
+
+p "Part 2: #{reg.first}"
