@@ -1,11 +1,19 @@
 require 'pp'
+require 'scanf'
 p1, p2 = File.read("/Users/hsinghui/sandbox/advent_of_code/2018/inputs/day16.in").split("\n\n\n")
-
-samples  = {}
-count = 0
 p1 = p1.split("\n\n").map { |x| x.strip }
-# p1.each do |sample|
-# end
+
+def find_opcodes before, input, after
+  count = 0
+  OPCODES.each do |op|
+    b = before.dup
+    out = send(op, input, b)
+    if out == after
+      count += 1
+    end
+  end
+  count
+end
 
 OPCODES = %i[
   addr
@@ -146,20 +154,17 @@ def eqrr input, reg
   reg
 end
 
-before = [3, 2, 1, 1]
-input = "9 2 1 2".split(" ").map { |x| x.to_i}
-after =  [3, 2, 2, 1]
-# puts
-# p mulr input, before
-# puts
 
-OPCODES.each do |op|
-  b = before.dup
-  # p "Before: #{ b}"
-  out = send(op, input, b)
-  if out == after
-    p [op, out]
+count = 0
+p1.each do |sample|
+  regs = sample.scanf("Before: [%d, %d, %d, %d]\n %d %d %d %d\nAfter: [%d, %d, %d, %d]")
+  before = regs[0,4]
+  input = regs[4, 4]
+  out = regs[8, 4]
+  codes = find_opcodes before, input, out
+  if codes >= 3
     count += 1
   end
 end
-p count
+p "Part 1: #{count}"
+
