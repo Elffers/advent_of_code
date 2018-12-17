@@ -2,8 +2,6 @@ require 'pp'
 require 'set'
 
 # input = File.read("/Users/hhh/JungleGym/advent_of_code/2018/inputs/day15.in")
-# print input
-# puts
 input = File.readlines("./inputs/day15.in")
 input = File.readlines("./inputs/day15_test1.in")
 
@@ -27,15 +25,41 @@ class Node
   end
 end
 
-class Unit
-  attr_accessor :x, :y, :pts, :pwr, :alive
+class Grid
+  attr_accessor :elves, :goblins, :units, :state, :rows, :cols
 
-  def initialize x, y
+  def initialize rows, cols
+    @rows = rows
+    @cols = cols
+    @elves = []
+    @goblins = []
+    @units = []
+    @state = Hash.new { |h, k| h[k] = Hash.new }
+  end
+
+  def to_s
+    @state.each do |k,row|
+      p row.values.join
+    end
+  end
+end
+
+# TODO: change to hashmap with key = position
+# elves = []
+# goblins = []
+# units = []
+
+
+class Unit
+  attr_accessor :x, :y, :pts, :pwr, :alive, :grid
+
+  def initialize x, y, grid
     @x = x
     @y = y
     @pts = 200
     @pwr = 3
     @alive = true
+    @grid = grid
   end
 
   def pos
@@ -64,12 +88,12 @@ class Unit
   end
 
   def move_to step, grid
-    char = grid[@x][@y]
-    grid[@x][@y] = "."
+    char = grid.state[@x][@y]
+    grid.state[@x][@y] = "."
     i, j = step
     self.x = i
     self.y = j
-    grid[i][j] = char
+    grid.state[i][j] = char
   end
 
   def attack
@@ -122,7 +146,7 @@ class Unit
     enemies.each do |t|
       adj.each do |x, y|
         i, j = [t.x + x, t.y + y]
-        if grid[i][j] == "."
+        if grid.state[i][j] == "."
           targets << [i, j]
         end
       end
@@ -131,7 +155,7 @@ class Unit
   end
 
   def choose_path targets, grid
-    min_dist = grid.size * grid.size
+    min_dist = grid.rows * grid.cols
     distances = Hash.new { |h, k| h[k] = [] }
 
     targets.each do |target|
@@ -192,11 +216,11 @@ class Unit
     end
 
     x, y = coord
-    if x < 0 || y < 0 || x >= grid.size || y >= grid.size
+    if x < 0 || y < 0 || x >= grid.cols || y >= grid.rows
       return false
     end
 
-    if grid[x][y] != "."
+    if grid.state[x][y] != "."
       return false
     end
 
@@ -207,43 +231,44 @@ end
 class Elf < Unit; end
 class Goblin < Unit; end
 
-def print_grid grid
-  grid.each do |k,row|
-    p row.values.join
-  end
-end
+# def print_grid grid
+#   grid.each do |k,row|
+#     p row.values.join
+#   end
+# end
 
-# TODO: change to hashmap with key = position
-elves = []
-goblins = []
-units = []
+# # TODO: change to hashmap with key = position
+# elves = []
+# goblins = []
+# units = []
 
-grid = Hash.new { |h, k| h[k] = Hash.new }
+# grid = Hash.new { |h, k| h[k] = Hash.new }
 
+grid = Grid.new(input.size, input.first.size)
 input.each_with_index do |row, i|
   row.strip.chars.each_with_index do |char, j|
     if char == "G"
-      g = Goblin.new(i, j)
-      goblins << g
-      units << g
+      g = Goblin.new(i, j, grid)
+      grid.goblins << g
+      grid.units << g
     elsif char == "E"
-      e = Elf.new(i, j)
-      elves << e
-      units << e
+      e = Elf.new(i, j, grid)
+      grid.elves << e
+      grid.units << e
     end
-    grid[i][j] = char
+    grid.state[i][j] = char
   end
 end
 
-u = units.first
-print_grid grid
+u = grid.units.first
+grid.to_s
 if u.is_a? Goblin
-  u.take_turn elves, grid
+  u.take_turn grid.elves, grid
 else
-  u.take_turn goblins, grid
+  u.take_turn grid.goblins, grid
 end
 
-print_grid grid
+grid.to_s
 
 # while goblins.any? { |g| g.alive? } || elves .any? { |e| g.alive? }
 # rounds = 0
