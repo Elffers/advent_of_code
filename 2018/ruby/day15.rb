@@ -18,8 +18,7 @@ class Node
 
   def path_to
     path = []
-    path << self
-    node = self.prev
+    node = self
     while !node.nil?
       path << node
       node = node.prev
@@ -47,27 +46,53 @@ class Unit
     @alive
   end
 
-  def take_turn grid, enemies
+  def take_turn enemies, grid
     # find all targets
-    targets = find_targets enemies
+    targets = find_targets enemies, grid
+    # p "targets: #{targets}"
+
     # all enemies are dead
     return if targets.empty?
 
-    # already in range
-    if targets.include? self.pos
-      # find target in range of self.pos and attack
-    else
-
-      # find open squares in range of targets
-      #   - if in range, skip to attack
-      #   - if none in range or open, end
-      # find which in-range squares are reachable
-      # pick closest reachable square
+    if !targets.include? self.pos
+      path = choose_path targets, grid
+      step = path[1] #path[0] should be self.pos
+      move_to step, grid
     end
 
+    # attack
   end
 
-  def attack opp
+  def move_to step, grid
+    char = grid[@x][@y]
+    grid[@x][@y] = "."
+    i, j = step
+    self.x = i
+    self.y = j
+    grid[i][j] = char
+  end
+
+  def attack
+    enemy_type = self.is_a? Goblin ? "E" : "G"
+    # choose opponent in order of:
+    #   - adjacent
+    #   - fewest hit points
+    #   - in read order
+    adj = [
+      [0, -1], # top
+      [-1, 0], # left
+      [1, 0],  # right
+      [0, 1],  # down
+    ]
+    enemies = []
+    adj.each do |x, y|
+      i, j = [@x + x, @y + y]
+      if grid[i][j] == enemy_type
+        # TODO locate in enemies array
+        enemies << [i, j]
+      end
+    end
+
     opp.pts -= @pwr
 
     # move out of this method?
@@ -102,16 +127,31 @@ class Unit
         end
       end
     end
-    targets.sort_by!(&:itself)
+    targets.sort_by!(&:itself) # probably don't need to sort quite yet
   end
 
-  # Use BFS to find shortest path to each target
-  def find_reachable targets, grid
-    targets.map do |target|
-      shortest_path_to target, grid
-    end.compact
+  def choose_path targets, grid
+    min_dist = grid.size * grid.size
+    distances = Hash.new { |h, k| h[k] = [] }
+
+    targets.each do |target|
+      node = shortest_path_to target, grid
+      if node
+        distances[node.dist] << node.path_to
+        if node.dist < min_dist
+          min_dist = node.dist
+        end
+      end
+    end
+    # p distances
+
+    distances[min_dist].sort.first
   end
 
+  # Use BFS to find shortest path to target, if any
+  # NOTE: do we actually account for the path being the shortest possible?
+  # NOTE: path to node includes starting node -- will need to account for this
+  # when choosing step to take
   def shortest_path_to target, grid
     node = Node.new(self.pos, 0, nil)
     seen = Set.new
@@ -129,11 +169,7 @@ class Unit
     while !queue.empty?
       node = queue.shift
 
-      if node.pos == target
-        # p "distance: #{node.dist}"
-        # p "path: #{node.path_to}"
-        return node.path_to
-      end
+      return node if node.pos == target
 
       dist = node.dist
       i, j = node.pos
@@ -146,7 +182,7 @@ class Unit
       end
     end
 
-    p "No path found to #{target}"
+    # p "No path found to #{target}"
     return
   end
 
@@ -171,11 +207,18 @@ end
 class Elf < Unit; end
 class Goblin < Unit; end
 
+def print_grid grid
+  grid.each do |k,row|
+    p row.values.join
+  end
+end
+
+# TODO: change to hashmap with key = position
 elves = []
 goblins = []
 units = []
 
-map = Hash.new { |h, k| h[k] = Hash.new }
+grid = Hash.new { |h, k| h[k] = Hash.new }
 
 input.each_with_index do |row, i|
   row.strip.chars.each_with_index do |char, j|
@@ -183,38 +226,24 @@ input.each_with_index do |row, i|
       g = Goblin.new(i, j)
       goblins << g
       units << g
-      # map[i][j] = "."
     elsif char == "E"
       e = Elf.new(i, j)
       elves << e
       units << e
-      # map[i][j] = "."
     end
-    map[i][j] = char
+    grid[i][j] = char
   end
 end
 
-# pp goblins, elves
-# p units
 u = units.first
-# p u
+print_grid grid
 if u.is_a? Goblin
-  t = u.find_targets elves, map
-  r = u.find_reachable t, map
-  p r
+  u.take_turn elves, grid
 else
-  t =  u.find_targets goblins, map
-  r = u.find_reachable t, map
-  p r
+  u.take_turn goblins, grid
 end
 
-def print_map map
-  map.each do |k,row|
-    p row.values.join
-  end
-end
-
-# print_map map
+print_grid grid
 
 # while goblins.any? { |g| g.alive? } || elves .any? { |e| g.alive? }
 # rounds = 0
