@@ -1,10 +1,32 @@
 require 'pp'
+require 'set'
 
 # input = File.read("/Users/hhh/JungleGym/advent_of_code/2018/inputs/day15.in")
 # print input
 # puts
-input = File.readlines("/Users/hhh/JungleGym/advent_of_code/2018/inputs/day15.in")
-input = File.readlines("/Users/hhh/JungleGym/advent_of_code/2018/inputs/day15_test1.in")
+input = File.readlines("./inputs/day15.in")
+input = File.readlines("./inputs/day15_test1.in")
+
+class Node
+  attr_accessor :pos, :dist, :prev
+
+  def initialize pos, dist, prev
+    @pos = pos
+    @dist = dist
+    @prev = prev
+  end
+
+  def path_to
+    path = []
+    path << self
+    node = self.prev
+    while !node.nil?
+      path << node
+      node = node.prev
+    end
+    path.map { |n| n.pos}.sort # NOTE not sure about sort
+  end
+end
 
 class Unit
   attr_accessor :x, :y, :pts, :pwr, :alive
@@ -28,22 +50,21 @@ class Unit
   def take_turn grid, enemies
     # find all targets
     targets = find_targets enemies
+    # all enemies are dead
     return if targets.empty?
 
+    # already in range
     if targets.include? self.pos
       # find target in range of self.pos and attack
     else
+
+      # find open squares in range of targets
+      #   - if in range, skip to attack
+      #   - if none in range or open, end
+      # find which in-range squares are reachable
+      # pick closest reachable square
     end
 
-    # find open squares in range of targets
-    #   - if in range, skip to attack
-    #   - if none in range or open, end
-    # find which in-range squares are reachable
-    # pick closest reachable square
-
-  end
-
-  def move
   end
 
   def attack opp
@@ -64,6 +85,7 @@ class Unit
     (@x - x).abs + (@y - y).abs
   end
 
+  # Finds open squares adjacent to enemies
   def find_targets enemies, grid
     adj = [
       [0, -1], # top
@@ -83,49 +105,67 @@ class Unit
     targets.sort_by!(&:itself)
   end
 
+  # Use BFS to find shortest path to each target
   def find_reachable targets, grid
-    adj = [
-      [0, -1], # top
-      [-1, 0], # left
-      [1, 0],  # right
-      [0, 1],  # down
-    ]
-    targets.each do |t|
-      find_path t, grid
-    end
-    # A star?
+    targets.map do |target|
+      shortest_path_to target, grid
+    end.compact
   end
 
-  def path_to target, grid
-    pos = @pos
-    x, y = pos
-    path = []
-
-    # base cases
-    if pos = target
-      return path
-    end
-    if grid[x][y] != "."
-      return nil
-    end
-    if grid[x][y].nil? # outside of grid
-      return nil
-    end
-    path = []
-
-    adj = [
-      [0, -1], # top
-      [-1, 0], # left
-      [1, 0],  # right
-      [0, 1],  # down
-    ]
+  def shortest_path_to target, grid
+    node = Node.new(self.pos, 0, nil)
+    seen = Set.new
     queue = []
-    adj.each do |i, j|
-      pt = [
+
+    seen <<  node.pos
+    queue << node
+    adj = [
+      [0, 1],
+      [1, 0],
+      [0, -1],
+      [-1, 0],
+    ]
+
+    while !queue.empty?
+      node = queue.shift
+
+      if node.pos == target
+        # p "distance: #{node.dist}"
+        # p "path: #{node.path_to}"
+        return node.path_to
+      end
+
+      dist = node.dist
+      i, j = node.pos
+
+      neighbors = adj.map { |n| [n.first + i, n.last + j] }.select { |c| is_valid? c, grid, seen }
+      neighbors.each do |pos|
+        n = Node.new(pos, dist + 1, node)
+        queue << n
+        seen << pos
+      end
     end
 
+    p "No path found to #{target}"
+    return
   end
 
+  def is_valid? coord, grid, seen
+    if seen.include? coord
+      return false
+    end
+
+    x, y = coord
+    if x < 0 || y < 0 || x >= grid.size || y >= grid.size
+      return false
+    end
+
+    if grid[x][y] != "."
+      return false
+    end
+
+    true
+  end
 end
 
 class Elf < Unit; end
@@ -159,9 +199,13 @@ end
 u = units.first
 # p u
 if u.is_a? Goblin
-  u.find_targets elves, map
+  t = u.find_targets elves, map
+  r = u.find_reachable t, map
+  p r
 else
-  u.find_targets goblins, map
+  t =  u.find_targets goblins, map
+  r = u.find_reachable t, map
+  p r
 end
 
 def print_map map
