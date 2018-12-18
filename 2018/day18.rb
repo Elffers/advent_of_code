@@ -15,21 +15,9 @@ def print_grid grid
   end
 end
 
-def count grid
+def change grid
   wooded = 0
   lumber = 0
-  grid.each do |k,row|
-    row.each do |i, acre|
-      wooded += 1 if acre == "|"
-      lumber += 1 if acre == "#"
-    end
-  end
-  wooded * lumber
-end
-
-# print_grid grid
-#
-def change grid
   new_grid = Hash.new { |h, k| h[k] = Hash.new }
   adj = [
     [-1, -1], [0, -1], [1, -1],
@@ -45,23 +33,26 @@ def change grid
           grid[y + j][x + i]
         end
       end
-      # p "neighbors for #{[j, i]}: #{neighbors.compact.join}"
       case acre
       when "."
         if neighbors.count("|") >= 3
           new_grid[j][i] = "|"
+          wooded += 1
         else
           new_grid[j][i] = "."
         end
       when "|"
         if neighbors.count("#") >= 3
           new_grid[j][i] = "#"
+          lumber += 1
         else
           new_grid[j][i] = "|"
+          wooded += 1
         end
       when "#"
         if neighbors.count("#") >= 1 && neighbors.count("|") >= 1
           new_grid[j][i] = "#"
+          lumber += 1
         else
           new_grid[j][i] = "."
         end
@@ -70,11 +61,12 @@ def change grid
       end
     end
   end
-  new_grid
+  # p wooded * lumber
+  [new_grid, wooded * lumber]
 end
 
-# 1000000000.times do |i|
-10.times do
-  grid = change grid
+count = 0
+10.times do |i|
+  grid, count = change grid
 end
-p "Part 1: #{count grid}"
+p "Part 1: #{count}"
