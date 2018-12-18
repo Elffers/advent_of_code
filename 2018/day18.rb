@@ -66,7 +66,17 @@ def change grid
 end
 
 count = 0
-10.times do |i|
+# 10.times do |i|
+# 1000000000.times do |i|
+counts = Hash.new 0
+1000.times do |i|
   grid, count = change grid
+  counts[count] += 1
+  if counts[count] > 1
+    p i
+    break
+  end
+
+  p counts if i % 100 == 0
 end
 p "Part 1: #{count}"
