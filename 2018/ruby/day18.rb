@@ -65,18 +65,21 @@ def change grid
   [new_grid, wooded * lumber]
 end
 
-count = 0
+# count = 0
 # 10.times do |i|
-# 1000000000.times do |i|
-counts = Hash.new 0
-1000.times do |i|
+#   grid, count = change grid
+#   p count
+# end
+# p "Part 1: #{count}"
+
+ans = 0
+n = (1000000000 - 580)
+n = n % 28
+p n # 0
+580.times do
+  counts = Hash.new 0
   grid, count = change grid
   counts[count] += 1
-  if counts[count] > 1
-    p i
-    break
-  end
-
-  p counts if i % 100 == 0
+  ans = count
 end
-p "Part 1: #{count}"
+p "Part 2: #{ans}"
