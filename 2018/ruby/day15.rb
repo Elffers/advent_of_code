@@ -68,7 +68,7 @@ class Unit
   def take_turn
     # find all targets
     targets = find_targets self.enemies
-    p "targets: #{targets}"
+    p "i am a: #{@sym}, targets: #{targets}"
 
     # no open spots
     return if targets.empty?
@@ -135,6 +135,8 @@ class Unit
     if opp.pts < 0
       ox, oy = opp.pos
       @enemies.delete opp
+      @grid.units.delete opp
+
       grid.state[ox][oy] = "."
     end
     # p "total enemies after: #{@enemies.size}"
@@ -326,7 +328,8 @@ loop do
 
   sorted = grid.units.sort_by { |u| u.pos }
   sorted.each do |unit|
-    p "current unit: #{unit.pos}"
+    puts
+    p "CURRENT UNIT: #{unit.pos}"
     unit.take_turn
     if unit.enemies.empty?
       return rounds
