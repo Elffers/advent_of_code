@@ -1,11 +1,5 @@
 require 'pp'
 require 'set'
-require 'pry'
-
-input = File.readlines("./inputs/day15.in")
-# input = File.readlines("./inputs/day15.in")
-# input = File.readlines("./inputs/day15_test2.in")
-# input = File.readlines("./inputs/day15_test3.in")
 
 class Node
   attr_accessor :pos, :dist, :prev
@@ -23,19 +17,16 @@ class Node
       path.unshift node
       node = node.prev
     end
-    path.map { |n| n.pos} #.sort # NOTE not sure about sort
+    path.map { |n| n.pos}
   end
 end
 
 class Grid
-  attr_accessor :elves, :goblins, :units, :state, :rows, :cols
+  attr_accessor :units, :state, :rows, :cols
 
   def initialize rows, cols
     @rows = rows
     @cols = cols
-    @elves = []
-    @goblins = []
-    @units = []
     @state = Hash.new { |h, k| h[k] = Hash.new }
   end
 
@@ -44,63 +35,62 @@ class Grid
       p row.values.join
     end
   end
+
+  def populate units
+     @units = units
+  end
+
+  def goblins
+    @units.select { |u| u.sym == "G" }
+  end
+
+  def elves
+    @units.select { |u| u.sym == "E" }
+  end
 end
 
 class Unit
-  attr_accessor :x, :y, :pts, :pwr, :grid
+  attr_accessor :x, :y, :pts, :pwr, :grid, :sym
 
-  def initialize x, y, grid
+  def initialize x, y, grid, sym
     @x = x
     @y = y
     @pts =  200
     @pwr = 3
     @grid = grid
+    @sym = sym
   end
 
   def pos
     [@x, @y]
   end
 
-  def alive?
-    @alive
-  end
-
   def take_turn
-    # find all targets
-    return "NO ENEMIES" if @enemies.empty?
-    targets = find_targets self.enemies
-    # p "i am a: #{@sym}, targets: #{targets}"
+    targets = find_targets
 
-    # no open spots
     return if targets.empty?
 
     if targets.include? pos
       attack
     else
       path = choose_path targets
-      # p "path when i have #{pts}: #{path}"
       return if path.nil?
-      step = path[1] #path[0] should be self.pos
+      step = path[1] # path[0] should be self.pos
       move_to step
-      # p "pos after move: #{pos}"
       attack
     end
-
   end
 
   def move_to step
-    # p "old position: #{pos}"
     char = @grid.state[@x][@y]
     @grid.state[@x][@y] = "."
     i, j = step
     self.x = i
     self.y = j
-    # p "new position: #{pos}"
     @grid.state[i][j] = char
   end
 
   def attack
-    # p "current position: #{pos}"
     enemy_type = self.sym == "E" ? "G" : "E"
     adj = [
       [0, -1], # top
@@ -108,46 +98,25 @@ class Unit
       [1, 0],  # right
       [0, 1],  # down
     ]
-    enemies = []
+    opps = []
     adj.each do |x, y|
       i, j = [@x + x, @y + y]
-      # p [pos, i, j]
       if grid.state[i][j] == enemy_type
-        enemy = @enemies.find { |e| e.x == i && e.y == j }
-        # TODO locate in enemies array
-        enemies << enemy
+        opp = get_enemies.find { |e| e.x == i && e.y == j }
+        opps << opp
       end
     end
 
-    return if enemies.empty?
+    return if opps.empty?
 
-    # p "BEFORE ENEMY POINTS: #{@enemies.map { |x| x.pts }}"
-    # p "attack candidates: #{enemies.size}"
-    opp = choose_opponent enemies
-    # p self.sym
-    # p "attack candidates: #{opp.pos}"
-
-    # p "pts before: #{opp.pts}"
+    opp = choose_opponent opps
     opp.pts -= @pwr
 
-    # p "pts after : #{opp.pts}"
-    # p "total enemies before: #{@enemies.size}"
-    # move out of this method?
     if opp.pts < 0
       ox, oy = opp.pos
-      @enemies.delete opp
-      @grid.units.delete opp
-      if enemy_type == "E"
-        @grid.elves.delete opp
-      else
-        @grid.goblins.delete opp
-      end
-
-
       grid.state[ox][oy] = "."
+      @grid.units.delete opp
     end
-    # p "total enemies after: #{@enemies.size}"
-    # p "total enemies after: #{@grid.goblins.size}"
   end
 
   def choose_opponent enemies
@@ -155,6 +124,7 @@ class Unit
     #   - adjacent
     #   - fewest hit points
     #   - in read order
+
     min_pts = 201
     hit_pts = Hash.new { |h, k| h[k] = [] }
     enemies.each do |x|
@@ -163,25 +133,21 @@ class Unit
       end
       hit_pts[x.pts] << x
     end
-    # p "HIT PITS: #{hit_pts.size}, min_pts: #{min_pts}"
     candidates = hit_pts[min_pts]
-    # p "choosing from: #{candidates.size}"
     opps = candidates.sort_by { |e| e.pos }
-    # p "CHOOSING OPPS FROM: #{opps.map { |x| [x.pos, x.pts] }}"
     opps.first
   end
 
-  def is_a? type
-    self.class == type
-  end
-
-  def dist pt
-    x, y = pt
-    (@x - x).abs + (@y - y).abs
+  def get_enemies
+    if @sym == "G"
+      @grid.elves
+    else
+      @grid.goblins
+    end
   end
 
   # Finds open squares adjacent to enemies
-  def find_targets enemies
+  def find_targets
     adj = [
       [0, -1], # top
       [-1, 0], # left
@@ -189,7 +155,7 @@ class Unit
       [0, 1],  # down
     ]
     targets = []
-    enemies.each do |t|
+    get_enemies.each do |t|
       adj.each do |x, y|
         i, j = [t.x + x, t.y + y]
         if @grid.state[i][j] == "." || pos == [i, j]
@@ -213,7 +179,6 @@ class Unit
         end
       end
     end
-    # p "Distances: #{distances[min_dist].size}"
     distances[min_dist].sort.first
   end
 
@@ -222,7 +187,7 @@ class Unit
   # NOTE: path to node includes starting node -- will need to account for this
   # when choosing step to take
   def shortest_path_to target
-    node = Node.new(self.pos, 0, nil)
+    node = Node.new(pos, 0, nil)
     seen = Set.new
     queue = []
 
@@ -243,7 +208,7 @@ class Unit
       dist = node.dist
       i, j = node.pos
 
-      neighbors = adj.map { |n| [n.first + i, n.last + j] }.select { |c| is_valid? c, seen }
+      neighbors = adj.map { |x, y| [x+i, y+j] }.select { |c| is_valid? c, seen }
       neighbors.each do |pos|
         n = Node.new(pos, dist + 1, node)
         queue << n
@@ -256,103 +221,67 @@ class Unit
   end
 
   def is_valid? coord, seen
-    if seen.include? coord
-      return false
-    end
+    return false if seen.include? coord
 
     x, y = coord
     if x < 0 || y < 0 || x >= @grid.cols || y >= @grid.rows
       return false
     end
 
-    if @grid.state[x][y] != "."
-      return false
-    end
+    return false if @grid.state[x][y] != "."
 
     true
   end
 end
 
-class Elf < Unit
-  attr_accessor :enemies, :sym
+def process_input input
+  grid = Grid.new(input.size, input.first.size)
+  units = []
 
-  def initialize i, j, grid
-    super
-    @enemies = self.grid.goblins
-    @sym = "E"
-
-  end
-end
-
-class Goblin < Unit
-  attr_accessor :enemies, :sym
-
-  def initialize i, j, grid
-    super
-    @enemies = self.grid.elves
-    @sym = "G"
-  end
-end
-
-##############################################
-grid = Grid.new(input.size, input.first.size)
-input.each_with_index do |row, i|
-  row.strip.chars.each_with_index do |char, j|
-    if char == "G"
-      g = Goblin.new(i, j, grid)
-      grid.goblins << g
-      grid.units << g
-    elsif char == "E"
-      e = Elf.new(i, j, grid)
-      grid.elves << e
-      grid.units << e
-    end
-    grid.state[i][j] = char
-  end
-end
-
-##############   TEST   #####################
-
-# u = grid.units.first
-# grid.to_s
-# 3.times do
-#   if u.is_a? Goblin
-#     u.take_turn grid.elves
-#   else
-#     u.take_turn grid.goblins
-#   end
-#   puts
-#   grid.to_s
-# end
-
-# grid.to_s
-
-rounds = 0
-until grid.goblins.empty? || grid.elves.empty?
-
-  sorted = grid.units.sort_by { |u| u.pos }
-  sorted.each do |unit|
-    # puts
-    # p "CURRENT UNIT: #{unit.pos}"
-    # if unit.enemies.empty?
-    #   p "Part 1: #{rounds * grid.units.map { |x| x.pts }.reduce(:+)}"
-    #   break
-    # end
-    unit.take_turn
-    if unit.enemies.empty?
-      p "FINAL ELF HIT POINTS: #{grid.elves.map { |x| x.pts }}"
-      p "FINAL GOBLIN HIT POINTS: #{grid.goblins.map { |x| x.pts }}"
-      p "Part 1: #{rounds * grid.units.map { |x| x.pts }.reduce(:+)}"
-      break
+  input.each_with_index do |row, i|
+    row.strip.chars.each_with_index do |char, j|
+      if char == "E" || char == "G"
+        e = Unit.new(i, j, grid, char)
+        units << e
+      end
+      grid.state[i][j] = char
     end
   end
 
-  rounds += 1
-  p "FINISHED ROUND: #{rounds}"
-  # grid.to_s
-  # p "FINAL ELF HIT POINTS: #{grid.elves.map { |x| x.pts }}"
-  # p "FINAL GOBLIN HIT POINTS: #{grid.goblins.map { |x| x.pts }}"
-  # p "ROUND: #{rounds}"
+  grid.populate units
+
+  grid
 end
 
+def run grid
+  rounds = 0
+  until grid.goblins.empty? || grid.elves.empty?
+    sorted = grid.units.sort_by { |u| u.pos }
+    sorted.each_with_index do |unit, i|
+      unit.take_turn
 
+      if unit.get_enemies.empty?
+        # p "FINAL HIT POINTS: #{grid.units.map { |x| x.pts }}"
+        p "FINISHED ROUND: #{rounds}"
+        p "Part 1: #{rounds * grid.units.map { |x| x.pts }.reduce(:+)}"
+        break
+      end
+    end
+
+    rounds += 1
+
+    # p "FINISHED ROUND: #{rounds}"
+  end
+end
+
+tests = File.read("./inputs/day15_test3.in").split("\n\n").map do |str|
+  str.split("\n")
+end
+
+test_grids = tests.map { |t| process_input t }
+test_grids.each { |test| run test } # first two tests off by one round?
+
+input = File.readlines("./inputs/day15.in")
+# input = File.readlines("./inputs/day15_test2.in")
+grid = process_input input
+run grid
