@@ -78,7 +78,8 @@ class Unit
       attack
     else
       path = choose_path targets
-      p "path: #{path}"
+      p "path when i have #{pts}: #{path}"
+      return if path.nil?
       step = path[1] #path[0] should be self.pos
       move_to step
       p "pos after move: #{pos}"
@@ -206,8 +207,7 @@ class Unit
         end
       end
     end
-    p "Distances: #{distances[min_dist].sort.first}"
-
+    p "Distances: #{distances[min_dist].size}"
     distances[min_dist].sort.first
   end
 
@@ -322,8 +322,7 @@ end
 # grid.to_s
 
 rounds = 0
-# while goblins.any? { |g| g.alive? } || elves .any? { |e| g.alive? }
-loop do
+until grid.goblins.empty? || grid.elves.empty?
   rounds += 1
 
   sorted = grid.units.sort_by { |u| u.pos }
@@ -332,7 +331,8 @@ loop do
     p "CURRENT UNIT: #{unit.pos}"
     unit.take_turn
     if unit.enemies.empty?
-      return rounds
+      p rounds
+      break
     end
   end
   grid.to_s
