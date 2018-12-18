@@ -2,10 +2,10 @@ require 'pp'
 require 'set'
 require 'pry'
 
-# input = File.read("/Users/hhh/JungleGym/advent_of_code/2018/inputs/day15.in")
+input = File.readlines("./inputs/day15.in")
 # input = File.readlines("./inputs/day15.in")
-# input = File.readlines("./inputs/day15_test1.in")
-input = File.readlines("./inputs/day15_test2.in")
+# input = File.readlines("./inputs/day15_test2.in")
+# input = File.readlines("./inputs/day15_test3.in")
 
 class Node
   attr_accessor :pos, :dist, :prev
@@ -67,22 +67,22 @@ class Unit
 
   def take_turn
     # find all targets
+    return "NO ENEMIES" if @enemies.empty?
     targets = find_targets self.enemies
-    p "i am a: #{@sym}, targets: #{targets}"
+    # p "i am a: #{@sym}, targets: #{targets}"
 
     # no open spots
     return if targets.empty?
 
     if targets.include? pos
-      p "IN RANGE"
       attack
     else
       path = choose_path targets
-      p "path when i have #{pts}: #{path}"
+      # p "path when i have #{pts}: #{path}"
       return if path.nil?
       step = path[1] #path[0] should be self.pos
       move_to step
-      p "pos after move: #{pos}"
+      # p "pos after move: #{pos}"
       attack
     end
 
@@ -121,22 +121,28 @@ class Unit
 
     return if enemies.empty?
 
-    p "BEFORE ENEMY POINTS: #{@enemies.map { |x| x.pts }}"
+    # p "BEFORE ENEMY POINTS: #{@enemies.map { |x| x.pts }}"
     # p "attack candidates: #{enemies.size}"
     opp = choose_opponent enemies
     # p self.sym
-    p "attack candidates: #{opp.pos}"
+    # p "attack candidates: #{opp.pos}"
 
-    p "pts before: #{opp.pts}"
+    # p "pts before: #{opp.pts}"
     opp.pts -= @pwr
 
-    p "pts after : #{opp.pts}"
+    # p "pts after : #{opp.pts}"
     # p "total enemies before: #{@enemies.size}"
     # move out of this method?
     if opp.pts < 0
       ox, oy = opp.pos
       @enemies.delete opp
       @grid.units.delete opp
+      if enemy_type == "E"
+        @grid.elves.delete opp
+      else
+        @grid.goblins.delete opp
+      end
+
 
       grid.state[ox][oy] = "."
     end
@@ -161,7 +167,7 @@ class Unit
     candidates = hit_pts[min_pts]
     # p "choosing from: #{candidates.size}"
     opps = candidates.sort_by { |e| e.pos }
-    p "CHOOSING OPPS FROM: #{opps.map { |x| [x.pos, x.pts] }}"
+    # p "CHOOSING OPPS FROM: #{opps.map { |x| [x.pos, x.pts] }}"
     opps.first
   end
 
@@ -207,7 +213,7 @@ class Unit
         end
       end
     end
-    p "Distances: #{distances[min_dist].size}"
+    # p "Distances: #{distances[min_dist].size}"
     distances[min_dist].sort.first
   end
 
@@ -323,21 +329,30 @@ end
 
 rounds = 0
 until grid.goblins.empty? || grid.elves.empty?
-  rounds += 1
 
   sorted = grid.units.sort_by { |u| u.pos }
   sorted.each do |unit|
-    puts
-    p "CURRENT UNIT: #{unit.pos}"
+    # puts
+    # p "CURRENT UNIT: #{unit.pos}"
+    # if unit.enemies.empty?
+    #   p "Part 1: #{rounds * grid.units.map { |x| x.pts }.reduce(:+)}"
+    #   break
+    # end
     unit.take_turn
     if unit.enemies.empty?
-      p rounds
+      p "FINAL ELF HIT POINTS: #{grid.elves.map { |x| x.pts }}"
+      p "FINAL GOBLIN HIT POINTS: #{grid.goblins.map { |x| x.pts }}"
+      p "Part 1: #{rounds * grid.units.map { |x| x.pts }.reduce(:+)}"
       break
     end
   end
-  grid.to_s
-  p "FINAL ELF HIT POINTS: #{grid.elves.map { |x| x.pts }}"
-  p "FINAL GOBLIN HIT POINTS: #{grid.goblins.map { |x| x.pts }}"
-  p "ROUND: #{rounds}"
-  puts
+
+  rounds += 1
+  p "FINISHED ROUND: #{rounds}"
+  # grid.to_s
+  # p "FINAL ELF HIT POINTS: #{grid.elves.map { |x| x.pts }}"
+  # p "FINAL GOBLIN HIT POINTS: #{grid.goblins.map { |x| x.pts }}"
+  # p "ROUND: #{rounds}"
 end
+
+
