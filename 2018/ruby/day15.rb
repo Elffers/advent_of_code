@@ -52,11 +52,11 @@ end
 class Unit
   attr_accessor :x, :y, :pts, :pwr, :grid, :sym
 
-  def initialize x, y, grid, sym
+  def initialize x, y, grid, sym, pwr
     @x = x
     @y = y
     @pts =  200
-    @pwr = 3
+    @pwr = pwr
     @grid = grid
     @sym = sym
   end
@@ -110,7 +110,9 @@ class Unit
     return if opps.empty?
 
     opp = choose_opponent opps
+    # p "opp power before: #{opp.pts}"
     opp.pts -= @pwr
+    # p "opp power after: #{opp.pts}"
 
     if opp.pts < 0
       ox, oy = opp.pos
@@ -234,14 +236,18 @@ class Unit
   end
 end
 
-def process_input input
+def process_input input, pwr
   grid = Grid.new(input.size, input.first.size)
   units = []
 
   input.each_with_index do |row, i|
     row.strip.chars.each_with_index do |char, j|
-      if char == "E" || char == "G"
-        e = Unit.new(i, j, grid, char)
+      if char == "E"
+        e = Unit.new(i, j, grid, char, pwr)
+        units << e
+      end
+      if char == "G"
+        e = Unit.new(i, j, grid, char, 3)
         units << e
       end
       grid.state[i][j] = char
@@ -255,22 +261,31 @@ end
 
 def run grid
   rounds = 0
-  until grid.goblins.empty? || grid.elves.empty?
+  elves = grid.elves.size
+  until grid.goblins.empty? # || grid.elves.empty?
     sorted = grid.units.sort_by { |u| u.pos }
     sorted.each_with_index do |unit, i|
       unit.take_turn
 
+      if grid.elves.size < elves
+        return "OH NO"
+      end
+
       if unit.get_enemies.empty?
-        # p "FINAL HIT POINTS: #{grid.units.map { |x| x.pts }}"
+        p "FINAL ELF POINTS: #{grid.elves.map { |x| x.pts }}"
         p "FINISHED ROUND: #{rounds}"
-        p "Part 1: #{rounds * grid.units.map { |x| x.pts }.reduce(:+)}"
-        break
+        grid.to_s
+        return "Part 1: #{rounds * grid.units.map { |x| x.pts }.reduce(:+)}"
       end
     end
 
     rounds += 1
 
-    # p "FINISHED ROUND: #{rounds}"
+        p "FINAL ELF POINTS: #{grid.elves.map { |x| x.pts }}"
+        p "FINAL GOBLIN POINTS: #{grid.goblins.map { |x| x.pts }}"
+
+    p "FINISHED ROUND: #{rounds}"
+    puts
   end
 end
 
@@ -278,10 +293,29 @@ tests = File.read("./inputs/day15_test3.in").split("\n\n").map do |str|
   str.split("\n")
 end
 
-test_grids = tests.map { |t| process_input t }
-test_grids.each { |test| run test } # first two tests off by one round?
+test_grids = tests.map { |t| process_input t, 3 }
+# test_grids.each { |test| run test } # first two tests off by one round?
 
 input = File.readlines("./inputs/day15.in")
 # input = File.readlines("./inputs/day15_test2.in")
-grid = process_input input
-run grid
+
+# grid = process_input input, 100
+
+# binary search for power
+min = 4
+min = 10
+# max = 100
+
+# input = tests[3]
+# p input
+grid = process_input input, min
+res = run grid
+
+while res == "OH NO"
+  grid = process_input input, min
+  res = run grid
+  p "MIN: #{min}"
+  min+=1
+  puts
+end
+p res
