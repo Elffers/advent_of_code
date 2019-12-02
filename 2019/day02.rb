@@ -6,15 +6,12 @@ end
 
 MEMORY = process input
 
-noun = 12
-verb = 2
+def run program, noun, verb
+  program[1] = noun
+  program[2] = verb
 
-program = MEMORY
-program[1] = noun
-program[2] = verb
-
-def run program
   ip = 0
+
   while program[ip] != 99
     param1 = program[ip + 1]
     param2 = program[ip + 2]
@@ -34,8 +31,29 @@ def run program
     ip += 4
   end
 
-  program
+  program[0]
 end
 
-run program
-p "Part 1: #{program[0]}"
+program = MEMORY.dup
+noun = 12
+verb = 2
+
+out = run program, noun, verb
+
+p "Part 1: #{out}"
+# 3306701
+
+target = 19690720
+
+(0..99).each do |n|
+  (0..99).each do |v|
+    program = MEMORY.dup
+    out = run program, n, v
+
+    if out == target
+      p "Part 2: #{100 * n + v}"
+      # 7621
+      break
+    end
+  end
+end
