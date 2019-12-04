@@ -5,19 +5,22 @@ def has_double? n
   !n.to_s.match(/(.)\1{1,}/).nil?
 end
 
-def increases? n
+def valid? n
+  count = Hash.new 0
   digits = n.to_s.chars.map { |x| x.to_i }
   current = digits.first
+
   while !digits.empty?
     d = digits.shift
     return false if d < current
+    count[d] += 1
     current = d
   end
-  return true
+  count.values.include? 2
 end
 
-count = range.select do |n|
-  has_double?(n) && increases?(n)
-end.count
+pwds = range.select do |n|
+  valid?(n)
+end
 
-p count
+p pwds.count
