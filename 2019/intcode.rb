@@ -1,12 +1,15 @@
 class Computer
-  attr_accessor :memory
+  attr_accessor :memory, :noun, :verb
 
-  def initialize memory
+  def initialize memory, noun, verb
+    @noun = noun
+    @verb = verb
+    memory[1] = noun
+    memory[2] = verb
     @memory = memory
   end
 
-  def run noun, verb
-    boot noun, verb
+  def run
     ip = 0
 
     while @memory[ip] != 99
@@ -29,12 +32,5 @@ class Computer
     end
 
     @memory[0]
-  end
-
-  private
-
-  def boot noun, verb
-    @memory[1] = noun
-    @memory[2] = verb
   end
 end
