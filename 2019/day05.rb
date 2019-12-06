@@ -59,8 +59,76 @@ class Computer
         addr = @memory[ip + 1]
         @output = @memory[addr]
         p "Write instruction output: #{@output}"
+
         jump = 2
 
+      when "05"
+        # Opcode 5 is jump-if-true: if the first parameter is non-zero, it
+        # sets the instruction pointer to the value from the second parameter.
+        # Otherwise, it does nothing.
+          params = get_params [
+            @memory[ip + 1],
+            @memory[ip + 2]
+          ], param_modes
+
+          if params[0] != 0
+            ip = params[1]
+            jump = 0
+          else
+            jump = 3
+          end
+
+      when "06"
+        # Opcode 6 is jump-if-false: if the first parameter is zero, it sets
+        # the instruction pointer to the value from the second parameter.
+        # Otherwise, it does nothing.
+          params = get_params [
+            @memory[ip + 1],
+            @memory[ip + 2]
+          ], param_modes
+
+          if params[0] == 0
+            ip = params[1]
+            jump = 0
+          else
+            jump = 3
+          end
+
+      when "07"
+        # Opcode 7 is less than: if the first parameter is less than the
+        # second parameter, it stores 1 in the position given by the third
+        # parameter. Otherwise, it stores 0.
+          params = get_params [
+            @memory[ip + 1],
+            @memory[ip + 2]
+          ], param_modes
+
+          addr = @memory[ip + 3]
+
+          if params[0] < params[1]
+            @memory[addr] = 1
+          else
+            @memory[addr] = 0
+          end
+          jump = 4
+
+      when "08"
+        # Opcode 8 is equals: if the first parameter is equal to the second
+        # parameter, it stores 1 in the position given by the third parameter.
+        # Otherwise, it stores 0.
+          params = get_params [
+            @memory[ip + 1],
+            @memory[ip + 2]
+          ], param_modes
+
+          addr = @memory[ip + 3]
+
+          if params[0] ==  params[1]
+            @memory[addr] = 1
+          else
+            @memory[addr] = 0
+          end
+          jump = 4
       else
         p "ERROR: unknown instruction: #{instr}"
       end
@@ -104,9 +172,17 @@ end
 memory = process input
 
 ac = IO.new 1
-computer = Computer.new memory, ac
+computer = Computer.new memory.dup, ac
 computer.run
 out = computer.output
 
 p "Part 1: #{out}"
 # 6069343
+
+ac = IO.new 5
+computer = Computer.new memory.dup, ac
+computer.run
+out = computer.output
+
+p "Part 2: #{out}"
+# 3188550
