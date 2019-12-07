@@ -1,9 +1,9 @@
 class Computer
-  attr_accessor :memory, :device, :output
+  attr_accessor :memory, :inputs, :output
 
-  def initialize memory, device
+  def initialize memory, inputs
     @memory = memory
-    @device = device # IO device. Currently only expecting one A/C, but maybe extensible
+    @inputs = inputs # List of input values
   end
 
   def run
@@ -51,7 +51,7 @@ class Computer
 
       when "03"
         addr = @memory[ip + 1]
-        @memory[addr] = @device.id
+        @memory[addr] = @inputs.shift
 
         jump = 2
 
@@ -172,7 +172,7 @@ end
 memory = process input
 
 ac = IO.new 1
-computer = Computer.new memory.dup, ac
+computer = Computer.new memory.dup, [ac.id]
 computer.run
 out = computer.output
 
@@ -180,7 +180,7 @@ p "Part 1: #{out}"
 # 6069343
 
 ac = IO.new 5
-computer = Computer.new memory.dup, ac
+computer = Computer.new memory.dup, [ac.id]
 computer.run
 out = computer.output
 
