@@ -5,9 +5,11 @@
 Quick script for ease of retrieving input and creating ruby file:
 
 Use:
-$ aoc <day>
+```
+$ aoc <day> <year>
+```
 
-By default, retrieves input for current year for given <day>. If year is specified as second argument, will retrive for that year.
+By default, retrieves input for current year for given day. If year is specified as second argument, will retrive for that year.
 
 ```
 #!/bin/bash
@@ -34,4 +36,3 @@ else
 	echo "p input" >> $FILE
 fi
 ```
-
