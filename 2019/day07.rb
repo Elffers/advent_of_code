@@ -1,36 +1,31 @@
-require './day05.rb'
+require './computer.rb'
 
-input = File.read("./inputs/day07.in").strip
 # input = "3,15,3,16,1002,16,10,16,1,16,15,15,4,15,99,0,0"
 # input = "3,23,3,24,1002,24,10,24,1002,23,-1,23, 101,5,23,23,1,24,23,23,4,23,99,0,0"
-MEMORY = process(input).freeze
+input = "3,26,1001,26,-4,26,3,27,1002,27,2,27,1,27,26,
+27,4,27,1001,28,-1,28,1005,28,6,99,0,0,5"
+
+input = "./inputs/day07.in"
+MEMORY = process input
 
 def process sequence
-  amp1 = Computer.new MEMORY.dup, [sequence[0], 0]
-  out1 = amp1.run
-
-  amp2 = Computer.new MEMORY.dup, [sequence[1], out1]
-  out2 = amp2.run
-
-  amp3 = Computer.new MEMORY.dup, [sequence[2], out2]
-  out3 = amp3.run
-
-  amp4 = Computer.new MEMORY.dup, [sequence[3], out3]
-  out4 = amp4.run
-
-  amp5 = Computer.new MEMORY.dup, [sequence[4], out4]
-  amp5.run
+  signal = 0
+  sequence.each do |s|
+    amp = Computer.new MEMORY.dup, [s, signal]
+    signal = amp.run
+  end
+  signal
 end
 
-def generate_sequence
+def generate_signals
   sequences = [0, 1, 2, 3, 4].permutation(5).to_a
   sequences.map do |seq|
     process seq
-  end.max
+  end
 end
 
-
 if __FILE__ == $0
-  max = generate_sequence
+  max = generate_signals.max
   p "Part 1: #{max}"
+  # 199988
 end
