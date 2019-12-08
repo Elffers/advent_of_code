@@ -60,8 +60,12 @@ class Computer
 
       when "04"
         addr = @memory[ip + 1]
-        @output = @memory[addr]
-        # p "Write instruction output: #{@output}"
+        if instr[-3] == "0"
+          @output = @memory[addr]
+        elsif instr[-3] == "1"
+          @output = addr
+        end
+        p "Write instruction output: #{@output}"
 
         jump = 2
 
