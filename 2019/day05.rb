@@ -135,6 +135,7 @@ class Computer
 
       ip += jump
     end
+    @output
   end
 
   def get_params params, param_modes
@@ -174,16 +175,14 @@ memory = process input
 if __FILE__ == $0
   ac = IO.new 1
   computer = Computer.new memory.dup, [ac.id]
-  computer.run
-  out = computer.output
+  out = computer.run
 
   p "Part 1: #{out}"
   # 6069343
 
   ac = IO.new 5
   computer = Computer.new memory.dup, [ac.id]
-  computer.run
-  out = computer.output
+  out = computer.run
 
   p "Part 2: #{out}"
   # 3188550

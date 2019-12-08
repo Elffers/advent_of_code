@@ -7,31 +7,26 @@ MEMORY = process(input).freeze
 
 def process sequence
   amp1 = Computer.new MEMORY.dup, [sequence[0], 0]
-  amp1.run
-  out1 = amp1.output
-  # p amp1.memory
+  out1 = amp1.run
 
   amp2 = Computer.new MEMORY.dup, [sequence[1], out1]
-  amp2.run
-  out2 = amp2.output
-  # p amp2.memory
+  out2 = amp2.run
 
   amp3 = Computer.new MEMORY.dup, [sequence[2], out2]
-  amp3.run
-  out3 = amp3.output
-  # p amp3.memory
+  out3 = amp3.run
 
   amp4 = Computer.new MEMORY.dup, [sequence[3], out3]
-  amp4.run
-  out4 = amp4.output
-  # p amp4.memory
+  out4 = amp4.run
 
   amp5 = Computer.new MEMORY.dup, [sequence[4], out4]
   amp5.run
-  # p amp5.memory
-
-  amp5.output
 end
+
+# def loop amps
+#   amp1, amp2, amp3, amp4, amp5 = amps
+
+
+# end
 
 if __FILE__ == $0
   sequences = [0, 1, 2, 3, 4].permutation(5).to_a
