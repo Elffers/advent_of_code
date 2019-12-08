@@ -58,7 +58,7 @@ class Computer
       when "04"
         addr = @memory[ip + 1]
         @output = @memory[addr]
-        p "Write instruction output: #{@output}"
+        # p "Write instruction output: #{@output}"
 
         jump = 2
 
@@ -171,18 +171,20 @@ end
 
 memory = process input
 
-ac = IO.new 1
-computer = Computer.new memory.dup, [ac.id]
-computer.run
-out = computer.output
+if __FILE__ == $0
+  ac = IO.new 1
+  computer = Computer.new memory.dup, [ac.id]
+  computer.run
+  out = computer.output
 
-p "Part 1: #{out}"
-# 6069343
+  p "Part 1: #{out}"
+  # 6069343
 
-ac = IO.new 5
-computer = Computer.new memory.dup, [ac.id]
-computer.run
-out = computer.output
+  ac = IO.new 5
+  computer = Computer.new memory.dup, [ac.id]
+  computer.run
+  out = computer.output
 
-p "Part 2: #{out}"
-# 3188550
+  p "Part 2: #{out}"
+  # 3188550
+end
