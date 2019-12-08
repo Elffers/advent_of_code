@@ -22,20 +22,15 @@ def process sequence
   amp5.run
 end
 
-# def loop amps
-#   amp1, amp2, amp3, amp4, amp5 = amps
+def generate_sequence
+  sequences = [0, 1, 2, 3, 4].permutation(5).to_a
+  sequences.map do |seq|
+    process seq
+  end.max
+end
 
-
-# end
 
 if __FILE__ == $0
-  sequences = [0, 1, 2, 3, 4].permutation(5).to_a
-
-  max = 0
-  sequences.each do |seq|
-    out = process seq
-    max = out if out > max
-  end
-
+  max = generate_sequence
   p "Part 1: #{max}"
 end
