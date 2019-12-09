@@ -1,4 +1,3 @@
-# Puzzle input
 range = (272091..815432)
 
 def has_double? n
@@ -23,4 +22,5 @@ pwds = range.select do |n|
   valid?(n)
 end
 
+# Part 2
 p pwds.count

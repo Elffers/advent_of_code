@@ -1,11 +1,7 @@
 class Computer
-  attr_accessor :memory, :noun, :verb
+  attr_accessor :memory
 
-  def initialize memory, noun, verb
-    @noun = noun
-    @verb = verb
-    memory[1] = noun
-    memory[2] = verb
+  def initialize memory
     @memory = memory
   end
 
