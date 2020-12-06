@@ -1,26 +1,79 @@
 package main
 
-import(
+import (
 	"fmt"
 	"io/ioutil"
+	"regexp"
+	"strconv"
 	"strings"
 )
 
-// this is the worst
-// func splitGroups (data []byte, atEOF bool) (advance int, token []byte, err error) {
-// 	if atEOF && len(data) == 0 {
-// 		return 0, nil, nil
-// 	}
-// 	if i := strings.Index(string(data), "\n\n"); i >= 0 {
-// 		return i + 1, data[0:i], nil
-// 	}
-// 	// If we're at EOF, we have a final, non-terminated line. Return it.
-// 	if atEOF {
-// 		return len(data), data, nil
-// 	}
-// 	// Request more data.
-// 	return 0, nil, nil
-// }
+// ['byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid']
+func valid(data map[string]string) bool {
+	if val, ok := data["byr"]; ok {
+		y, _ := strconv.Atoi(val)
+		if (y < 1920) || (y > 2002) {
+			return false
+		}
+	}
+
+	if val, ok := data["iyr"]; ok {
+		y, _ := strconv.Atoi(val)
+		if (y < 2010) || (y > 2020) {
+			return false
+		}
+	}
+
+	if val, ok := data["eyr"]; ok {
+		y, _ := strconv.Atoi(val)
+		if (y < 2020) || (y > 2030) {
+			return false
+		}
+	}
+
+	if val, ok := data["hgt"]; ok {
+		unit := val[len(val)-2 : len(val)]
+		height := val[:len(val)-2]
+		h, _ := strconv.Atoi(height)
+		switch unit {
+		case "cm":
+			if (h < 150) || (h > 193) {
+				return false
+			}
+		case "in":
+			if (h < 59) || (h > 76) {
+				return false
+			}
+		default:
+			return false
+		}
+	}
+
+	if val, ok := data["hcl"]; ok {
+		re := regexp.MustCompile(`^#[0-9a-f]{6}$`)
+		match := re.MatchString(val)
+		if !match {
+			return false
+		}
+	}
+
+	if val, ok := data["ecl"]; ok {
+		re := regexp.MustCompile(`^(amb|blu|brn|gry|grn|hzl|oth)$`)
+		match := re.MatchString(val)
+		if !match {
+			return false
+		}
+	}
+	if val, ok := data["pid"]; ok {
+		re := regexp.MustCompile(`^[0-9]{9}$`)
+		match := re.MatchString(val)
+		if !match {
+			return false
+		}
+	}
+
+	return true
+}
 
 func main() {
 	input, err := ioutil.ReadFile("/Users/hhh/JungleGym/advent_of_code/2020/inputs/day04.in")
@@ -29,10 +82,9 @@ func main() {
 	}
 
 	passports := strings.Split(string(input), "\n\n")
-	// scanner.Split(splitGroups)
 	r := strings.NewReplacer("\n", " ")
 
-	valid := 0
+	valid1, valid2 := 0, 0
 	for _, p := range passports {
 
 		passpt := r.Replace(p)
@@ -46,13 +98,21 @@ func main() {
 			}
 		}
 		if len(data) == 8 {
-			valid += 1
+			valid1 += 1
+			if valid(data) {
+				valid2 += 1
+			}
 		}
 		if len(data) == 7 {
 			if _, ok := data["cid"]; !ok {
-				valid += 1
+				valid1 += 1
+
+				if valid(data) {
+					valid2 += 1
+				}
 			}
 		}
 	}
-	fmt.Printf("part 1: %d\n", valid)
+	fmt.Printf("part 1: %d\n", valid1)
+	fmt.Printf("part 2: %d\n", valid2)
 }
