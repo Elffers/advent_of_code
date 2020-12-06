@@ -1,35 +1,30 @@
-require 'set'
 input = File.read("/Users/hhh/JungleGym/advent_of_code/2020/inputs/day06.in").split("\n\n")
 
-count = 0
-counts = input.map do |group|
-  q = Set.new
-  copy = group.dup.gsub("\n", "")
-  copy.chars.each do |c|
-    q << c
-  end
-  q.size
+count1 = input.map do |group|
+  group.dup.gsub("\n", "").chars.uniq.size
+end.reduce(:+)
 
+p "part 1: #{count1}"
+
+count2 = 0
+input.each do |group|
   answers = Hash.new 0
+
   members = group.split("\n")
   members.each do |m|
-    m.chars.each do |c|
+    m.each_char do |c|
       answers[c] += 1
     end
   end
 
   all_yes = 0
-
-  answers.each do |question, responses|
-    if responses == members.size
+  answers.each do |answer, count|
+    if count == members.size
       all_yes += 1
     end
   end
 
-  count += all_yes
+  count2 += all_yes
 end
 
-res = counts.reduce(:+)
-
-p "part 1: #{res}"
-p "part 2: #{count}"
+p "part 2: #{count2}"
