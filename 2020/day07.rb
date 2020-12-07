@@ -1,7 +1,4 @@
-require 'pp'
 input = File.readlines("/Users/hhh/JungleGym/advent_of_code/2020/inputs/day07.in").map { |x| x.strip }
-input = File.readlines("/Users/hhh/JungleGym/advent_of_code/2020/inputs/day07test.in").map { |x| x.strip }
-#
 bags = Hash.new { |h, k| h[k] = Hash.new }
 
 input.each do |line|
@@ -17,7 +14,6 @@ input.each do |line|
   end
   bags[key] = inner_bags
 end
-
 
 def contains_shiny_gold(graph, key)
   queue = graph[key].keys.dup
@@ -38,22 +34,17 @@ bags.keys.each do |bag|
   p1 += 1 if contains_shiny_gold(bags, bag)
 end
 
-pp bags
-
 def total_bags_for(key, graph)
   inner_bags = graph[key]
-  queue = graph[key].keys.dup
-
-  while !queue.empty?
-    queue.compact!
-    val = queue.shift
+  if inner_bags.empty?
+    return 0
   end
-
+ inner_bags.map do |bag, count|
+    count*total_bags_for(bag, graph) + count
+ end.reduce(:+)
 end
 
-# graph["shiny gold"].map do |inner_bags|
-#   inner
-# end
+p2 = total_bags_for("shiny gold", bags)
 
-p "part 1: #{p1}" #326
-# p "part 2: #{p2}"
+p "part 1: #{p1}"
+p "part 2: #{p2}"
