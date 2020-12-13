@@ -1,6 +1,7 @@
 input = File.readlines("/Users/hhh/JungleGym/advent_of_code/2020/inputs/day07.in").map { |x| x.strip }
-bags = Hash.new { |h, k| h[k] = Hash.new }
 
+# process input into hash of bags with hash of bags they contain
+bags = Hash.new { |h, k| h[k] = Hash.new }
 input.each do |line|
   k, vals = line.split("contain")
   /(?<key>\w+ \w+) bag/ =~ k
