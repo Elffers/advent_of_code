@@ -4,22 +4,25 @@ t = t.to_i
 
 buses = ids.split(",").select { |x| x != "x" }.map { |x| x.to_i }
 
-x = buses.map do |b|
+departure_times = buses.map do |b|
   n = 1
-  dep = n*b
+  dt = n*b
   while n*b < t
-    dep = n*b
+    dt = n*b
     n += 1
   end
-  dep += b
+
+  dt += b
 end
 
-m = x.min
-idx = x.index(m)
+m = departure_times.min
+idx = departure_times.index(m)
 bus = buses[idx]
-delta = m-t
+wait_time = m-t
 
-p "part 1: #{delta * bus}"
+p "part 1: #{wait_time * bus}"
+
+# Part 2
 
 buses = ids.split(",")
 pairs = []
