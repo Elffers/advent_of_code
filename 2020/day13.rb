@@ -29,32 +29,6 @@ buses.each_with_index do |b, r|
     pairs << [mod, r]
   end
 end
-p pairs
-
-# This method is too slow
-# loop do
-#   ok = false
-#   buses.each_with_index do |b, i|
-#     if b == "x"
-#       next
-#     end
-#     b = b.to_i
-#     ok = (ts+i) % b == 0
-#     if ok
-#       p [b, i, ts]
-#     else
-#       break
-#     end
-#     ok = true
-#   end
-
-#   if ok
-#     p "part 2: #{ts}"
-#     break
-#   else
-#     ts += 1
-#   end
-# end
 
 ts = 100000000000000 + 3 # this is divisible by 19
 
@@ -63,7 +37,7 @@ while !pairs.empty?
   b, i = pairs.shift
   loop do
     if (ts+i) % b == 0
-      p "current ts after bus #{b} is #{ts}"
+      # increase increment by LCM of the current bus and next bus
       inc *= b
       break
     else
@@ -71,4 +45,5 @@ while !pairs.empty?
     end
   end
 end
-p ts
+
+p "part 2: #{ts}"
