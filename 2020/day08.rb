@@ -41,7 +41,7 @@ input.each_with_index do |line, i|
     fixed[i] = ["nop", arg]
   end
 
-  acc, halts =  find_loop fixed
+  acc, halts = find_loop fixed
   if halts
     p "part 2: #{acc}"
   end
