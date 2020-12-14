@@ -1,4 +1,3 @@
-require 'pp'
 input = File.read("/Users/hhh/JungleGym/advent_of_code/2020/inputs/day14.in").split("\n")
 
 mem = Hash.new 0
@@ -6,11 +5,7 @@ mem2 = Hash.new 0
 
 def mask_bits(bits, mask)
   ("%036b" % bits.to_i).chars.zip(mask.chars).map do |b, m|
-    if m == "X"
-      b
-    else
-      m
-    end
+    m == "X" ? b : m
   end.join.to_i(2)
 end
 
@@ -19,11 +14,7 @@ def masked_addrs(addr, mask)
   floats = mask.count("X")
 
   bin = ("%036b" % addr.to_i).chars.zip(mask.chars).map do |b, m|
-    if m == "0"
-      b
-    else
-      m
-    end
+    m == "0" ? b : m
   end
 
   bit_combos = (0...2**floats).map do |float|
@@ -50,9 +41,8 @@ input.each do |x|
   else
     /mem\[(?<addr>\d+)\]/ =~ instr
 
-    val = mask_bits(bits, mask)
-
-    mem[addr] = val
+    # part 1
+    mem[addr] = mask_bits(bits, mask)
 
     # part 2
     addrs = masked_addrs(addr, mask)
