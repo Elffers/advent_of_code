@@ -1,5 +1,4 @@
 input = File.read("/Users/hhh/JungleGym/advent_of_code/2020/inputs/day15.in").split(",").map { |x| x.to_i }
-input = [0,3, 6]
 
 # holds each number and the last turn it was spoken
 game = {}
@@ -12,19 +11,22 @@ end
 
 last = input.last
 
-while turns < 2020 #30_000_000
+loop do
   turns += 1
   if game[last].nil?
-    p "turn: #{turns} is #{last}"
     game[last] = turns
     last = 0
   else
     last_turn = game[last]
-    p "turn: #{turns} is #{last}"
     game[last] = turns
     last = turns - last_turn
   end
-  # p "game: #{game}"
+
+  if turns == 2020-1
+     p "part 1: #{last}"
+  end
+  if turns == 30000000-1
+     p "part 2: #{last}"
+     break
+  end
 end
-
-
