@@ -2,10 +2,6 @@ require 'set'
 
 input = File.read("/Users/hhh/JungleGym/advent_of_code/2020/inputs/day09.in").split("\n").map { |x| x.to_i }
 
-x, y = 0, 25
-window = input[x,y]
-queue = input[y, input.size]
-
 def sum_in? n, window
   set = Set.new(window)
 
@@ -15,24 +11,29 @@ def sum_in? n, window
   end
 end
 
-while !queue.empty?
-  curr = queue.shift
-  if !sum_in? curr, window
-    p "part 1: #{curr}"
-    break
+def part1 input
+  x, y = 0, 25
+  window = input[x,y]
+  queue = input[y, input.size]
+
+  while !queue.empty?
+    curr = queue.shift
+    if !sum_in? curr, window
+      return curr
+    end
+    window.shift
+    window << curr
   end
-  window.shift
-  window << curr
 end
 
-target = curr
+target = part1 input
+p "part 1: #{target}"
 
 x = 0
 y = x + 2
 
 while y < input.size
   window = input[x..y]
-  # p window
   sum = window.reduce(:+)
   if sum == target
     p "part 2: #{window.min + window.max}"
