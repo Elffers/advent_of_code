@@ -1,15 +1,14 @@
-require 'pp'
 require 'set'
-rules, t, tickets = File.read("/Users/hhh/JungleGym/advent_of_code/2020/inputs/day16.in").split("\n\n")
-# rules, t, tickets = File.read("/Users/hhh/JungleGym/advent_of_code/2020/inputs/day16test.in").split("\n\n")
+rules, m, tickets = File.read("/Users/hhh/JungleGym/advent_of_code/2020/inputs/day16.in").split("\n\n")
 
-my_ticket = t.split("\n").last.split(",").map { |x| x.to_i }
+my_ticket = m.split("\n").last.split(",").map { |x| x.to_i }
 tickets = tickets.split("\n").map { |t| t.split(",").map { |n| n.to_i } }
 
 tickets.shift # get rid of header
 
 ranges = []
 ticket_rules = Hash.new { |h, k| h[k] = [] }
+valid_tickets = []
 
 rules = rules.split("\n")
 rules.each do |rule|
@@ -28,6 +27,8 @@ def is_valid? ranges, n
   end.any? { |x| x == false }
 end
 
+# takes in all values of the same field, returns true if all values in the
+# field satisfy the rule
 def matches_rule? ranges, vals
   matches = vals.map do |n|
     is_valid? ranges, n
@@ -37,48 +38,58 @@ end
 
 invalid = 0
 tickets.each do |ticket|
-
+  valid = true
   ticket.each do |n|
     if !is_valid? ranges, n
       invalid += n
+      valid = false
     end
   end
-
+  if valid
+    valid_tickets << ticket
+  end
 end
 
 p "part 1: #{invalid}"
 
-matches = Hash.new { |h, k| h[k] = [] }
-matched_fields = Hash.new
+matched_fields = Hash.new { |h, k| h[k] = [] }
 
-s = Set.new(0..my_ticket.size-1)
+s = Set.new(ticket_rules.keys)
 
-# while !s.empty?
-  p s.size
-  p matched_fields
+(0..my_ticket.size-1).each do |i|
+  f = valid_tickets.map { |x| x[i] } # look at the same field for all tickets
 
-  (0..my_ticket.size-1).each do |i|
-    f = tickets.map { |x| x[i] } # look at the same field for all tickets
-
-    ticket_rules.each do |field, rs|
-      if !matched_fields[field].nil?
-        next
-      end
-      if matches_rule? rs, f
-        matches[i] << field
-      end
-    end
-
-    if matches[i].length == 1
-      field = matches[i].first
-      matched_fields[field] = i
-      s.delete i
+  ticket_rules.each do |field, rs|
+    if matches_rule? rs, f
+      matched_fields[field] << i # for whatever reason doing it the other way around doesn't work
     end
   end
-# end
+end
 
-pp matches
+final = Hash.new
+seen = Set.new
 
-pp matched_fields
+while !s.empty?
+  matched_fields.each do |k, v|
+    copy = v.dup
+    copy.each do |n|
+      if seen.include? n
+        v.delete n
+      end
+    end
+    if v.length == 1
+      seen << v.first
+      final[k] = v.first
+      s.delete k
+    end
+  end
+end
 
+res = 1
+final.each do |k, v|
+  if k.start_with? "departure"
+    res *= my_ticket[v]
+  end
+end
 
+p "part 2: #{res}"
