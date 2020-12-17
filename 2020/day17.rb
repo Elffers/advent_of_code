@@ -5,7 +5,7 @@ state = Hash.new "."
 
 input.each_with_index do |row, x|
   row.chars.each_with_index do |s, y|
-    state[[x, y, 0]] = s
+    state[[x, y, 0 ]] = s
   end
 end
 
@@ -20,6 +20,7 @@ def cycle(state)
     y0.upto(yn).each do |y|
       z0.upto(zn).each do |z|
         actives = 0
+
         neighbors = [
           [x-1, y-1, z-1], [x, y-1, z-1], [x+1, y-1, z-1],
           [x-1, y, z-1],   [x, y, z-1],   [x+1, y, z-1],
@@ -38,19 +39,13 @@ def cycle(state)
           i,j,k = n
           actives += 1 if state[[i,j,k]] == "#"
         end
-        val = state[[x,y,z]]
 
-        case val
-        when "#"
-          if !(actives == 2 || actives == 3)
-            val = "."
-          end
-
-        when "."
-          if actives == 3
-            val = "#"
-          end
-        end
+        val = case state[[x,y,z]]
+              when "#"
+                [2,3].include?(actives) ? "#" : "."
+              when "."
+                actives == 3 ? "#" : "."
+              end
         new_state[[x,y,z]] = val
 
       end
