@@ -5,7 +5,7 @@ state = Hash.new "."
 
 input.each_with_index do |row, x|
   row.chars.each_with_index do |s, y|
-    state[[x, y, 0 ]] = s
+    state[[x, y, 0, 0]] = s
   end
 end
 
@@ -15,39 +15,34 @@ def cycle(state)
   x0, xn = coords.map { |c| c[0] }.min - 1, coords.map { |c| c[0] }.max + 1
   y0, yn = coords.map { |c| c[1] }.min - 1, coords.map { |c| c[1] }.max + 1
   z0, zn = coords.map { |c| c[2] }.min - 1, coords.map { |c| c[2] }.max + 1
+  w0, wn = coords.map { |c| c[3] }.min - 1, coords.map { |c| c[3] }.max + 1
 
   x0.upto(xn).each do |x|
     y0.upto(yn).each do |y|
       z0.upto(zn).each do |z|
-        actives = 0
+        w0.upto(wn).each do |w|
 
-        neighbors = [
-          [x-1, y-1, z-1], [x, y-1, z-1], [x+1, y-1, z-1],
-          [x-1, y, z-1],   [x, y, z-1],   [x+1, y, z-1],
-          [x-1, y+1, z-1], [x, y+1, z-1], [x+1, y+1, z-1],
+          actives = 0
+          (-1..1).each do |dx|
+            (-1..1).each do |dy|
+              (-1..1).each do |dz|
+                (-1..1).each do |dw|
+                  next if dx == 0 && dy == 0 && dz == 0 && dw == 0
 
-          [x-1, y-1, z],   [x, y-1, z],   [x+1, y-1, z],
-          [x-1, y, z],                    [x+1, y, z],
-          [x-1, y+1, z],   [x, y+1, z],   [x+1, y+1, z],
-
-          [x-1, y-1, z+1], [x, y-1, z+1], [x+1, y-1, z+1],
-          [x-1, y, z+1],   [x, y, z+1],   [x+1, y, z+1],
-          [x-1, y+1, z+1], [x, y+1, z+1], [x+1, y+1, z+1],
-        ]
-
-        neighbors.each do |n|
-          i,j,k = n
-          actives += 1 if state[[i,j,k]] == "#"
-        end
-
-        val = case state[[x,y,z]]
-              when "#"
-                [2,3].include?(actives) ? "#" : "."
-              when "."
-                actives == 3 ? "#" : "."
+                  actives += 1 if state[[x + dx, y + dy, z + dz, w + dw]] == "#"
+                end
               end
-        new_state[[x,y,z]] = val
+            end
+          end
 
+          val = case state[[x,y,z,w]]
+                when "#"
+                  [2,3].include?(actives) ? "#" : "."
+                when "."
+                  actives == 3 ? "#" : "."
+                end
+          new_state[[x,y,z,w]] = val
+        end
       end
     end
   end
@@ -61,21 +56,4 @@ end
 
 count = state.values.count("#")
 
-p "part 1: #{count}"
-
-
-
-#     adjacent = [
-#       [x-1, y-1, z-1], [x, y-1, z-1], [x+1, y-1, z-1],
-#       [x-1, y, z-1],   [x, y, z-1],   [x+1, y, z-1],
-#       [x-1, y+1, z-1], [x, y+1, z-1], [x+1, y+1, z-1],
-
-#       [x-1, y-1, z],   [x, y-1, z],   [x+1, y-1, z],
-#       [x-1, y, z],                    [x+1, y, z],
-#       [x-1, y+1, z],   [x, y+1, z],   [x+1, y+1, z],
-
-#       [x-1, y-1, z+1], [x, y-1, z+1], [x+1, y-1, z+1],
-#       [x-1, y, z+1],   [x, y, z+1],   [x+1, y, z+1],
-#       [x-1, y+1, z+1], [x, y+1, z+1], [x+1, y+1, z+1],
-#     ]
-
+p "part 2: #{count}"
