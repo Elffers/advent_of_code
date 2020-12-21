@@ -39,14 +39,19 @@ class Tile
   end
 
   def match? tile
+    matches = []
     self.edges.each_with_index do |a, i|
       tile.edges.each_with_index do |b, j|
         if a == b
-          return [i, j]
+          matches << [i, j]
         end
       end
     end
-    return
+    if matches.empty?
+    return nil
+    else
+      return matches
+    end
   end
 
 end
@@ -54,21 +59,32 @@ end
 tiles = input.map { |x| Tile.new x}
 
 corners = []
-options = Hash.new
+config = Hash.new
 tiles.each do |t1|
-  options[t1.id] = Hash.new
+  config[t1.id] = Hash.new
   tiles.each do |t2|
     next if t1 == t2
 
     match = t1.match? t2
     if !match.nil?
-      options[t1.id][t2.id] =  match
+      config[t1.id][t2.id] =  match
     end
   end
 
-  if options[t1.id].size == 2
+  if config[t1.id].size == 2
     corners << t1.id
   end
 end
 
 p "part 1: #{corners.reduce(:*)}"
+pp config
+
+
+# 3 x 20
+sm = <<-SEAMONSTER
+                  #
+#    ##    ##    ###
+ #  #  #  #  #  #
+SEAMONSTER
+
+
