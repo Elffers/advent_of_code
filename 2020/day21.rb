@@ -1,7 +1,6 @@
 require 'set'
 
 input = File.readlines("/Users/hhh/JungleGym/advent_of_code/2020/inputs/day21.in").map { |x| x.strip }
-# input = File.readlines("/Users/hhh/JungleGym/advent_of_code/2020/inputs/day21test.in").map { |x| x.strip }
 
 allergens = Hash.new
 ing_count = Hash.new 0
@@ -24,6 +23,7 @@ input.each do |x|
   end
 end
 
+# copied from day 16
 allergen_map = Hash.new
 seen = Set.new
 s = Set.new(allergens.keys)
@@ -44,8 +44,6 @@ while !s.empty?
   end
 end
 
-p allergen_map
-p ing_count
 res = 0
 ing_count.each do |i, count|
 
@@ -54,4 +52,7 @@ ing_count.each do |i, count|
   end
 end
 
-p res
+p "part 1: #{res}"
+
+# part 2
+puts allergen_map.sort_by { |k, v| k }.map { |pair| pair.last}.join(",")
