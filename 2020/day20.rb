@@ -11,8 +11,19 @@ class Tile
     @img = y.split("\n")
   end
 
-  def to_s(img=@img)
-    puts img.join("\n")
+  def to_s(orientation=0)
+    image = case orientation
+    when 0 then img
+    when 1 then img.map { |x| x.reverse }
+    # when 2 then img
+    # when 3 then img
+    # when 4 then img
+    # when 5 then img
+    # when 6 then img
+    # when 7 then img
+    end
+
+    puts image.join("\n")
   end
 
   def top
@@ -77,7 +88,10 @@ tiles.each do |t1|
 end
 
 p "part 1: #{corners.reduce(:*)}"
-pp config
+corners.each do |c|
+  p config[c]
+end
+# pp config
 
 
 # 3 x 20
