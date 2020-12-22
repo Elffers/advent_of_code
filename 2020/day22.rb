@@ -1,37 +1,55 @@
 players = File.read("/Users/hhh/JungleGym/advent_of_code/2020/inputs/day22.in").split("\n\n")
 
-p1, p2 = players.map do |p|
-  p.split("\n")[1..-1].map { |x| x.to_i }
-end
+class Player
+  attr_accessor :id, :hand, :curr
 
-def score hand
-  hand.reverse.map.with_index do |card, i|
-    card * (i+1)
-  end.reduce(:+)
-end
+  def initialize id, hand
+    @id = id
+    @hand = hand
+  end
 
-def play p1, p2
-  moves = 0
-  loop do
-    if p1.empty? || p2.empty?
-      return p1.empty? ? score(p2) : score(p1)
-    end
+  def play
+    @curr = @hand.shift
+  end
 
-    curr1 = p1.shift
-    curr2 = p2.shift
+  def score
+    hand.reverse.map.with_index do |card, i|
+      card * (i+1)
+    end.reduce(:+)
+  end
 
-    if curr1 > curr2
-      p1 << curr1
-      p1 << curr2
-    end
-    if curr2 > curr1
-      p2 << curr2
-      p2 << curr1
-    end
+  def take loser
+    hand << curr
+    hand << loser.curr
+  end
 
-    moves += 1
+  def triggers?
+    hand.size >= curr
+  end
+
+  def lost?
+    hand.empty?
   end
 end
 
-res = play p1, p2
-p "part 1: #{res}"
+p1, p2 = players.map.with_index do |p, i|
+  hand = p.split("\n")[1..-1].map { |x| x.to_i }
+  Player.new i, hand
+end
+
+def combat p1, p2
+  loop do
+    return p2 if p1.lost?
+    return p1 if p2.lost?
+
+    p1.play
+    p2.play
+
+    p1.take p2 if p1.curr > p2.curr
+    p2.take p1 if p2.curr > p1.curr
+  end
+end
+
+winner = combat p1, p2
+p "part 1: #{winner.score}"
+
