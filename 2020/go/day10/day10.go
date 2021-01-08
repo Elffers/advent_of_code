@@ -26,7 +26,7 @@ func format(input string) []int {
 }
 
 func main() {
-	input, err := ioutil.ReadFile("/Users/hhh/JungleGym/advent_of_code/2020/inputs/day10test.in")
+	input, err := ioutil.ReadFile("/Users/hhh/JungleGym/advent_of_code/2020/inputs/day10.in")
 	if err != nil {
 		panic(err)
 	}
@@ -55,34 +55,23 @@ func main() {
 
 	fmt.Printf("part 1: %v\n", d1*d3)
 
-	graph := make(map[int][]int)
+	graph := make(map[int]int)
+	graph[0] = 1
 
-	for _, a := range adapters {
-		choices := []int{a+1, a+2, a+3}
-		children := []int{}
+	// need to get rid of first 0 in adapters
+	for _, a := range adapters[1:] {
+		choices := []int{a-1, a-2, a-3}
+		var combos int
 		for _, c := range choices {
 			if _, ok := set[c]; ok {
-				children = append(children, c)
+				combos += graph[c]
 			}
 		}
-		graph[a] = children
+		graph[a] = combos
 	}
 
+	device := adapters[len(adapters)-1]
 
-	target := adapters[len(adapters)-1]
-	queue := graph[0]
-	combos := 0
-
-	for len(queue) > 0 {
-		curr := queue[0]
-		queue = queue[1:]
-		if curr == target {
-			combos += 1
-		} else {
-			queue = append(queue, graph[curr]...)
-		}
-	}
-
-	fmt.Printf("part 2: %v\n", combos)
+	fmt.Printf("part 2: %v\n", graph[device])
 }
 
