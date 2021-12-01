@@ -6,20 +6,18 @@ def move cups
 
   pickup = cups[1..3]
   rest = cups[4..-1]
-  p "pickup: #{pickup}"
-  p "rest: #{rest}"
 
   if curr == cups.min
     dest = rest.max
   else
-  dest = curr - 1
-  while pickup.include? dest
-    if dest < rest.min
-      dest = rest.max
-    else
-      dest -= 1
+    dest = curr - 1
+    while pickup.include? dest
+      if dest < rest.min
+        dest = rest.max
+      else
+        dest -= 1
+      end
     end
-  end
   end
 
   p "curr: #{curr}"
@@ -32,7 +30,6 @@ def move cups
   new.concat pickup
   new.rotate!(-(idx+3))
 
-
   new << curr
   p "new: #{new}"
   puts
@@ -43,7 +40,6 @@ end
 100.times do
   cups = move cups
 end
-p cups
 
 def final cups
   i = cups.index 1
@@ -52,4 +48,4 @@ def final cups
   post.concat(pre).join
 end
 
-p final cups
+p "part 1: #{final cups}

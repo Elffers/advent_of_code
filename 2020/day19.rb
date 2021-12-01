@@ -20,19 +20,37 @@ end
 #  "3"=>"4 5 | 5 4",
 #  "4"=>"a",
 #  "5"=>"b"}
-
-rule = @rules["0"]
+#
 
 def is_terminal? r
   r == "a" || r == "b"
 end
 
+def regex_for rule
+  re = ""
+
+  queue = rule.first.chars
+
+  while !queue.empty?
+    r = queue.shift
+    if is_terminal? r
+      re += r
+    end
+
+
+
+  end
+
+
+
+
+  Regex.new re
+end
+
+
 def match rule, s
   curr = s[0]
   cons = s[1..-1]
-  # if rule.empty?
-  #   return true, ""
-  # end
 
   # handle terminal
   if is_terminal? rule
@@ -55,30 +73,32 @@ def match rule, s
 
       seq = @rules[r]
 
-      match =  match seq, s
+      match =  match seq, s, queue
+
       if !match
         return false
       else
         s = cons
       end
     end
-    return true
+
+    p "done with queue"
+
+    s.empty?
   end
-  return true
-
   # TODO handle seq | seq
-
 end
 
 
-count = 0
 data = input.split("\n")
 
 p match rule, data[0] # FIXME test
 
+# count = 0
+# rule = @rules["0"]
 # data.each do |s|
 #   count += 1 if match rule, s
 # end
 
-p count
+# p "part 1: #{count}"
 
