@@ -1,18 +1,12 @@
 input = File.read("/Users/hhh/JungleGym/advent_of_code/2021/inputs/day03.in").split("\n")
 
 g = ""
-e = ""
-input.map { |i| i.chars}.transpose.map do |x|
-  a = x.count { |i| i == "1" }
-  b = x.count { |i| i == "0" }
-  if a > b
-    g += "1"
-    e += "0"
-  else
-    g += "0"
-    e += "1"
-  end
+input.map { |i| i.chars }.transpose.map do |x|
+  a = x.count "1"
+  b = x.count "0"
+  if a > b then g += "1" else g += "0" end
 end
+e = g.tr "10","01"
 p "Part 1: #{[g, e].map { |x| x.to_i(2) }.reduce(:*)}"
 
 def find_oxy xs, pos
