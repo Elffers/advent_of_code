@@ -1,11 +1,12 @@
 input = File.read("/Users/hhh/JungleGym/advent_of_code/2021/inputs/day04.in").split "\n\n"
+# input = File.read("/Users/hhh/JungleGym/advent_of_code/2021/inputs/day04test.in").split "\n\n"
 nums = input.shift
 nums = nums.split ","
 p nums
 
 class Board
   attr_reader :board
-  attr_accessor :marks, :last_num
+  attr_accessor :marks, :last_num, :won
 
   def initialize str
     @board = str.split("\n").map { |row| row.split " " }
@@ -46,12 +47,19 @@ boards = input.map do |s|
   Board.new s
 end
 
+count = 0
 nums.each do |n|
   boards.each do |b|
     b.mark n
-    if b.winning?
-      p "Part 1: #{b.score}"
-      return
+    if b.winning? && !b.won
+      b.won = true
+      count += 1
+      if count == 1
+        p "Part 1: #{b.score}"
+      end
+      if count == boards.size
+        p "Part 2: #{b.score}"
+      end
     end
   end
 end
