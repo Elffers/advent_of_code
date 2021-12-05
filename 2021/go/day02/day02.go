@@ -17,6 +17,7 @@ func main() {
 
 	s := bufio.NewScanner(file)
 	x, y := 0,0
+	x2, y2, a := 0,0,0
 	for s.Scan() {
 		res := strings.Split(s.Text(), " ")
 		dir := res[0]
@@ -24,11 +25,16 @@ func main() {
 		switch dir {
 			case "forward":
 				x += d
+				x2 += d
+				y2 += a*d
 			case "down":
 				y += d
+				a += d
 			case "up":
 				y -= d
+				a -= d
 		}
 	}
 	fmt.Printf("Day 1: %d\n", x*y)
+	fmt.Printf("Day 1: %d\n", x2*y2)
 }
