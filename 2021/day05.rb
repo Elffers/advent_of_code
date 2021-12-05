@@ -10,11 +10,23 @@ input.each do |i|
     (min..max).each do |y|
       pts[[x1,y]] += 1
     end
-  end
-  if y1 == y2
+  elsif y1 == y2
     min, max = [x1, x2].minmax
     (min..max).each do |x|
       pts[[x,y1]] += 1
+    end
+  else
+    slope = (x1-x2)/(y1-y2)
+    ymin, ymax = [y1, y2].minmax
+    xmin, xmax = [x1, x2].minmax
+    if slope == 1
+      (xmin..xmax).to_a.zip((ymin..ymax).to_a).each do |pt|
+          pts[pt] += 1
+      end
+    elsif slope == -1
+      (xmin..xmax).to_a.zip((ymin..ymax).to_a.reverse).each do |pt|
+          pts[pt] += 1
+      end
     end
   end
 end
