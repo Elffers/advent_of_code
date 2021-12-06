@@ -1,33 +1,37 @@
-input = File.read("/Users/hhh/JungleGym/advent_of_code/2021/inputs/day06.in").split(",").map { |x| x.to_i }
-# input = File.read("/Users/hhh/JungleGym/advent_of_code/2021/inputs/day06test.in").split(",").map { |x| x.to_i }
-p input
-p input.length
+input = File.read("/Users/hhh/JungleGym/advent_of_code/2021/inputs/day06test.in").split(",").map { |x| x.to_i }
+# input = File.read("/Users/hhh/JungleGym/advent_of_code/2021/inputs/day06.in").split(",").map { |x| x.to_i }
 
 def tick input
-  out = []
-  new = []
-  input.each do |x|
+  out = Array.new(input.size + input.count(0))
+  ni = input.size
+  input.each_with_index do |x,i|
     if x == 0
-      out << 6
-      new << 8
+      out[i] = 6
+      out[ni] = 8
+      ni += 1
     else
-      out << x-1
+      out[i] = x-1
     end
   end
-  out + new
-  # new = []
-  # old.each do |x|
-  #   if x == 6
-  #     new << 8
-  #   end
-  # end
-
-  # old.concat new
+  out
 end
 
-x = input
-80.times do
+x = [4] 
+30.times do |i|
   x = tick x
+  p [i+1, x.length]
 end
+p "Part 1: #{x.length}"
 
-p x.length
+# x = input
+# 256.times do |i|
+#   p [i, x.length]
+#   x = tick x
+# end
+
+# p x.length
+# def spawn clock, days
+#   if days = 0
+#     return 1
+#   end
+# end
