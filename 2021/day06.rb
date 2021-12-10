@@ -21,7 +21,7 @@ end
 
 256.times do |i|
   counts = tick counts
-  if i == 79 
+  if i == 79
     p "Part 1: #{counts.values.sum}"
   end
 end
