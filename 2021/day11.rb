@@ -30,7 +30,6 @@ def inc octs
 end
 
 def flash x, y, input
-  # @flashed << [x, y]
   @flashes += 1
   input[x][y] = 0 # flashed
   ns = neighbors x, y
@@ -47,7 +46,8 @@ end
 
 @flashes = 0
 os = input.map { |x| x.chars.map { |c| c.to_i }}
-100.times do
+i = 0
+loop do
   os = inc os
   os.each_with_index do |line, x|
     line.each_with_index do |o, y|
@@ -56,9 +56,14 @@ os = input.map { |x| x.chars.map { |c| c.to_i }}
       end
     end
   end
-  # p "FLASH"
-  # os.each { |o| p o }
-  # puts
-end
+  i += 1
 
-p "Part 1: #{@flashes}"
+  if i == 100
+    p "Part 1: #{@flashes}"
+  end
+
+  if os.all? { |x| x.all? { |c| c == 0 } }
+    p "Part 2: #{i}"
+    break
+  end
+end
