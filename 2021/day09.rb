@@ -4,19 +4,17 @@ input = File.read("/Users/hhh/JungleGym/advent_of_code/2021/inputs/day09.in").sp
 @h = input.size
 @w = input.first.size
 
+# vertical and horizontal only
 def neighbors x, y
+  dirs = [
+    [-1, 0], [0, -1], [0, 1], [1, 0]
+  ]
   ns = []
-  if x - 1 >= 0
-    ns << [x-1,y]
-  end
-  if y - 1 >= 0
-    ns << [x,y-1]
-  end
-  if x + 1 < @h
-    ns << [x+1,y]
-  end
-  if y + 1 < @w
-    ns << [x,y+1]
+  dirs.each do |(i,j)|
+    dx, dy = x+i, y+j
+    if (0 <= dx && dx < @h) && (0 <= dy && dy < @w)
+      ns << [dx, dy]
+    end
   end
   ns
 end
@@ -30,7 +28,8 @@ input.each_with_index do |line, x|
     end
   end
 end
-p "Part 1: #{lps.map { |(i,j)| input[i][j] +1 }.sum}"
+
+p "Part 1: #{lps.map { |(i,j)| input[i][j]+1 }.sum}"
 
 def find_basin x,y,input
   size = 0
