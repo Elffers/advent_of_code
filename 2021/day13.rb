@@ -1,4 +1,3 @@
-input = File.read("/Users/hhh/JungleGym/advent_of_code/2021/inputs/day13test.in").split "\n\n"
 input = File.read("/Users/hhh/JungleGym/advent_of_code/2021/inputs/day13.in").split "\n\n"
 
 lines = input.first.split "\n"
@@ -6,9 +5,6 @@ instr = input.last.split("\n").map do |i|
   /(?<axis>\w)=(?<n>\d+)/ =~ i
   [axis, n.to_i]
 end
-i = instr.first
-i1 = instr[1]
-# p instr
 
 cds = lines.map do |line|
   line.split(",").map { |x| x.to_i }
@@ -17,11 +13,7 @@ end
 def display grid
   grid.each do |l|
     row = l.map do |p|
-      if p.nil?
-        "."
-      else
-        "#"
-      end
+      p.nil? ? " " : "#"
     end
     puts row.join
   end
@@ -37,104 +29,80 @@ def grid cds
   g
 end
 
-g = grid cds
-# display g
-puts
-
-def fold g, i
-  # w = cds.map { |x| x.first }.max
-  # h = cds.map { |x| x.last }.max
-  axis, n = i
+def fold_helper g, n
+  h = g.size
+  w = g.first.size
   count = 0
 
-  case axis
-  when "y"
-    h = g.size
-    w = g.first.size
-    # w is the same
-    # folded = Array.new(h-n) { Array.new(w+1) }
-    # rows 0 through n-1 will be the same
-    # rows n through h will be upside down
-    top = g[0,n-1]
-    bottom = g[n,h].reverse
-    display(bottom)
-    if n >= h/2
-      (0..n-1).each do |i|
-        row = g[i]
-        if i >= n-(h-n)
-          j = n+(n-i)
-          overlap = g[j]
-          row.zip(overlap).each do |x|
-            if x.include? "#"
-              count += 1
-            end
-          end
-        else
-          count += row.count "#"
-        end
-      end
-    else
-      # size of bottom = h-n, so indexes = 0 - (n+2)
-      # size of top = n
-      bottom.each_with_index do |row, i|
-        if i <= bottom.size - n
-          j = n-(n-i)
-          overlap = g[j]
-          row.zip(overlap).each do |x|
-            if x.include? "#"
-              count += 1
-            end
-          end
-        else
-          count += row.count "#"
-        end
-      end
-    end
-  when "x"
-    #   # h is the same
-    #   grid = Array.new(h) { Array.new(w-n) }
-    # end
-    g = g.transpose
-    h = g.size
-    if n >= h/2
-      (0..n-1).each do |i|
-        row = g[i]
-        if i >= n-(h-n)
-          j = n+(n-i)
-          overlap = g[j]
-          row.zip(overlap).each do |x|
-            if x.include? "#"
-              count += 1
-            end
-          end
-        else
-          count += row.count "#"
-        end
-      end
-    else
-      # size of bottom = h-n, so indexes = 0 - (n+2)
-      # size of top = n
-      bottom.each_with_index do |row, i|
-        if i <= bottom.size - n
-          j = n-(n-i)
-          overlap = g[j]
-          row.zip(overlap).each do |x|
-            if x.include? "#"
-              count += 1
-            end
-          end
-        else
-          count += row.count "#"
-        end
-      end
-    end
+  # rows 0-(n-1) will be the same
+  # rows n-h will be upside down
+  top = g[0...n]
+  bottom = g[n+1..h].reverse
+  new_height = [top.size, bottom.size].max
+  folded = Array.new(new_height) { Array.new(w) }
 
+  if top.size >= bottom.size
+    (0...n).each do |i|
+      row = g[i]
+      # check for overlapping dots
+      if i >= n-(h-n)
+        j = n+(n-i)
+        overlap = g[j]
+        nr = row.zip(overlap).map do |x|
+          if x.include? "#"
+            count += 1
+            "#"
+          else
+            nil
+          end
+        end
+        folded[i] = nr
+      else
+        count += row.count "#"
+        folded[i] = row
+      end
+    end
+  else
+    bottom.each_with_index do |row, i|
+      if i <= bottom.size - n
+        j = n-(n-i)
+        overlap = g[j]
+        nr = row.zip(overlap).map do |x|
+          if x.include? "#"
+            count += 1
+            "#"
+          else
+            nil
+          end
+        end
+        folded[i] = nr
+      else
+        count += row.count "#"
+        folded[i] = row
+      end
+    end
   end
-  p count
-  # need to return grid
-  count
+  p "COUNT: #{count}"
+  folded
+end
+
+def fold g, instr
+  axis, n = instr
+  folded = nil
+
+  folded = case axis
+  when "y"
+    fold_helper g, n
+  when "x"
+    f = fold_helper g.transpose, n
+    f.transpose
+  end
+  folded
 end
 
 g = grid(cds)
-p fold(g, i)
-# display(fold(cds, i))
+
+instr.each do |i|
+  g = fold(g, i)
+  display g
+end
