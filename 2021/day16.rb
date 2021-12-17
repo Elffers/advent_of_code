@@ -27,37 +27,27 @@ class Packet
     sps = subpackets.map { |sp| sp.val }
 
     case @type
-    when 0 #sum - 1 or 2 subpkts
-      # p "SUM: #{subpackets}"
+    when 0
       if sps.size == 1
         sps.first
       else
         sps.reduce :+
       end
-    when 1 # mult - 1 or 2 subpkts
+    when 1
       if sps.size == 1
         sps.first
       else
         sps.reduce :*
       end
-    when 2 # min - min value of all subpkts
+    when 2
       sps.min
-    when 3 # max - max of all subpkts
+    when 3
       sps.max
     when 5 # gt - 2 subpkts only. val = 1 if sp1 > sp2, else 0
-      if sps.size != 2
-        puts "ERROR 5"
-      end
       sps.first > sps.last ? 1 : 0
     when 6 # lt - 2 subpkts only. val = 1 if sp1 < sp2, else 0
-      if sps.size != 2
-        puts "ERROR 6"
-      end
       sps.first < sps.last ? 1 : 0
     when 7 # eq - 2 subpkts only. val = 1 if sp1 = sp2, else 0
-      if sps.size != 2
-        puts "ERROR 7"
-      end
       sps.first == sps.last ? 1 : 0
     end
   end
@@ -86,35 +76,31 @@ def parse bits, parent, sp_size=nil
   end
 
   while s.rest? && !s.rest.chars.all? { |x| x == "0" }
-  if parent && parent.sp_size == parent.subpackets.size
-    return
-  end
+    if parent && parent.sp_size == parent.subpackets.size
+      return
+    end
+
     # header = version + id (6 bits)
     # get packet version
     v = s.scan(/\d{3}/)
     v = v.to_i(2)
-
-    p "VERSION: #{v}"
 
     # get packet type ID
     id = s.scan(/\d{3}/)
     id = id.to_i(2)
     p "TYPE: #{id}"
     pkt = Packet.new v, id, parent, s
+
     if !parent.nil?
       if parent.sp_size.nil?
         parent.subpackets << pkt
-        p "parent should not have sp_size: #{parent.inspect}"
       elsif !parent.sp_size.nil?
         if parent.subpackets.size < parent.sp_size
           parent.subpackets << pkt
-          p "parent SHOULD have sp_size: #{parent.inspect}"
-          p "sbpkt: #{pkt.inspect}"
         end
       end
     end
 
-    # set body/value
     if pkt.literal?
       num = ""
       # scan groups
@@ -129,30 +115,23 @@ def parse bits, parent, sp_size=nil
         num += b[1,4]
       end
       pkt.body = num
-      p "LITERAL VAL #{pkt.val}"
-      # p "REST? #{[s.rest, s.rest?]}"
-    elsif pkt.op?
 
+    elsif pkt.op?
       i = s.scan /(0|1)/ # length type ID
       pkt.length_type = i
-      p "LENGTH_TYPE #{i}"
 
       case i
       when "1" # len = number of subpackets
         n = s.scan /\d{11}/
         sps = n.to_i(2)
-
-        p "SPS #{sps}"
         pkt.sp_size = sps
         parse s.rest, pkt
-        # fast forward scanner
       when "0" # len = number of actual bits
         n = s.scan /\d{15}/
         len = n.to_i(2)
         parse s.scan(/.{#{len}}/), pkt
       end
     end
-
   end
   pkt
 end
