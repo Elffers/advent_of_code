@@ -27,20 +27,17 @@ class Packet
     sps = subpackets.map { |sp| sp.val }
 
     case @type
-    when 4
-      body.to_i(2)
     when 0 #sum - 1 or 2 subpkts
-      # p "SUM: #{subpackets.size}"
+      # p "SUM: #{subpackets}"
       if sps.size == 1
         sps.first
       else
         sps.reduce :+
       end
     when 1 # mult - 1 or 2 subpkts
-      case sps.size
-      when 1
+      if sps.size == 1
         sps.first
-      when 2
+      else
         sps.reduce :*
       end
     when 2 # min - min value of all subpkts
@@ -164,17 +161,18 @@ end
 # h = "38006F45291200"
 # h = "EE00D40C823060"
 # h = "8A004A801A8002F478"
-h = "620080001611562C8802118E34"
-h = "C0015000016115A2E0802F182340"
-h = "A0016C880162017C3686B18A3D4780"
+# h = "620080001611562C8802118E34"
+# h = "C0015000016115A2E0802F182340"
+# h = "A0016C880162017C3686B18A3D4780"
 # h = "C200B40A82"
 # h = "04005AC33890"
 # h = "880086C3E88112"
 # h = "CE00C43D881120"
 # h = "F600BC2D8F"
 # h = "D8005AC2A8F0"
-h = "9C005AC2F8F0"
-h = "9C0141080250320F1802104A08"
+# h = "9C005AC2F8F0"
+# h = "9C0141080250320F1802104A08"
+
 h = input.first.chomp
 b = hex_to_binary h
 
@@ -191,11 +189,5 @@ def version_sum root
 end
 
 pkt = parse b, nil
-puts
-# p "Part 1: #{version_sum pkt}"
-# p "SIZE: #{pkt.subpackets.size}" #????
-
-# pkt.subpackets.each do |x|
-#   p x.subpackets.size
-# end
+p "Part 1: #{version_sum pkt}"
 p "Part 2: #{pkt.val}"
