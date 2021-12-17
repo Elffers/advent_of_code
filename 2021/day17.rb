@@ -47,21 +47,20 @@ def step_until_hit vel
 end
 
 maxes = Hash.new { |h,k| h[k] = [] }
-(0..100).each do |dx|
-  (0..100).each do |dy|
+(-100..300).each do |dx|
+  (-100..300).each do |dy|
     r, m = step_until_hit [dx, dy]
     if r
       maxes[m] << [dx,dy]
     end
-    # if !max_height.nil? && max_height > max
-    #   max = max_height
-    #   puts "MAX: #{max_height}"
-    #   break
-    # end
   end
 end
 
-# p maxes
 m = maxes.keys.max
-p "MAX: #{m}"
-p "MAX: #{maxes[m]}"
+p "Part 1: #{m}"
+
+count = 0
+maxes.each do |k, v|
+  count += v.size
+end
+p "Part 2: #{count}"
