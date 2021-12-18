@@ -17,6 +17,21 @@ def pair? s
     s.last.class == Integer
 end
 
+def inorder node, n, res
+  n+=1
+  if (pair? node) && n == 5
+    p "FOUND IT: #{node}"
+    res << node
+  elsif leaf? node
+    res << node
+  else
+    inorder(node.first, n, res)
+    inorder(node.last, n, res)
+  end
+  res
+end
+
+
 # node must be a pair
 def explode node
   return if leaf? node
@@ -118,10 +133,11 @@ end
 s = [[[[0,7],4],[[7,8],[6,0]]],[8,1]]
 # p "Part 1: #{magnitude s}"
 
-# s = [[[[[9,8],1],2],3],4]
+s = [[[[[9,8],1],2],3],4]
 # explode s
-s = [[3,[2,[1,[7,3]]]],[6,[5,[4,[3,2]]]]]
-explode s
+p inorder s, 0, []
+# s = [[3,[2,[1,[7,3]]]],[6,[5,[4,[3,2]]]]]
+# p inorder s, 0, []
 
-# s = [[6,[5,[4,[3,2]]]],1]
-# explode s
+s = [[6,[5,[4,[3,2]]]],1]
+p inorder s, 0, []
