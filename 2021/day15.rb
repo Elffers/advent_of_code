@@ -1,5 +1,6 @@
+require 'set'
 input = File.read("/Users/hhh/JungleGym/advent_of_code/2021/inputs/day15test.in").split("\n").map { |x| x.chars.map { |c| c.to_i }}
-input = File.read("/Users/hhh/JungleGym/advent_of_code/2021/inputs/day15.in").split("\n").map { |x| x.chars.map { |c| c.to_i }}
+# input = File.read("/Users/hhh/JungleGym/advent_of_code/2021/inputs/day15.in").split("\n").map { |x| x.chars.map { |c| c.to_i }}
 
 # vertical and horizontal only
 def adj x, y, input
@@ -39,9 +40,6 @@ def shortest_path input
       memo[i][j] = input[i][j] + v.compact.min
     end
   end
-  # memo.each do |m|
-  #   p m
-  # end
   memo[h-1][w-1]
 end
 
@@ -87,8 +85,73 @@ p2.each_with_index do |row, i|
 end
 
 # p "p3"
-p3.each do |x|
-  p x
+# p3.each do |x|
+#   p x
+# end
+
+def find_min_node queue, costs
+  min = Float::INFINITY
+  node = nil
+  queue.each do |n|
+    cost = costs[n.first][n.last]
+    if cost < min
+      node = n
+    end
+  end
+  node
 end
 
-p "Part 2: #{shortest_path p3}"
+require "pp"
+
+def dijkstra input
+  p input
+  h = input.size
+  w = input.first.size
+  costs = Array.new(h) { Array.new(w) { Float::INFINITY } }
+  costs[0][0] = 0
+
+  queue = []
+  node = [0,0]
+  queue << node
+  (0...h).each do |i|
+    (0...w).each do |j|
+      queue << [i, j]
+    end
+  end
+
+  path = []
+  sum = 0
+  seen = Set.new
+
+  while !queue.empty?
+    node = find_min_node queue, costs
+    p "NODE: #{node}"
+    seen << node # TODO
+    x = node.first
+    y = node.last
+    val = input[x][y]
+    sum += val
+    path << val
+    ns = adj x, y, input
+    # p "NS: #{ns}"
+    queue.delete node # TODO need this?
+    ns.each do |n|
+      i, j = n
+      if !seen.include? [i,j] # TODO
+        seen << [i,j]
+        cost = costs[x][y] + input[i][j]
+        if cost < costs[i][j]
+          costs[i][j] = cost
+          # p "ALT COST: #{p costs[i][j]}"
+        end
+      end
+    end
+  end
+  pp costs
+  p "SUM: #{sum}"
+  sum
+end
+
+p dijkstra input
+
+# p "Part 2: #{shortest_path p3}"
