@@ -1,19 +1,20 @@
 require 'pp'
 input = File.read("/Users/hhh/JungleGym/advent_of_code/2021/inputs/day20test.in").split("\n\n")
 # input = File.read("/Users/hhh/JungleGym/advent_of_code/2021/inputs/day20.in").split("\n\n")
-#
+
 @algo, i = input
 
-img = Hash.new { |h,k| h[k] = Hash.new { |h,k| h[k] = "." } }
+img = Array.new { Hash.new { |h,k| h[k] = "." } }
+
 i.split("\n").each_with_index do |row, i|
   row.chars.each_with_index do |px, j|
     img[i][j] = px
   end
   img
 end
+p img
 
 def px_val x, y, img
-  # pp img
   min = img.keys.min
   max = img.keys.max
   i = [
@@ -22,7 +23,6 @@ def px_val x, y, img
     [ 1, -1], [ 1, 0], [ 1, 1],
   ].map do |(i,j)|
     dx, dy = x+i, y+j
-    p [dx, dy]
     if (min <= dx && dx <= max) && (min <= dy && dy <= max)
       img[dx][dy]
     else
@@ -33,6 +33,7 @@ def px_val x, y, img
   end.join
   p i
   i = i.to_i(2)
+  p @algo[i]
   puts
 
   @algo[i]
@@ -65,8 +66,8 @@ def enhance img
     v[max+1] = "."
   end
 
-  img.each_pair do |x, val|
-    val.each_pair do |y, _|
+  img.sort_by { |k, v| k }.each do |x, val|
+    val.sort_by { |k, v| k }.each do |y, _|
       px = px_val x, y, img
       new_img[x][y] = px
       count += 1 if px == "#"
@@ -91,14 +92,14 @@ def display img
 end
 
 # p "PIXEL #{px_val 0, 0, img}"
-display img
-puts
-
-img, count = enhance img
-display img
-p count
+# display img
 puts
 
 # img, count = enhance img
 # display img
-# p "Part 1: #{count}"
+# p count
+# puts
+
+# # img, count = enhance img
+# # display img
+# # p "Part 1: #{count}"
