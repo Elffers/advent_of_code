@@ -38,12 +38,14 @@ def shortest_path input
       ns = adj i, j, input
       v = ns.map { |(x, y)| memo[x][y] }
       memo[i][j] = input[i][j] + v.compact.min
+      p "MEMO COST: #{memo[i][j]}, #{[i,j] }"
     end
   end
+  pp memo
   memo[h-1][w-1]
 end
 
-p "Part 1: #{shortest_path input}"
+# p "Part 1: #{shortest_path input}"
 
 p2 = Array.new(5) { Array.new(5) }
 
@@ -89,69 +91,75 @@ end
 #   p x
 # end
 
-def find_min_node queue, costs
-  min = Float::INFINITY
-  node = nil
-  queue.each do |n|
-    cost = costs[n.first][n.last]
-    if cost < min
-      node = n
-    end
-  end
-  node
+def find_min_node queue, dist
+  cost, idx = queue.map.with_index do |n, i|
+    [dist[n.first][n.last], i]
+  end.min_by { |x| x.first }
+  queue[idx]
 end
 
 require "pp"
 
-def dijkstra input
-  p input
-  h = input.size
-  w = input.first.size
-  costs = Array.new(h) { Array.new(w) { Float::INFINITY } }
-  costs[0][0] = 0
+def dijkstra weights
+  h = weights.size
+  w = weights.first.size
+  dist = Array.new(h) { Array.new(w) { Float::INFINITY } }
+  dist[0][0] = 0
 
+  seen = Set.new
+  prev = Hash.new
   queue = []
-  node = [0,0]
-  queue << node
   (0...h).each do |i|
     (0...w).each do |j|
       queue << [i, j]
     end
   end
 
-  path = []
-  sum = 0
-  seen = Set.new
-
   while !queue.empty?
-    node = find_min_node queue, costs
-    p "NODE: #{node}"
-    seen << node # TODO
+    # puts
+    node = find_min_node queue, dist
+    queue.delete node
     x = node.first
     y = node.last
-    val = input[x][y]
-    sum += val
-    path << val
-    ns = adj x, y, input
-    # p "NS: #{ns}"
-    queue.delete node # TODO need this?
+    val = weights[x][y]
+    ns = adj x, y, weights
+
     ns.each do |n|
       i, j = n
-      if !seen.include? [i,j] # TODO
-        seen << [i,j]
-        cost = costs[x][y] + input[i][j]
-        if cost < costs[i][j]
-          costs[i][j] = cost
-          # p "ALT COST: #{p costs[i][j]}"
+      # if !seen.include? [i,j] # TODO
+        cost = dist[x][y] + weights[i][j]
+        # p "COST: #{cost}, #{[i,j] }"
+        if cost < dist[i][j]
+          dist[i][j] = cost
+          # p "ALT COST for #{[i,j]}: #{dist[i][j]}"
+          prev[[i,j]] = [x,y]
         end
-      end
+      # end
     end
   end
-  pp costs
-  p "SUM: #{sum}"
-  sum
+  # dist.each do |d|
+  #   p d
+  # end
+  p "DEST COST? #{dist[h-1][w-1]}"
+
+  path = Hash.new
+  costs = []
+  dest = [h-1, w-1]
+  # if prev[dest] || dest == [0,0]
+    while dest
+      cost = weights[dest.first][dest.last]
+      # path.unshift dest
+      path[dest] = cost
+      costs.unshift cost
+      dest = prev[dest]
+    end
+  # end
+
+  # p "COSTS: #{costs}"
+  path
 end
 
-p dijkstra input
+pp dijkstra p3
+# pp dijkstra input
 
 # p "Part 2: #{shortest_path p3}"
