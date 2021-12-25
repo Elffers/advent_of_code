@@ -7,7 +7,7 @@ def adj x, y, input
   h = input.size
   w = input.first.size
   dirs = [
-    [-1, 0], [0, -1], [0, 1], [1, 0]
+    [-1, 0], [1, 0], [0, -1], [0, 1]
   ]
   ns = []
   dirs.each do |(i,j)|
@@ -45,121 +45,108 @@ def shortest_path input
   memo[h-1][w-1]
 end
 
-# p "Part 1: #{shortest_path input}"
-
-p2 = Array.new(5) { Array.new(5) }
-
 def inc input, i
   x = (1..9).to_a
   input.map do |r|
-    r.map do |v|
-      x = (v+i) %9
-      if x == 0
-        x = 9
-      end
-      x
+    x = (r+i) %9
+    if x == 0
+      x = 9
     end
+    x
   end
 end
 
-i = 0
-p2.each_with_index do |row, x|
-  row.each_with_index do |t, y|
-    i = x + y
-    t = inc input, i
-    p2[x][y] = t
+def expand input
+  res = []
+
+  i = 0
+  while i < 5
+  input.each do |row|
+    new_row = []
+    (0..4).each do |j|
+      new_row.concat(inc row, i+j)
+    end
+    res << new_row
   end
+  i += 1
+  end
+  res
 end
 
-h = input.size
-w = input.first.size
+input2 = expand input
 
-p3 = Array.new
-
-# each p2 row is first five rows of p3
-r = 0
-p2.each_with_index do |row, i|
-  (0..9).each do |ti|
-    new_row =  row.map { |t| t[ti] }.flatten
-    p3[r] = new_row
-    r += 1
+def extract_min queue, dist
+  costs = queue.map.with_index do |n, i|
+    cost = dist[n.first][n.last]
+    [cost, i]
   end
-end
 
-# p "p3"
-# p3.each do |x|
-#   p x
-# end
-
-def find_min_node queue, dist
-  cost, idx = queue.map.with_index do |n, i|
-    [dist[n.first][n.last], i]
-  end.min_by { |x| x.first }
+  _, idx = costs.min_by { |(cost, i)| cost }
   queue[idx]
 end
 
 require "pp"
 
 def dijkstra weights
-  h = weights.size
-  w = weights.first.size
-  dist = Array.new(h) { Array.new(w) { Float::INFINITY } }
+  dist = weights.map do |row|
+    row.map do |d|
+      Float::INFINITY
+    end
+  end
+
   dist[0][0] = 0
 
   seen = Set.new
   prev = Hash.new
+  # TODO use priority queue
   queue = []
-  (0...h).each do |i|
-    (0...w).each do |j|
+  d = weights.size
+  (0...d).each do |i|
+    (0...d).each do |j|
       queue << [i, j]
     end
   end
 
   while !queue.empty?
     # puts
-    node = find_min_node queue, dist
-    queue.delete node
-    x = node.first
-    y = node.last
-    val = weights[x][y]
-    ns = adj x, y, weights
+    u = extract_min queue, dist
+    queue.delete u
+    x = u.first
+    y = u.last
+    # val = weights[x][y]
+    vs = adj x, y, weights
 
-    ns.each do |n|
-      i, j = n
+    vs.each do |v|
+      i, j = v
       # if !seen.include? [i,j] # TODO
-        cost = dist[x][y] + weights[i][j]
-        # p "COST: #{cost}, #{[i,j] }"
-        if cost < dist[i][j]
-          dist[i][j] = cost
-          # p "ALT COST for #{[i,j]}: #{dist[i][j]}"
-          prev[[i,j]] = [x,y]
-        end
+      cost = dist[x][y] + weights[i][j]
+      # p "COST: #{cost}, #{[i,j] }"
+      if cost < dist[i][j]
+        dist[i][j] = cost # decrease-key
+        # p "ALT COST for #{[i,j]}: #{dist[i][j]}"
+        prev[v] = u
+      end
       # end
     end
   end
   # dist.each do |d|
   #   p d
   # end
-  p "DEST COST? #{dist[h-1][w-1]}"
 
   path = Hash.new
   costs = []
-  dest = [h-1, w-1]
-  # if prev[dest] || dest == [0,0]
-    while dest
-      cost = weights[dest.first][dest.last]
-      # path.unshift dest
-      path[dest] = cost
-      costs.unshift cost
-      dest = prev[dest]
-    end
-  # end
+  dest = [d-1, d-1]
+  while dest
+    cost = weights[dest.first][dest.last]
+    path[dest] = cost
+    costs.unshift cost
+    dest = prev[dest]
+  end
 
-  # p "COSTS: #{costs}"
-  path
+  pp path.sort_by { |k, v| k}
+  dist[d-1][d-1]
 end
 
-pp dijkstra p3
-# pp dijkstra input
+# p "Part 1: #{dijkstra input}"
 
-# p "Part 2: #{shortest_path p3}"
+p "Part 2: #{dijkstra input2}"
