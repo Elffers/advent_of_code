@@ -100,25 +100,28 @@ def dijkstra weights
   prev = Hash.new
   # TODO use priority queue
   queue = []
+  # queue = Hash.new { |h, k| h[k] = [] }
   d = weights.size
   (0...d).each do |i|
     (0...d).each do |j|
+      # priority = weights[i][j]
+      # queue[priority] << [i, j]
       queue << [i, j]
     end
   end
 
   while !queue.empty?
-    # puts
     u = extract_min queue, dist
     queue.delete u
+    seen << u
+
     x = u.first
     y = u.last
-    # val = weights[x][y]
     vs = adj x, y, weights
 
     vs.each do |v|
       i, j = v
-      # if !seen.include? [i,j] # TODO
+      if !seen.include? [i,j] # TODO
       cost = dist[x][y] + weights[i][j]
       # p "COST: #{cost}, #{[i,j] }"
       if cost < dist[i][j]
@@ -126,7 +129,7 @@ def dijkstra weights
         # p "ALT COST for #{[i,j]}: #{dist[i][j]}"
         prev[v] = u
       end
-      # end
+      end
     end
   end
   # dist.each do |d|
@@ -150,3 +153,7 @@ end
 # p "Part 1: #{dijkstra input}"
 
 p "Part 2: #{dijkstra input2}"
+# test input:
+# real	0m1.360s
+# user	0m1.340s
+# sys	0m0.015s
