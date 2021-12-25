@@ -1,6 +1,4 @@
-input = File.read("/Users/hhh/JungleGym/advent_of_code/2021/inputs/day25test.in").split "\n"
-# input = File.read("/Users/hhh/JungleGym/advent_of_code/2021/inputs/day25test2.in").split "\n"
-# input = File.read("/Users/hhh/JungleGym/advent_of_code/2021/inputs/day25.in").split "\n"
+input = File.read("/Users/hhh/JungleGym/advent_of_code/2021/inputs/day25.in").split "\n"
 
 def display input
   input.each do |x|
@@ -8,21 +6,22 @@ def display input
   end
 end
 
-def step input
+def move_east input
   h = input.size
   w = input.first.size
 
-  res = Array.new(h)
+  east = Array.new(h)
   stopped = true
 
-  # east herd first
   input.each_with_index do |row, x|
-    # p "ROW: #{row}"
     new_row = Array.new(w, ".")
     row.chars.each_with_index do |sc, y|
-      if sc == ">" 
+      if sc == "v"
+        new_row[y] = sc
+      end
+      if sc == ">"
         i = (y + 1) % w
-        if  row[i] == "."
+        if row[i] == "."
           new_row[i] = sc
           stopped = false
         else
@@ -30,31 +29,54 @@ def step input
         end
       end
     end
-    # p "NEW ROW: #{new_row}"
-    res[x] = new_row.join
+    east[x] = new_row.join
   end
 
-  # res.each_with_index do |row, x|
-  #   row.chars.each_with_index do |sc, y|
-  #     i = (x + 1) % h
-  #     if sc == "v" && res[x][i] == "."
-  #       res[x][i] == sc
-  #       stopped = false
-  #     else
-  #       res[x][y] == sc
-  #     end
-  #   end
-  # end
-
-  res
+  [east, stopped]
 end
 
+def move_south input, stopped
+  input = input.map { |x| x.chars }.transpose
+  h = input.size
+  w = input.first.size
 
-display input
-puts
-x = 2
-x.times do
-  input = step input
-  display input
-  puts
+  south = Array.new(h)
+
+  # south herd
+  input.each_with_index do |row, x|
+    new_row = Array.new(w, ".")
+    row.each_with_index do |sc, y|
+      if sc == ">"
+        new_row[y] = sc
+      end
+      if sc == "v"
+        i = (y + 1) % w
+        if row[i] == "."
+          new_row[i] = sc
+          stopped = false
+        else
+          new_row[y] = sc
+        end
+      end
+    end
+    south[x] = new_row
+  end
+  south = south.transpose.map { |x| x.join }
+
+  [south, stopped]
 end
+
+def step input
+  x, s = move_east input
+  move_south x, s
+end
+
+count = 0
+loop do
+  input, x = step input
+  count += 1
+  if x
+    break
+  end
+end
+p count
