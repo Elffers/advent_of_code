@@ -75,14 +75,17 @@ end
 
 input2 = expand input
 
-def extract_min queue, dist
-  costs = queue.map.with_index do |n, i|
-    cost = dist[n.first][n.last]
-    [cost, i]
-  end
+def extract_min queue
+  priority = queue.keys.min
+  v = queue[priority].shift
+  # costs = queue.map.with_index do |n, i|
+  #   cost = dist[n.first][n.last]
+  #   [cost, i]
+  # end
 
-  _, idx = costs.min_by { |(cost, i)| cost }
-  queue[idx]
+  # _, idx = costs.min_by { |(cost, i)| cost }
+  # queue[idx]
+  [v, priority]
 end
 
 require "pp"
@@ -99,20 +102,24 @@ def dijkstra weights
   seen = Set.new
   prev = Hash.new
   # TODO use priority queue
-  queue = []
-  # queue = Hash.new { |h, k| h[k] = [] }
+  # queue = []
+  queue = Hash.new { |h, k| h[k] = [] }
   d = weights.size
   (0...d).each do |i|
     (0...d).each do |j|
-      # priority = weights[i][j]
-      # queue[priority] << [i, j]
-      queue << [i, j]
+      priority = dist[i][j]
+      queue[priority] << [i, j]
+      # queue << [i, j]
     end
   end
 
   while !queue.empty?
-    u = extract_min queue, dist
-    queue.delete u
+    u, p = extract_min queue
+    queue[p].delete u
+    if queue[p].empty?
+      queue.delete p
+    end
+    # queue.delete u
     seen << u
 
     x = u.first
@@ -154,6 +161,6 @@ end
 
 p "Part 2: #{dijkstra input2}"
 # test input:
-# real	0m1.360s
-# user	0m1.340s
-# sys	0m0.015s
+# real	0m0.600s
+# user	0m0.583s
+# sys	0m0.013s
