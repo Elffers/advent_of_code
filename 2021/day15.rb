@@ -1,6 +1,6 @@
 require 'set'
 input = File.read("/Users/hhh/JungleGym/advent_of_code/2021/inputs/day15test.in").split("\n").map { |x| x.chars.map { |c| c.to_i }}
-# input = File.read("/Users/hhh/JungleGym/advent_of_code/2021/inputs/day15.in").split("\n").map { |x| x.chars.map { |c| c.to_i }}
+input = File.read("/Users/hhh/JungleGym/advent_of_code/2021/inputs/day15.in").split("\n").map { |x| x.chars.map { |c| c.to_i }}
 
 # vertical and horizontal only
 def adj x, y, input
@@ -74,17 +74,18 @@ def expand input
 end
 
 input2 = expand input
+def extract_min queue, dist
+  costs = queue.map.with_index do |n, i|
+    cost = dist[n.first][n.last]
+    [cost, i]
+  end
+  _, idx = costs.min_by { |(cost, i)| cost }
+  queue[idx]
+end
 
-def extract_min queue
+def extract_min2 queue
   priority = queue.keys.min
   v = queue[priority].shift
-  # costs = queue.map.with_index do |n, i|
-  #   cost = dist[n.first][n.last]
-  #   [cost, i]
-  # end
-
-  # _, idx = costs.min_by { |(cost, i)| cost }
-  # queue[idx]
   [v, priority]
 end
 
@@ -102,24 +103,25 @@ def dijkstra weights
   seen = Set.new
   prev = Hash.new
   # TODO use priority queue
-  # queue = []
-  queue = Hash.new { |h, k| h[k] = [] }
+  queue = []
+  # queue = Hash.new { |h, k| h[k] = [] }
   d = weights.size
   (0...d).each do |i|
     (0...d).each do |j|
-      priority = dist[i][j]
-      queue[priority] << [i, j]
-      # queue << [i, j]
+      # priority = dist[i][j]
+      # queue[priority] << [i, j]
+      queue << [i, j]
     end
   end
 
   while !queue.empty?
-    u, p = extract_min queue
-    queue[p].delete u
-    if queue[p].empty?
-      queue.delete p
-    end
-    # queue.delete u
+    p queue.size
+    u = extract_min queue, dist
+    # queue[p].delete u
+    # if queue[p].empty?
+    #   queue.delete p
+    # end
+    queue.delete u
     seen << u
 
     x = u.first
@@ -153,7 +155,7 @@ def dijkstra weights
     dest = prev[dest]
   end
 
-  pp path.sort_by { |k, v| k}
+  # pp path.sort_by { |k, v| k}
   dist[d-1][d-1]
 end
 
