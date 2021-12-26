@@ -1,28 +1,35 @@
 require 'pp'
 input = File.read("/Users/hhh/JungleGym/advent_of_code/2021/inputs/day20test.in").split("\n\n")
-# input = File.read("/Users/hhh/JungleGym/advent_of_code/2021/inputs/day20.in").split("\n\n")
+input = File.read("/Users/hhh/JungleGym/advent_of_code/2021/inputs/day20.in").split("\n\n")
 
-@algo, i = input
+# algo, x = input
+# @algo = algo.split("\n").join
 
-img = Array.new { Hash.new { |h,k| h[k] = "." } }
+@algo, x = input
+img = Hash.new
 
-i.split("\n").each_with_index do |row, i|
+x.split("\n").each_with_index do |row, i|
+  obj = Hash.new
   row.chars.each_with_index do |px, j|
-    img[i][j] = px
+    obj[j] = px
+    img[i] = obj
   end
   img
 end
-p img
 
 def px_val x, y, img
   min = img.keys.min
   max = img.keys.max
-  i = [
+
+  adj = [
     [-1, -1], [-1, 0], [-1, 1],
     [ 0, -1], [ 0, 0], [ 0, 1],
     [ 1, -1], [ 1, 0], [ 1, 1],
   ].map do |(i,j)|
-    dx, dy = x+i, y+j
+    [x+i, y+j]
+  end
+
+  b = adj.map do |(dx, dy)|
     if (min <= dx && dx <= max) && (min <= dy && dy <= max)
       img[dx][dy]
     else
@@ -31,11 +38,8 @@ def px_val x, y, img
   end.map do |c|
     c == "." ? 0 : 1
   end.join
-  p i
-  i = i.to_i(2)
-  p @algo[i]
-  puts
 
+  i = b.to_i(2)
   @algo[i]
 end
 
@@ -46,37 +50,14 @@ def enhance img
 
   new_img = Hash.new
 
-  (min-1..max+1).each do |k|
-    new_img[k] = Hash.new
-  end
-
-  (min-1..max+1).each do |v|
-    new_img[v][v] = "."
-  end
-
-  img[min-1] = Hash.new
-  img[max+1] = Hash.new
-  (min-1..max+1).each do |v|
-    img[min-1][v] = "."
-    img[max+1][v] = "."
-  end
-
-  img.each_pair do |k, v|
-    v[min-1] = "."
-    v[max+1] = "."
-  end
-
-  img.sort_by { |k, v| k }.each do |x, val|
-    val.sort_by { |k, v| k }.each do |y, _|
-      px = px_val x, y, img
-      new_img[x][y] = px
+  (min-1..max+1).each do |i|
+    new_img[i] = Hash.new
+    (min-1..max+1).each do |j|
+      px = px_val i, j, img
       count += 1 if px == "#"
+      new_img[i][j] = px
     end
   end
-  # pp new_img
-  # TODO need to also calculate edges
-  # new_img[min-1] = new_row
-  # new_img[max+1] = new_row
 
   [new_img, count]
 end
@@ -91,15 +72,12 @@ def display img
   end
 end
 
-# p "PIXEL #{px_val 0, 0, img}"
-# display img
-puts
+2.times do
+  img, count = enhance img
+  display img
+  p count
+  puts
+end
 
-# img, count = enhance img
-# display img
-# p count
-# puts
-
-# # img, count = enhance img
-# # display img
-# # p "Part 1: #{count}"
+# 5860 too high
+# 5658 too low
