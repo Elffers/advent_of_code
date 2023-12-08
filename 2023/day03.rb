@@ -3,17 +3,15 @@ require 'strscan'
 rows = File.read("/Users/hhhsu/sandbox/advent_of_code/2023/inputs/day03.in").split("\n")
 # rows = File.read("/Users/hhhsu/sandbox/advent_of_code/2023/inputs/day03_test.in").split("\n")
 
+GEARS = Hash.new { |h, k| h[k] = [] }
 
 # returns all adjacent values to a given position in a grid (horizontal,
 # vertical, diagonal)
-GEARS = Hash.new { |h, k| h[k] = [] }
-
 def neighbors x, y, len, grid, num
   neighbors = []
   [-1, 0, 1].each do |i|
     (-1..len).each do |j|
       dx, dy = x+i, y+j
-      # p [dx, dy]
       if dx >= 0 && dx < grid.size && dy >= 0 && dy < grid.first.size
         val = grid[dx][dy]
         if val && (val != ".") && (!val.match?(/\d/))
@@ -29,18 +27,17 @@ def neighbors x, y, len, grid, num
 end
 
 sum = 0
+
 rows.each.with_index do |row, x|
   s = StringScanner.new(row)
   while !s.eos?
     if s.match?(/\d+/)
-      # p s.matched
       y = s.pos
       len = s.matched.size
       # for range of y values in each row, need to check rectangle
       ns = neighbors x, y, len, rows, s.matched
       if !ns.empty?
         sum += s.matched.to_i
-        # p [ns, s.matched]
       end
 
       s.pos += len
@@ -49,7 +46,7 @@ rows.each.with_index do |row, x|
   end
 end
 
-p sum
+p "Part 1: #{sum}"
 
 ratios = 0
 GEARS.values.each do |nums|
@@ -57,5 +54,5 @@ GEARS.values.each do |nums|
     ratios += nums.map{ |x| x.to_i }.reduce(:*)
   end
 end
-p ratios
 
+p "Part 2: #{ratios}"
