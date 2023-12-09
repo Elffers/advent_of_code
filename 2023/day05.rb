@@ -1,6 +1,6 @@
-require 'pp'
+require 'benchmark'
 maps = File.read("/Users/hhhsu/sandbox/advent_of_code/2023/inputs/day05.in").split("\n\n")
-maps = File.read("/Users/hhhsu/sandbox/advent_of_code/2023/inputs/day05_test.in").split("\n\n")
+# maps = File.read("/Users/hhhsu/sandbox/advent_of_code/2023/inputs/day05_test.in").split("\n\n")
 
 seeds = maps.shift.split(": ").last.split.map { |x| x.to_i }
 
@@ -20,7 +20,7 @@ end
 # input array, return array
 def src_to_dest data, sources
   lists = data.split("\n")
-  p lists.shift # remove header
+  lists.shift # remove header
   lists = lists.map { |list| list.split.map { |x| x.to_i } }
 
   out = sources.map do |s|
@@ -29,10 +29,16 @@ def src_to_dest data, sources
   out
 end
 
-src = seeds
-while !maps.empty?
-  # p src
-  m = maps.shift
-  src = src_to_dest m, src
+def part1 maps, seeds
+  src = seeds
+  while !maps.empty?
+    m = maps.shift
+    src = src_to_dest m, src
+  end
+  p "Part 1: #{src.min}"
 end
-p "Part 1: #{src.min}"
+
+
+Benchmark.bm do |x|
+  x.report {part1 maps, seeds}
+end
