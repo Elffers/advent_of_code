@@ -18,27 +18,27 @@ def check_lists s, lists
 end
 
 # input array, return array
-def src_to_dest data, sources
+def src_to_dest data, sources, f
   lists = data.split("\n")
   lists.shift # remove header
   lists = lists.map { |list| list.split.map { |x| x.to_i } }
 
   out = sources.map do |s|
-    check_lists(s, lists) || s
+    (method(f).call(s, lists)) || s
   end
   out
 end
 
-def part1 maps, seeds
+def part1 maps, seeds, f
   src = seeds
   while !maps.empty?
     m = maps.shift
-    src = src_to_dest m, src
+    src = src_to_dest m, src, f
   end
   p "Part 1: #{src.min}"
 end
 
-
 Benchmark.bm do |x|
-  x.report {part1 maps, seeds}
+  x.report {part1 maps, seeds, :check_lists}
+  # x.report {part2 maps, seeds}
 end
