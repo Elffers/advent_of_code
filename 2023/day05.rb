@@ -17,28 +17,32 @@ def check_lists s, lists
   nil
 end
 
+# def check_ranges input, lists
+#   lists.each do |list|
+#   end
+# end
+
 # input array, return array
-def src_to_dest data, sources, f
+def src_to_dest data, input, f
   lists = data.split("\n")
   lists.shift # remove header
   lists = lists.map { |list| list.split.map { |x| x.to_i } }
 
-  out = sources.map do |s|
+  out = input.map do |s|
     (method(f).call(s, lists)) || s
   end
   out
 end
 
-def part1 maps, seeds, f
-  src = seeds
+def run maps, input, f
+  src = input
   while !maps.empty?
     m = maps.shift
     src = src_to_dest m, src, f
   end
-  p "Part 1: #{src.min}"
+  src.min
 end
 
 Benchmark.bm do |x|
-  x.report {part1 maps, seeds, :check_lists}
-  # x.report {part2 maps, seeds}
+  x.report {p "Part 1: #{run maps, seeds, :check_lists}" }
 end
