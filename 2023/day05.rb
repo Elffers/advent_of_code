@@ -1,4 +1,6 @@
 require 'benchmark'
+require 'set'
+
 maps = File.read("/Users/hhhsu/sandbox/advent_of_code/2023/inputs/day05.in").split("\n\n")
 # maps = File.read("/Users/hhhsu/sandbox/advent_of_code/2023/inputs/day05_test.in").split("\n\n")
 
@@ -26,19 +28,18 @@ def check_ranges input, lists
   input.each_slice(2) do |pair|
     queue << pair
   end
-  p queue
   while !queue.empty?
+        p queue
     x0, r = queue.shift
-
     xn = x0+r-1
 
     overlap = false
+
     lists.each do |(dest, s0, len)|
       sn = s0+len-1
 
-      if x0 > sn || xn < s0
-        next #skip to next list
-      end
+      next if x0 > sn || xn < s0
+
       # whole input range is subset of list
       if s0 <= x0 && xn <= sn
         overlap = true
@@ -46,10 +47,11 @@ def check_ranges input, lists
         offset = x0-s0
         y0 = dest + offset
         p "WHOLE RANGE: #{[x0, xn]}"
-        p "source range: #{ [s0, sn]}, dest: #{dest}, offset: #{offset}}"
+        # p "source range: #{ [s0, sn]}, dest: #{dest}, offset: #{offset}}"
         out << y0
         out << r
-        puts
+        # puts
+        next
       elsif s0 <= x0 # map front, put back into queue
         overlap = true
         p "MAPPING FRONT #{[x0, xn]}"
@@ -58,14 +60,17 @@ def check_ranges input, lists
         r1 = sn-x0+1
         p "source range: #{ [s0, sn]}, dest: #{dest}}"
         p "front range: #{[y1, r1]}"
-        out << y1
-        out << r1
+        queue << [x0, r1] if !queue.include? [x0, r1]
+        # out << y1
+        # out << r1
 
         y2 = x0+r1
         r2 = r - r1
         p "back range: #{[y2, r2]}"
-        queue << [y2, r2]
+        queue << [y2, r2] if !queue.include? [y2, r2]
+        p queue
         puts
+        next
 
       elsif xn <= sn # map back, keep front
         overlap = true
@@ -75,13 +80,16 @@ def check_ranges input, lists
         r1 = offset
         p "source range: #{ [s0, sn]}, dest: #{dest}}"
         p "front range: #{[y1, r1]}"
-        queue << [y1, r1]
-        y2 = dest+offset
+        queue << [y1, r1]if !queue.include? [y1, r1]
+        p queue
+        y2 = x0+offset
         r2 = r-offset
         p "back range: #{[y2, r2]}"
-        out << y2
-        out << r2
+        queue << [y2, r2] if !queue.include? [y2, r2]
+        # out << y2
+        # out << r2
         puts
+        next
       end
     end
     if !overlap
