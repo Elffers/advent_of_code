@@ -3,7 +3,10 @@ times = input.first.split(/Time:\s+/).last.split(/\s+/).map { |x| x.to_i }
 distances = input.last.split(/Distance:\s+/).last.split(/\s+/).map { |x| x.to_i }
 
 records =  times.zip distances
-p records
+
+times2 = times.map { |x| x.to_s}.join.to_i
+distances2 = distances.map { |x| x.to_s}.join.to_i
+record2 =  [times2, distances2]
 
 def ways_to_beat record
   time, distance = record
@@ -33,6 +36,6 @@ ways = records.map do |record|
   ways_to_beat record
 end
 
-p ways
-p ways.reduce(:*)
+p "Part 1: #{ways.reduce(:*)}"
+p "Part 2: #{ways_to_beat record2}"
 
