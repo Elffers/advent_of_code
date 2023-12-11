@@ -6,7 +6,8 @@ class CamelHand
   include Comparable
   attr_reader :hand, :bid, :index
 
-  RANKS = %w[2 3 4 5 6 7 8 9 T J Q K A]
+  # RANKS1 = %w[ 2 3 4 5 6 7 8 9 T J Q K A]
+  RANKS = %w[J 2 3 4 5 6 7 8 9 T Q K A]
 
   def <=>(other)
     chars = self.hand.chars.zip(other.hand.chars)
@@ -19,14 +20,36 @@ class CamelHand
 
   # data: "32T3K 765"
   def initialize data, i
-    @hand = data.split.first
+    @hand = data.split.first # part 1
     @bid = data.split.last.to_i
     @index = i
   end
 
-  def type
+  def wildcard_hand
     counts = Hash.new 0
     hand.chars.each do |x|
+      counts[x] += 1 if x != "J"
+    end
+
+    max = counts.values.max
+    high_card_index = 0
+
+    counts.each_pair do |card, count|
+      if count == max
+        i = RANKS.index(card)
+        if i > high_card_index
+          high_card_index = i
+        end
+      end
+    end
+    high_card = RANKS[high_card_index]
+
+    hand.gsub(/J/, high_card)
+  end
+
+  def type
+    counts = Hash.new 0
+    wildcard_hand.chars.each do |x|
       counts[x] += 1
     end
 
@@ -57,8 +80,10 @@ types = Hash.new { |h, k| h[k] = [] }
 cards.each do |card|
   types[card.type] << card
 end
+
 sorted = []
 (1..7).each do |i|
+  # p [i, types[i]] if !types[i].empty?
   types[i].sort.each do |hand|
     sorted << hand
   end
@@ -67,5 +92,3 @@ scores =  sorted.map.with_index do |x, i|
   x.bid * (i+1)
 end
 p scores.reduce(:+)
-
-
