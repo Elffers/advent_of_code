@@ -1,9 +1,7 @@
-require 'pp'
 grids = File.read("/Users/hhhsu/sandbox/advent_of_code/2023/inputs/day13.in").split("\n\n").map { |x| x.split("\n") }
-grids = File.read("/Users/hhhsu/sandbox/advent_of_code/2023/inputs/day13_test.in").split("\n\n").map { |x| x.split("\n") }
+# grids = File.read("/Users/hhhsu/sandbox/advent_of_code/2023/inputs/day13_test.in").split("\n\n").map { |x| x.split("\n") }
 
 def reflections grid
-  # print grid
   i = 0
   while i < grid.size
     # find shortest distance to top or bottom
@@ -17,7 +15,6 @@ def reflections grid
     is_axis = false
     while n <= number_of_rows
       if grid[x]  == grid[y]
-        # p "got here: #{[x, y]}, i: #{i}, n: #{number_of_rows}"
         is_axis = true
         x -= 1
         y += 1
@@ -29,7 +26,6 @@ def reflections grid
     end
 
     if is_axis
-      # p "reflection at: #{d1}"
       return d1
     end
 
@@ -47,24 +43,6 @@ def flip grid
   end
   out
 end
-
-def old_reflection grid
-  vert = false
-  res = reflections grid
-  if res
-    return [res, vert]
-  else
-    res = reflections(flip grid)
-    vert = true if res
-    # puts "VERT: #{[i, j]}"
-    return [res, vert]
-  end
-end
-
-# flipped = flip grids.first
-# p reflections flipped
-# p reflections grids.first
-# p reflections grids.last
 
 def run grids, cache
   h = 0
@@ -90,8 +68,6 @@ end
 cache = {}
 out, cache = run grids, cache
 p "Part 1: #{out}"
-# p cache
-puts
 
 def print grid
   grid.each do |x|
@@ -100,7 +76,7 @@ def print grid
   puts
 end
 
-def new_axis grid, old_axis
+def new_axis grid, old_axis, is_vert, was_vert
   # print grid
   i = 0
   while i < grid.size
@@ -115,7 +91,6 @@ def new_axis grid, old_axis
     is_axis = false
     while n <= number_of_rows
       if grid[x]  == grid[y]
-        # p "got here: #{[x, y]}, i: #{i}, n: #{number_of_rows}"
         is_axis = true
         x -= 1
         y += 1
@@ -126,8 +101,9 @@ def new_axis grid, old_axis
       end
     end
 
-    if is_axis && d1 != old_axis
-      # p "reflection at: #{d1}"
+    same = (old_axis == d1) && (is_vert == was_vert)
+
+    if is_axis && !same
       return d1
     end
 
@@ -141,19 +117,18 @@ def new_reflection grid, old_axis, was_vert
     new_grid = grid.dup
     j = 0
     while j < grid.first.size
-      vert = false
-      # p [i, j]
       char = grid[i][j]
       new_grid[i][j] = char == "#" ? "." : "#"
 
-      res = new_axis new_grid, old_axis
-      if res # && !was_vert
-        return [res, vert]
+      res = new_axis new_grid, old_axis, false, was_vert
+      # same_as_old = (res == old_axis && was_vert == false)
+      if res #&& !same_as_old
+        return [res, false]
       else
-        res = new_axis(flip(new_grid), old_axis)
-        vert = true if res
-        if res #&& was_vert
-          return [res, vert]
+        res = new_axis(flip(new_grid), old_axis, true, was_vert)
+        # same_as_old = (res == old_axis && was_vert == true)
+        if res #&& !same_as_old
+          return [res, true]
         end
       end
       new_grid[i][j] = char
@@ -167,7 +142,7 @@ h = 0
 v = 0
 grids.each.with_index do |grid, i|
   old_axis, was_vert = cache[i]
-  res, vert = new_reflection grid, old_axis, was_vert
+  res, vert = new_reflection(grid, old_axis, was_vert)
   if res.nil?
     p "indx: #{i}"
     print grid
@@ -180,4 +155,4 @@ grids.each.with_index do |grid, i|
   end
 end
 
-p 100*h + v
+p "Part 2: #{100*h + v}"
