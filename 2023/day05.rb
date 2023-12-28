@@ -29,7 +29,6 @@ def check_ranges input, lists
     queue << pair
   end
   while !queue.empty?
-        p queue
     x0, r = queue.shift
     xn = x0+r-1
 
@@ -107,7 +106,7 @@ def src_to_dest data, input
   p lists.shift # remove header
   lists = lists.map { |list| list.split.map { |x| x.to_i } }
 
-  # transform(input, lists, f)
+  # transform(input, lists, f) # part 1
   check_ranges(input, lists)
 end
 
@@ -116,7 +115,6 @@ def run maps, input
   while !maps.empty?
     m = maps.shift
     src = src_to_dest m, src
-    p "OUTPUT: #{src}"
     puts
   end
   src.each_slice(2).map { |x| x.first }.min
