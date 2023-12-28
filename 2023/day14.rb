@@ -1,4 +1,5 @@
 input = File.read("/Users/hhhsu/sandbox/advent_of_code/2023/inputs/day14.in").split("\n")
+# input = File.read("/Users/hhhsu/sandbox/advent_of_code/2023/inputs/day14test.in").split("\n")
 
 def roll_north input
   width = input.first.size
@@ -118,6 +119,7 @@ def roll_east input
   out = []
   weight = 0
   height = input.size
+
   input.each.with_index do |row, i|
     new_row = []
     score = height - i
@@ -125,7 +127,7 @@ def roll_east input
     row.each.with_index do |char, j|
       if char == "O"
         rocks += 1
-        #        weight += score
+        weight += score
       elsif char == "."
         new_row << "."
       elsif char == "#"
@@ -143,20 +145,59 @@ def roll_east input
   [weight, out]
 end
 
+def print input
+  input.each { |x| puts x.join }
+  puts
+end
+
 def cycle input
+  # p "rolling north"
   weight, input = roll_north input
+  # p weight
+  # print input
+
+  # p "rolling west"
   weight, input = roll_west input
+  # p weight
+  # print input
+
+  # p "rolling south"
   weight, input = roll_south input
+  # p weight
+  # print input
+
+  # p "rolling east"
   weight, input = roll_east input
+  # p weight
+  # print input
+  [weight, input]
 end
 
 
-  weight, input = roll_north(input)
-  p weight
+# weight, input = roll_north(input)
+# p "Part 1: #{weight}"
 
-# 3.times do
-#   weight, input = cycle(input)
-#   p weight
-# end
+seen = Hash.new 0
+repeated = {}
 
-# input.each { |x| puts x.join }
+300.times do |i|
+  # puts "====#{i+1}======"
+  weight, input = cycle(input)
+  if seen[weight] > 1
+    cycle = repeated.keys.size-2 #two repeats in beginning
+    start = repeated[weight]-cycle
+    r = (1000000000-start) % cycle
+    lookup = {}
+    repeated.each do |weight, i|
+      lookup[i-cycle] = weight
+    end
+    key = r+start-1
+    puts "Part 2: #{lookup[key]}"
+    break
+  end
+
+  if seen[weight] == 1
+    repeated[weight] = i
+  end
+  seen[weight] += 1
+end
